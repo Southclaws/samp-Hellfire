@@ -161,3 +161,44 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+
+#AMX compiled files
+*.amx
+
+#executables
+*.exe
+
+#shortcuts
+*.lnk
+
+#dlls
+*.dll
+
+#banfile
+*.ban
+
+#sublime stuff
+*.sublime-project
+*.sublime-workspace
+
+
+#unwanted files
+crashinfo.txt
+server_log.txt
+server.cfg
+start.bat
+samp-server.exe
+
+
+#unwanted folders
+Resources/
+Public Server/
+plugins/
+pawno/
+scriptfiles/
+npcmodes/
+BACKUP/
+
+gamemodes/Backups/
+gamemodes/Other Servers/
+gamemodes/Stopped Projects/
