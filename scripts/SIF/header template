@@ -1,0 +1,68 @@
+/*==============================================================================
+
+Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
+
+
+	SIF/Overview
+	{
+	}
+
+	SIF/FILENAME/Description
+	{
+	}
+
+	SIF/FILENAME/Dependencies
+	{
+		Streamer Plugin					- Incognito
+		YSI\y_hooks						- Y_Less
+	}
+
+	SIF/FILENAME/Credits
+	{
+		SA:MP Team						- Amazing mod!
+		SA:MP Community					- Inspiration and support
+		Incognito						- Very useful streamer plugin
+		Y_Less							- YSI framework
+	}
+
+	SIF/FILENAME/Core Functions
+	{
+		The functions that control the core features of this script.
+
+	}
+
+	SIF/FILENAME/Events
+	{
+		Events called by player actions done by using features from this script.
+
+	}
+
+	SIF/FILENAME/Interface Functions
+	{
+		Functions to get or set data values in this script without editing
+		the data directly. These include automatic ID validation checks.
+	
+	}
+
+	SIF/FILENAME/Internal Functions
+	{
+		Internal events called by player actions done by using features from
+		this script.
+	
+	}
+
+	SIF/FILENAME/Hooks
+	{
+		Hooked functions or callbacks, either SA:MP natives or from other
+		scripts or plugins.
+
+	}
+
+==============================================================================*/
+
+
+/*==============================================================================
+
+	Setup
+
+==============================================================================*/

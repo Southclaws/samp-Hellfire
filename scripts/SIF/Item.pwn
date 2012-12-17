@@ -1,4 +1,216 @@
+/*==============================================================================
+
+Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
+
+
+	SIF/Overview
+	{
+	}
+
+	SIF/Item/Description
+	{
+	}
+
+	SIF/Item/Dependencies
+	{
+		SIF/Button
+		Streamer Plugin
+		YSI\y_hooks
+		YSI\y_timers
+	}
+
+	SIF/Item/Credits
+	{
+		SA:MP Team						- Amazing mod!
+		SA:MP Community					- Inspiration and support
+		Incognito						- Very useful streamer plugin
+		Y_Less							- YSI framework
+	}
+
+	SIF/Item/Core Functions
+	{
+		The functions that control the core features of this script.
+
+		native -
+		native SIF/Item/
+		native -
+
+		native CreateItem(ItemType:type, Float:x, Float:y, Float:z, Float:rx = 0.0, Float:ry = 0.0, Float:rz = 0.0, Float:zoffset = 0.0, world = 0, interior = 0, label = 1)
+		{
+			Description:
+			Parameters:
+			Returns:
+		}
+
+		native DestroyItem(id)
+		{
+			Description:
+			Parameters:
+			Returns:
+		}
+
+		native ItemType:DefineItemType(name[], model, size, Float:rotx = 0.0, Float:roty = 0.0, Float:rotz = 0.0, Float:attx = 0.0, Float:atty = 0.0, Float:attz = 0.0, Float:attrx = 0.0, Float:attry = 0.0, Float:attrz = 0.0, boneid = 6)
+		{
+			Description:
+			Parameters:
+			Returns:
+		}
+
+		native ShiftItemTypeIndex(ItemType:start, amount)
+		{
+			Description:
+			Parameters:
+			Returns:
+		}
+
+		native PlayerPickUpItem(playerid, itemid, animtype)
+		{
+			Description:
+			Parameters:
+			Returns:
+		}
+
+		native PlayerDropItem(playerid)
+		{
+			Description:
+			Parameters:
+			Returns:
+		}
+
+		native PlayerGiveItem(playerid, targetid, call)
+		{
+			Description:
+			Parameters:
+			Returns:
+		}
+	}
+
+	SIF/Item/Events
+	{
+		Events called by player actions done by using features from this script.
+
+		native -
+		native SIF/Item/
+		native -
+
+		native OnPlayerUseItem(playerid, itemid)
+		{
+			Called:
+				When a player presses F/Enter while holding an item.
+
+			Parameters:
+
+			Returns:
+		}
+		native OnPlayerUseItemWithItem(playerid, itemid, withitemid)
+		{
+			Called:
+				When a player uses a held item with an item on the floor.
+
+			Parameters:
+
+			Returns:
+		}
+		native OnPlayerUseItemWithButton(playerid, buttonid, itemid)
+		{
+			Called:
+				When a player uses an item while in a button area.
+
+			Parameters:
+
+			Returns:
+		}
+		native OnPlayerPickUpItem(playerid, itemid)
+		{
+			Called:
+				When a player presses the button to pick up an item.
+
+			Parameters:
+
+			Returns:
+		}
+		native OnPlayerPickedUpItem(playerid, itemid)
+		{
+			Called:
+				When a player finishes the picking up animation.
+
+			Parameters:
+
+			Returns:
+		}
+		native OnPlayerDropItem(playerid, itemid)
+		{
+			Called:
+				When a player presses the button to drop an item.
+
+			Parameters:
+
+			Returns:
+		}
+		native OnPlayerDroppedItem(playerid, itemid)
+		{
+			Called:
+				When a player finishes the animation for dropping an item.
+
+			Parameters:
+
+			Returns:
+		}
+		native OnPlayerGiveItem(playerid, targetid, itemid)
+		{
+			Called:
+				When a player presses the button to give an item to another
+				player.
+
+			Parameters:
+
+			Returns:
+		}
+		native OnPlayerGivenItem(playerid, targetid, itemid)
+		{
+			Called:
+				When a player finishes the animation for giving an item to
+				another player.
+
+			Parameters:
+
+			Returns:
+		}
+	}
+
+	SIF/Item/Interface Functions
+	{
+		Functions to get or set data values in this script without editing
+		the data directly. These include automatic ID validation checks.
+	
+	}
+
+	SIF/Item/Internal Functions
+	{
+		Internal events called by player actions done by using features from
+		this script.
+	
+	}
+
+	SIF/Item/Hooks
+	{
+		Hooked functions or callbacks, either SA:MP natives or from other
+		scripts or plugins.
+
+	}
+
+==============================================================================*/
+
+
+/*==============================================================================
+
+	Setup
+
+==============================================================================*/
+
+
 #include <YSI\y_hooks>
+
 
 #define MAX_ITEMS			(1024)
 #define MAX_ITEM_TYPES		(ItemType:64)
@@ -9,16 +221,11 @@
 #define INVALID_ITEM_ID		(-1)
 #define INVALID_ITEM_TYPE	(ItemType:-1)
 
-enum (<<=1)
-{
-	ITEMTYPE_FLAG_MATERIAL = 1,
-	ITEMTYPE_FLAG_TEXT
-}
-
 #define INVALID_ITEM_SIZE	(-1)
 #define ITEM_SIZE_SMALL		(0) // pocket
 #define ITEM_SIZE_MEDIUM	(1) // backpack
 #define ITEM_SIZE_LARGE		(2) // two handed carry only
+
 
 enum E_ITEM_DATA
 {
@@ -32,13 +239,13 @@ Float:		itm_posZ,
 
 			itm_exData
 }
+
 enum E_ITEM_TYPE_DATA
 {
 bool:		itm_used,
 			itm_name			[MAX_ITEM_NAME],
 			itm_model,
 			itm_size,
-			itm_flags,
 
 Float:		itm_rotX,
 Float:		itm_rotY,
@@ -53,26 +260,7 @@ Float:		itm_attachRotX,
 Float:		itm_attachRotY,
 Float:		itm_attachRotZ
 }
-enum E_ITEM_OBJECT_MATERIAL_DATA
-{
-			mat_objMatIndex,
-			mat_modelid,
-			mat_txdname			[32],
-			mat_texname			[32],
-			mat_colour
-}
-enum E_ITEM_OBJECT_TEXT_DATA
-{
-			mat_objTxtIndex,
-			mat_text			[32],
-			mat_materialsize,
-			mat_font			[32],
-			mat_fontsize,
-			mat_bold,
-			mat_fontcolour,
-			mat_backcolour,
-			mat_alignment
-}
+
 
 new
 			itm_Data			[MAX_ITEMS][E_ITEM_DATA],
@@ -82,9 +270,7 @@ Iterator:	itm_Index<MAX_ITEMS>,
 Iterator:	itm_WorldIndex<MAX_ITEMS>;
 
 new
-			itm_TypeData		[MAX_ITEM_TYPES][E_ITEM_TYPE_DATA],
-			itm_ObjectMaterial	[MAX_ITEM_TYPES][E_ITEM_OBJECT_MATERIAL_DATA],
-			itm_ObjectText		[MAX_ITEM_TYPES][E_ITEM_OBJECT_TEXT_DATA];
+			itm_TypeData		[MAX_ITEM_TYPES][E_ITEM_TYPE_DATA];
 
 new
 			itm_Holding			[MAX_PLAYERS],
@@ -92,41 +278,57 @@ Timer:		itm_InteractTimer	[MAX_PLAYERS],
 			itm_Interacting		[MAX_PLAYERS];
 
 
-// Called when a player presses F/Enter while holding an item.
 forward OnPlayerUseItem(playerid, itemid);
-
-// Called when a player uses a held item with an item on the floor.
 forward OnPlayerUseItemWithItem(playerid, itemid, withitemid);
-
-// Called when a player uses an item while in a button area.
 forward OnPlayerUseItemWithButton(playerid, buttonid, itemid);
-
-// Called when a player presses the button to pick up an item.
 forward OnPlayerPickUpItem(playerid, itemid);
-
-// Called when a player finishes the picking up animation.
 forward OnPlayerPickedUpItem(playerid, itemid);
-
-// Called when a player presses the button to drop an item.
 forward OnPlayerDropItem(playerid, itemid);
-
-// Called when a player finishes the animation for dropping an item.
 forward OnPlayerDroppedItem(playerid, itemid);
-
-// Called when a player presses the button to give an item to another player.
 forward OnPlayerGiveItem(playerid, targetid, itemid);
-
-// Called when a player finishes the animation for giving an item to another player.
 forward OnPlayerGivenItem(playerid, targetid, itemid);
 
-// Called when the script loads in case you want to define any items that start from 0 before other scripts.
-forward API_item_OnLoad();
+
+/*==============================================================================
+
+	Zeroing
+
+==============================================================================*/
 
 
-stock CreateItem(ItemType:type,
-	Float:x, Float:y, Float:z,
-	Float:rx = 0.0, Float:ry = 0.0, Float:rz = 0.0,
-	Float:zoffset = 0.0, world = 0, interior = 0, label = 1)
+#if defined FILTERSCRIPT
+hook OnFilterScriptInit()
+#else
+hook OnGameModeInit()
+#endif
+{
+	for(new i;i<MAX_PLAYERS;i++)
+	{
+	    itm_Holding[i] = INVALID_ITEM_ID;
+	    itm_Interacting[i] = INVALID_ITEM_ID;
+	}
+	for(new i;i<MAX_ITEMS;i++)
+	{
+	    itm_Holder[i] = INVALID_PLAYER_ID;
+	}
+	return 1;
+}
+
+hook OnPlayerConnect(playerid)
+{
+	itm_Holding[playerid]		= INVALID_ITEM_ID;
+	itm_Interacting[playerid]	= INVALID_ITEM_ID;
+}
+
+
+/*==============================================================================
+
+	Core Functions
+
+==============================================================================*/
+
+
+stock CreateItem(ItemType:type, Float:x, Float:y, Float:z, Float:rx = 0.0, Float:ry = 0.0, Float:rz = 0.0, Float:zoffset = 0.0, world = 0, interior = 0, label = 1)
 {
 	new id = Iter_Free(itm_Index);
 	
@@ -146,6 +348,7 @@ stock CreateItem(ItemType:type,
 
 	return id;
 }
+
 stock DestroyItem(id)
 {
 	if(!Iter_Contains(itm_Index, id))return 0;
@@ -177,11 +380,7 @@ stock DestroyItem(id)
 	return 1;
 }
 
-ItemType:DefineItemType(name[], model, size,
-	Float:rotx = 0.0, Float:roty = 0.0, Float:rotz = 0.0,
-	Float:attx = 0.0, Float:atty = 0.0, Float:attz = 0.0,
-	Float:attrx = 0.0, Float:attry = 0.0, Float:attrz = 0.0,
-	boneid = 6)
+ItemType:DefineItemType(name[], model, size, Float:rotx = 0.0, Float:roty = 0.0, Float:rotz = 0.0, Float:attx = 0.0, Float:atty = 0.0, Float:attz = 0.0, Float:attrx = 0.0, Float:attry = 0.0, Float:attrz = 0.0, boneid = 6)
 {
 	new ItemType:id;
 
@@ -217,56 +416,7 @@ ItemType:DefineItemType(name[], model, size,
 
 	return id;
 }
-ShiftItemType(ItemType:itemtype, amount)
-{
-	if(!IsValidItemType(itemtype))
-		return 0;
 
-	if(!(itemtype <= (itemtype + ItemType:amount) < MAX_ITEM_TYPES))
-		return 0;
-
-
-	itm_TypeData[itemtype + ItemType:amount][itm_used]			= true;
-	itm_TypeData[itemtype + ItemType:amount][itm_name]			= itm_TypeData[itemtype][itm_name];
-	itm_TypeData[itemtype + ItemType:amount][itm_model]			= itm_TypeData[itemtype][itm_model];
-	itm_TypeData[itemtype + ItemType:amount][itm_size]			= itm_TypeData[itemtype][itm_size];
-	itm_TypeData[itemtype + ItemType:amount][itm_flags] 		= itm_TypeData[itemtype][itm_flags];
-
-	itm_TypeData[itemtype + ItemType:amount][itm_rotX]			= itm_TypeData[itemtype][itm_rotX];
-	itm_TypeData[itemtype + ItemType:amount][itm_rotY]			= itm_TypeData[itemtype][itm_rotY];
-	itm_TypeData[itemtype + ItemType:amount][itm_rotZ]			= itm_TypeData[itemtype][itm_rotZ];
-
-	itm_TypeData[itemtype + ItemType:amount][itm_attachBone]	= itm_TypeData[itemtype][itm_attachBone];
-	itm_TypeData[itemtype + ItemType:amount][itm_attachPosX]	= itm_TypeData[itemtype][itm_attachPosX];
-	itm_TypeData[itemtype + ItemType:amount][itm_attachPosY]	= itm_TypeData[itemtype][itm_attachPosY];
-	itm_TypeData[itemtype + ItemType:amount][itm_attachPosZ]	= itm_TypeData[itemtype][itm_attachPosZ];
-
-	itm_TypeData[itemtype + ItemType:amount][itm_attachRotX]	= itm_TypeData[itemtype][itm_attachRotX];
-	itm_TypeData[itemtype + ItemType:amount][itm_attachRotY]	= itm_TypeData[itemtype][itm_attachRotY];
-	itm_TypeData[itemtype + ItemType:amount][itm_attachRotZ]	= itm_TypeData[itemtype][itm_attachRotZ];
-
-
-	itm_TypeData[itemtype][itm_used]		= false;
-	itm_TypeData[itemtype][itm_name][0]		= EOS;
-	itm_TypeData[itemtype][itm_model]		= 0;
-	itm_TypeData[itemtype][itm_size]		= 0;
-	itm_TypeData[itemtype][itm_flags]		= 0;
-
-	itm_TypeData[itemtype][itm_rotX]		= 0.0;
-	itm_TypeData[itemtype][itm_rotY]		= 0.0;
-	itm_TypeData[itemtype][itm_rotZ]		= 0.0;
-
-	itm_TypeData[itemtype][itm_attachBone]	= 0;
-	itm_TypeData[itemtype][itm_attachPosX]	= 0.0;
-	itm_TypeData[itemtype][itm_attachPosY]	= 0.0;
-	itm_TypeData[itemtype][itm_attachPosZ]	= 0.0;
-
-	itm_TypeData[itemtype][itm_attachRotX]	= 0.0;
-	itm_TypeData[itemtype][itm_attachRotY]	= 0.0;
-	itm_TypeData[itemtype][itm_attachRotZ]	= 0.0;
-
-	return 1;
-}
 stock ShiftItemTypeIndex(ItemType:start, amount)
 {
 	if(!(start <= (start + ItemType:amount) < MAX_ITEM_TYPES))
@@ -278,137 +428,53 @@ stock ShiftItemTypeIndex(ItemType:start, amount)
 
 	for(new ItemType:i = lastfree - ItemType:1; i >= start; i--)
 	{
-		ShiftItemType(i, amount);
+		if(!IsValidItemType(i))
+			continue;
+
+		if(!(i <= (i + ItemType:amount) < MAX_ITEM_TYPES))
+			continue;
+
+
+		itm_TypeData[i + ItemType:amount][itm_used]			= true;
+		itm_TypeData[i + ItemType:amount][itm_name]			= itm_TypeData[i][itm_name];
+		itm_TypeData[i + ItemType:amount][itm_model]			= itm_TypeData[i][itm_model];
+		itm_TypeData[i + ItemType:amount][itm_size]			= itm_TypeData[i][itm_size];
+
+		itm_TypeData[i + ItemType:amount][itm_rotX]			= itm_TypeData[i][itm_rotX];
+		itm_TypeData[i + ItemType:amount][itm_rotY]			= itm_TypeData[i][itm_rotY];
+		itm_TypeData[i + ItemType:amount][itm_rotZ]			= itm_TypeData[i][itm_rotZ];
+
+		itm_TypeData[i + ItemType:amount][itm_attachBone]	= itm_TypeData[i][itm_attachBone];
+		itm_TypeData[i + ItemType:amount][itm_attachPosX]	= itm_TypeData[i][itm_attachPosX];
+		itm_TypeData[i + ItemType:amount][itm_attachPosY]	= itm_TypeData[i][itm_attachPosY];
+		itm_TypeData[i + ItemType:amount][itm_attachPosZ]	= itm_TypeData[i][itm_attachPosZ];
+
+		itm_TypeData[i + ItemType:amount][itm_attachRotX]	= itm_TypeData[i][itm_attachRotX];
+		itm_TypeData[i + ItemType:amount][itm_attachRotY]	= itm_TypeData[i][itm_attachRotY];
+		itm_TypeData[i + ItemType:amount][itm_attachRotZ]	= itm_TypeData[i][itm_attachRotZ];
+
+
+		itm_TypeData[i][itm_used]							= false;
+		itm_TypeData[i][itm_name][0]							= EOS;
+		itm_TypeData[i][itm_model]							= 0;
+		itm_TypeData[i][itm_size]							= 0;
+
+		itm_TypeData[i][itm_rotX]							= 0.0;
+		itm_TypeData[i][itm_rotY]							= 0.0;
+		itm_TypeData[i][itm_rotZ]							= 0.0;
+
+		itm_TypeData[i][itm_attachBone]						= 0;
+		itm_TypeData[i][itm_attachPosX]						= 0.0;
+		itm_TypeData[i][itm_attachPosY]						= 0.0;
+		itm_TypeData[i][itm_attachPosZ]						= 0.0;
+
+		itm_TypeData[i][itm_attachRotX]						= 0.0;
+		itm_TypeData[i][itm_attachRotY]						= 0.0;
+		itm_TypeData[i][itm_attachRotZ]						= 0.0;
 	}
 	
 	return 1;
 }
-
-
-stock SetItemTypeObjectMaterial(ItemType:itemtype, index, model, txdname[], texname[], colour)
-{
-	if(!IsValidItemType(itemtype))return 0;
-
-	itm_ObjectMaterial[itemtype][mat_objMatIndex]		= index;
-	itm_ObjectMaterial[itemtype][mat_modelid]			= model;
-	itm_ObjectMaterial[itemtype][mat_colour]			= colourl
-
-	itm_ObjectMaterial[itemtype][mat_txdname][0] = EOS;
-	strcat(itm_ObjectMaterial[itemtype][mat_txdname], txdname);
-
-	itm_ObjectMaterial[itemtype][mat_texname][0] = EOS;
-	strcat(itm_ObjectMaterial[itemtype][mat_texname], texname);
-
-	t:itm_TypeData[itemtype][itm_flags]<ITEMTYPE_FLAG_MATERIAL>;
-
-	return 1;
-}
-stock SetItemTypeObjectText(ItemType:itemtype, text[], index, materialsize, fontface[], fontsize, bold, fontoclour, backcolour, alignment)
-{
-	if(!IsValidItemType(itemtype))return 0;
-
-	itm_ObjectText[itemtype][mat_objTxtIndex]	= index
-
-	itm_ObjectText[itemtype][mat_text][0] = EOS;
-	strcpy(itm_ObjectText[itemtype][mat_text],	text);
-
-	itm_ObjectText[itemtype][mat_materialsize]	= materialsize;
-
-	itm_ObjectText[itemtype][mat_font][0] = EOS;
-	strcpy(itm_ObjectText[itemtype][mat_font],	fontface);
-
-	itm_ObjectText[itemtype][mat_fontsize]		= fontsize;
-	itm_ObjectText[itemtype][mat_bold]			= bold;
-	itm_ObjectText[itemtype][mat_fontcolour]	= fontcolour;
-	itm_ObjectText[itemtype][mat_backcolour]	= backcolour;
-	itm_ObjectText[itemtype][mat_alignment]		= alignment;
-
-	t:itm_TypeData[itemtype][itm_flags]<ITEMTYPE_FLAG_MATERIAL>;
-
-	return 1;
-}
-
-RemoveItemFromWorld(itemid)
-{
-	if(!Iter_Contains(itm_Index, _:itemid))return 0;
-
-	if(itm_Holder[itemid] != INVALID_PLAYER_ID)
-	{
-		RemovePlayerAttachedObject(itm_Holder[itemid], ITM_ATTACH_INDEX);
-		itm_Holding[itm_Holder[itemid]] = INVALID_ITEM_ID;
-		itm_Interacting[itm_Holder[itemid]] = INVALID_ITEM_ID;
-		itm_Holder[itemid] = INVALID_PLAYER_ID;
-		itm_Interactor[itemid] = INVALID_PLAYER_ID;
-	}
-	else
-	{
-		DestroyDynamicObject(itm_Data[itemid][itm_objId]);
-		DestroyButton(itm_Data[itemid][itm_button]);
-		itm_Data[itemid][itm_button] = INVALID_BUTTON_ID;
-	}
-
-	Iter_Remove(itm_WorldIndex, itemid);
-
-	return 1;
-}
-CreateItemInWorld(itemid,
-	Float:x, Float:y, Float:z,
-	Float:rx = 0.0, Float:ry = 0.0, Float:rz = 0.0,
-	Float:zoffset = 0.0, world = 0, interior = 0, label = 1)
-{
-	if(!Iter_Contains(itm_Index, itemid))return 0;
-
-	new ItemType:itemtype = itm_Data[itemid][itm_type];
-
-	if(!IsValidItemType(itemtype))return 0;
-
-	itm_Data[itemid][itm_posX]					= x;
-	itm_Data[itemid][itm_posY]					= y;
-	itm_Data[itemid][itm_posZ]					= z;
-	
-	if(itm_Holder[itemid] != INVALID_PLAYER_ID)
-	{
-	    itm_Holding[itm_Holder[itemid]]			= INVALID_ITEM_ID;
-    	itm_Interacting[itm_Holder[itemid]]		= INVALID_ITEM_ID;
-    }
-    itm_Interactor[itemid]						= INVALID_PLAYER_ID;
-    itm_Holder[itemid]							= INVALID_PLAYER_ID;
-
-	itm_Data[itemid][itm_objId]					= CreateDynamicObject(itm_TypeData[itemtype][itm_model], x, y, z, rx, ry, rz, world, interior);
-
-	if(itm_TypeData[itemtype][itm_flags] & ITEMTYPE_FLAG_MATERIAL)
-	{
-		SetDynamicObjectMaterial(itm_Data		[itemid][itm_objId],
-			itm_ObjectMaterial					[itemtype][mat_objMatIndex],
-			itm_ObjectMaterial					[itemtype][mat_modelid],
-			itm_ObjectMaterial					[itemtype][mat_txdname],
-			itm_ObjectMaterial					[itemtype][mat_texname],
-			itm_ObjectMaterial					[itemtype][mat_colour]);
-	}
-	if(itm_TypeData[itemtype][itm_flags] & ITEMTYPE_FLAG_TEXT)
-	{
-		SetDynamicObjectMaterialText(itm_Data	[itemid][itm_objId],
-			itm_ObjectText						[itemtype][mat_objTxtIndex],
-			itm_ObjectText						[itemtype][mat_text],
-			itm_ObjectText						[itemtype][mat_materialsize],
-			itm_ObjectText						[itemtype][mat_font],
-			itm_ObjectText						[itemtype][mat_fontsize],
-			itm_ObjectText						[itemtype][mat_bold],
-			itm_ObjectText						[itemtype][mat_fontcolour],
-			itm_ObjectText						[itemtype][mat_backcolour],
-			itm_ObjectText						[itemtype][mat_alignment]);
-	}
-
-	itm_Data[itemid][itm_button] = CreateButton(x, y, z+zoffset, "Press F to pick up", world, interior, 1.0);
-
-	if(label)
-		SetButtonLabel(itm_Data[itemid][itm_button], itm_TypeData[itemtype][itm_name]);
-
-	Iter_Add(itm_WorldIndex, itemid);
-
-	return 1;
-}
-
 
 stock PlayerPickUpItem(playerid, itemid, animtype)
 {
@@ -424,6 +490,7 @@ stock PlayerPickUpItem(playerid, itemid, animtype)
 	}
 	return 1;
 }
+
 stock PlayerDropItem(playerid)
 {
 	if(CallLocalFunction("OnPlayerDropItem", "dd", playerid, itm_Holding[playerid]))
@@ -433,6 +500,7 @@ stock PlayerDropItem(playerid)
 	itm_InteractTimer[playerid] = defer DropItemDelay(playerid);
 	return 1;
 }
+
 stock PlayerGiveItem(playerid, targetid, call)
 {
 	new itemid = itm_Holding[playerid];
@@ -479,28 +547,71 @@ stock PlayerGiveItem(playerid, targetid, call)
 	return 1;
 }
 
-#if defined FILTERSCRIPT
-hook OnFilterScriptInit()
-#else
-hook OnGameModeInit()
-#endif
+
+/*==============================================================================
+
+	Internal Functions and Hooks
+
+==============================================================================*/
+
+
+CreateItemInWorld(itemid,
+	Float:x, Float:y, Float:z,
+	Float:rx = 0.0, Float:ry = 0.0, Float:rz = 0.0,
+	Float:zoffset = 0.0, world = 0, interior = 0, label = 1)
 {
-	for(new i;i<MAX_PLAYERS;i++)
+	if(!Iter_Contains(itm_Index, itemid))return 0;
+
+	new ItemType:itemtype = itm_Data[itemid][itm_type];
+
+	if(!IsValidItemType(itemtype))return 0;
+
+	itm_Data[itemid][itm_posX]					= x;
+	itm_Data[itemid][itm_posY]					= y;
+	itm_Data[itemid][itm_posZ]					= z;
+	
+	if(itm_Holder[itemid] != INVALID_PLAYER_ID)
 	{
-	    itm_Holding[i] = INVALID_ITEM_ID;
-	    itm_Interacting[i] = INVALID_ITEM_ID;
-	}
-	for(new i;i<MAX_ITEMS;i++)
-	{
-	    itm_Holder[i] = INVALID_PLAYER_ID;
-	}
+	    itm_Holding[itm_Holder[itemid]]			= INVALID_ITEM_ID;
+    	itm_Interacting[itm_Holder[itemid]]		= INVALID_ITEM_ID;
+    }
+    itm_Interactor[itemid]						= INVALID_PLAYER_ID;
+    itm_Holder[itemid]							= INVALID_PLAYER_ID;
+
+	itm_Data[itemid][itm_objId]					= CreateDynamicObject(itm_TypeData[itemtype][itm_model], x, y, z, rx, ry, rz, world, interior);
+
+	itm_Data[itemid][itm_button] = CreateButton(x, y, z+zoffset, "Press F to pick up", world, interior, 1.0);
+
+	if(label)
+		SetButtonLabel(itm_Data[itemid][itm_button], itm_TypeData[itemtype][itm_name]);
+
+	Iter_Add(itm_WorldIndex, itemid);
+
 	return 1;
 }
 
-hook OnPlayerConnect(playerid)
+RemoveItemFromWorld(itemid)
 {
-	itm_Holding[playerid]		= INVALID_ITEM_ID;
-	itm_Interacting[playerid]	= INVALID_ITEM_ID;
+	if(!Iter_Contains(itm_Index, _:itemid))return 0;
+
+	if(itm_Holder[itemid] != INVALID_PLAYER_ID)
+	{
+		RemovePlayerAttachedObject(itm_Holder[itemid], ITM_ATTACH_INDEX);
+		itm_Holding[itm_Holder[itemid]] = INVALID_ITEM_ID;
+		itm_Interacting[itm_Holder[itemid]] = INVALID_ITEM_ID;
+		itm_Holder[itemid] = INVALID_PLAYER_ID;
+		itm_Interactor[itemid] = INVALID_PLAYER_ID;
+	}
+	else
+	{
+		DestroyDynamicObject(itm_Data[itemid][itm_objId]);
+		DestroyButton(itm_Data[itemid][itm_button]);
+		itm_Data[itemid][itm_button] = INVALID_BUTTON_ID;
+	}
+
+	Iter_Remove(itm_WorldIndex, itemid);
+
+	return 1;
 }
 
 hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
@@ -810,7 +921,11 @@ public OnPlayerEnterButtonArea(playerid, buttonid)
 forward itm_OnPlayerEnterButtonArea(playerid, buttonid);
 
 
-// Interface
+/*==============================================================================
+
+	Interface Functions
+
+==============================================================================*/
 
 
 stock IsValidItem(itemid)
@@ -889,31 +1004,72 @@ stock SetItemLabel(itemid, text[], colour = 0xFFFF00FF, Float:range = 10.0)
 
 
 
-CMD:additem(playerid, params[])
+
+/*
+	Can't change the material of held objects, only world objects so these
+	functions are pretty useless.
+
+enum E_ITEM_OBJECT_MATERIAL_DATA
 {
-	new
-	    ItemType:type = ItemType:strval(params),
-	    Float:x,
-	    Float:y,
-	    Float:z,
-		Float:r;
+			mat_objMatIndex,
+			mat_modelid,
+			mat_txdname			[32],
+			mat_texname			[32],
+			mat_colour
+}
+enum E_ITEM_OBJECT_TEXT_DATA
+{
+			mat_objTxtIndex,
+			mat_text			[32],
+			mat_materialsize,
+			mat_font			[32],
+			mat_fontsize,
+			mat_bold,
+			mat_fontcolour,
+			mat_backcolour,
+			mat_alignment
+}
 
-	GetPlayerPos(playerid, x, y, z);
-	GetPlayerFacingAngle(playerid, r);
+stock SetItemTypeObjectMaterial(ItemType:itemtype, index, model, txdname[], texname[], colour)
+{
+	if(!IsValidItemType(itemtype))return 0;
 
-	SetItemExtraData(CreateItem(type,
-			x + (0.5 * floatsin(-r, degrees)),
-			y + (0.5 * floatcos(-r, degrees)),
-			z-0.8568, .rz = r, .zoffset = 0.7), 50);
+	itm_ObjectMaterial[itemtype][mat_objMatIndex]		= index;
+	itm_ObjectMaterial[itemtype][mat_modelid]			= model;
+	itm_ObjectMaterial[itemtype][mat_colour]			= colourl
 
+	itm_ObjectMaterial[itemtype][mat_txdname][0] = EOS;
+	strcat(itm_ObjectMaterial[itemtype][mat_txdname], txdname);
+
+	itm_ObjectMaterial[itemtype][mat_texname][0] = EOS;
+	strcat(itm_ObjectMaterial[itemtype][mat_texname], texname);
+
+	t:itm_TypeData[itemtype][itm_flags]<ITEMTYPE_FLAG_MATERIAL>;
 
 	return 1;
 }
+stock SetItemTypeObjectText(ItemType:itemtype, text[], index, materialsize, fontface[], fontsize, bold, fontoclour, backcolour, alignment)
+{
+	if(!IsValidItemType(itemtype))return 0;
 
+	itm_ObjectText[itemtype][mat_objTxtIndex]	= index
 
+	itm_ObjectText[itemtype][mat_text][0] = EOS;
+	strcpy(itm_ObjectText[itemtype][mat_text],	text);
 
+	itm_ObjectText[itemtype][mat_materialsize]	= materialsize;
 
+	itm_ObjectText[itemtype][mat_font][0] = EOS;
+	strcpy(itm_ObjectText[itemtype][mat_font],	fontface);
 
+	itm_ObjectText[itemtype][mat_fontsize]		= fontsize;
+	itm_ObjectText[itemtype][mat_bold]			= bold;
+	itm_ObjectText[itemtype][mat_fontcolour]	= fontcolour;
+	itm_ObjectText[itemtype][mat_backcolour]	= backcolour;
+	itm_ObjectText[itemtype][mat_alignment]		= alignment;
 
+	t:itm_TypeData[itemtype][itm_flags]<ITEMTYPE_FLAG_MATERIAL>;
 
-
+	return 1;
+}
+*/

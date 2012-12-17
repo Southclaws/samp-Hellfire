@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------//
 //                          San Andreas Free-for-All                          //
-//            Freeroam with a side order of intense deathmatching.            //
+//            Freeroam with a side order of intense Deathmatching.            //
 //		 	 Along with many Minigames, Races and other Activities			  //
 //                                By Southclaw                                //
 //----------------------------------------------------------------------------//
@@ -141,24 +141,24 @@ native WP_Hash(buffer[], len, const str[]);
 									public cmd_%1(%2)							// I wrote my own command processor to fit my needs!
 
 #define ACMD:%1[%2](%3)				forward cmd_%1_%2(%3);\
-									public cmd_%1_%2(%3)						// Admin only commands, the [parameter] in the brackets is the admin level
+									public cmd_%1_%2(%3)						// Admin only commands, the [parameter] in the brackets is the admin level.
 
 // Player Data
 #define pAdmin(%1)					gPlayerData[%1][ply_Admin]
 #define pSkin(%1)					gPlayerData[%1][ply_Skin]
 
-#define pKills(%1)					gPlayerData[%1][ply_Kills]
-#define pDeaths(%1)					gPlayerData[%1][ply_Deaths]
-#define pExp(%1)					gPlayerData[%1][ply_Exp]
-#define pRank(%1)					gPlayerData[%1][ply_Rank]
-#define pHeadShot(%1)				gPlayerData[%1][ply_HeadShots]
+#define pKills(%1)					dm_PlayerData[%1][dm_Kills]
+#define pDeaths(%1)					dm_PlayerData[%1][dm_Deaths]
+#define pExp(%1)					dm_PlayerData[%1][dm_Exp]
+#define pRank(%1)					dm_PlayerData[%1][dm_Rank]
+#define pHeadShot(%1)				dm_PlayerData[%1][dm_HeadShots]
 
-#define pTeam(%1)					dm_PlayerData[%1][Team]
-#define pKit(%1)					dm_PlayerData[%1][Kit]
-#define pGear(%1)					dm_PlayerData[%1][Gear]
-#define pStreak(%1)					dm_PlayerData[%1][Streak]
-#define pCombo(%1)					dm_PlayerData[%1][Combo]
-#define poTeam(%1)					((dm_PlayerData[%1][Team]*-1)+1)
+#define pTeam(%1)					dm_PlayerData[%1][dm_Team]
+#define pKit(%1)					dm_PlayerData[%1][dm_Kit]
+#define pGear(%1)					dm_PlayerData[%1][dm_Gear]
+#define pStreak(%1)					dm_PlayerData[%1][dm_Streak]
+#define pCombo(%1)					dm_PlayerData[%1][dm_Combo]
+#define poTeam(%1)					((dm_PlayerData[%1][dm_Team]*-1)+1)
 
 
 // Colours
@@ -609,17 +609,6 @@ enum E_PLAYER_DATA
 		ply_TimePlayed,
 		ply_TimeInVeh,
 		ply_TimeOnFoot,
-
-		//--Deathmatch
-		ply_Kills,
-		ply_Deaths,
-		ply_Exp,
-		ply_Rank,
-		ply_HeadShots,
-		ply_TeamKills,
-		ply_HighStreak,
-		ply_Wins,
-		ply_Losses
 }
 enum E_SAVE_DATA
 {
@@ -728,11 +717,14 @@ forward OnDeath(playerid, killerid, reason);
 
 //======================API Scripts
 
-#include "../scripts/API/Button/Button.pwn"
+#include "../scripts/SIF/Button.pwn"
+#include "../scripts/SIF/Door.pwn"
+#include "../scripts/SIF/Item.pwn"
+#include "../scripts/SIF/Inventory.pwn"
+#include "../scripts/SIF/Craft.pwn"
+
 #include "../scripts/API/Balloon/Balloon.pwn"
 #include "../scripts/API/Checkpoint/Checkpoint.pwn"
-#include "../scripts/API/Item/Item.pwn"
-#include "../scripts/API/Door/Door.pwn"
 #include "../scripts/API/Line/Line.pwn"
 #include "../scripts/API/Zipline/Zipline.pwn"
 #include "../scripts/API/Ladder/Ladder.pwn"
@@ -745,8 +737,6 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/Items/dispenser.pwn"
 #include "../scripts/Items/timebomb.pwn"
 
-#include "../scripts/API/Inventory/Inventory.pwn"
-#include "../scripts/API/Craft/Craft.pwn"
 #include "../scripts/CountDown.pwn"
 
 //======================Gameplay Scripts

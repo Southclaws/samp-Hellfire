@@ -123,10 +123,10 @@
 #define ENEMY_OBJECTIVE				0xFF0000FF
 
 // Dialog Texts
-#define DIALOGTEXT_SCORLIM		"Enter the score limit below\nFirst team to reach this amount of kills wins the match.\n\n"#C_YELLOW"Between "#SCORLIM_MIN" and "#SCORLIM_MAX"."
-#define DIALOGTEXT_TICKLIM		"Enter the Attackers Ticket Count\nEach time an attacking player is killed their team ticket count depletes by 1,\nwhen at 0 the match ends and Defenders win.\n\n"#C_YELLOW"Between "#TICKLIM_MIN" and "#TICKLIM_MAX"."
-#define DIALOGTEXT_FLAGLIM		"Enter the CTF Flag limit below\nWhen a team captures this many flags the match ends and they win.\n\n"#C_YELLOW"Between "#FLAGLIM_MIN" and "#FLAGLIM_MAX"."
-#define DIALOGTEXT_FORCLIM		"Enter the Reinforcement Ticket limit below\nEach time a player dies, their team ticket count depletes by 1,\nwhen at 0 the match ends and that team loses.\n\n"#C_YELLOW"Between "#FORCLIM_MIN" and "#FORCLIM_MAX"."
+#define DIALOGTEXT_SCORLIM		"Enter the score limit below\nFirst dm_Team to reach this amount of kills wins the match.\n\n"#C_YELLOW"Between "#SCORLIM_MIN" and "#SCORLIM_MAX"."
+#define DIALOGTEXT_TICKLIM		"Enter the Attackers Ticket Count\nEach time an attacking player is killed their dm_Team ticket count depletes by 1,\nwhen at 0 the match ends and Defenders win.\n\n"#C_YELLOW"Between "#TICKLIM_MIN" and "#TICKLIM_MAX"."
+#define DIALOGTEXT_FLAGLIM		"Enter the CTF Flag limit below\nWhen a dm_Team captures this many flags the match ends and they win.\n\n"#C_YELLOW"Between "#FLAGLIM_MIN" and "#FLAGLIM_MAX"."
+#define DIALOGTEXT_FORCLIM		"Enter the Reinforcement Ticket limit below\nEach time a player dies, their dm_Team ticket count depletes by 1,\nwhen at 0 the match ends and that dm_Team loses.\n\n"#C_YELLOW"Between "#FORCLIM_MIN" and "#FORCLIM_MAX"."
 #define DIALOGTEXT_MATCHTIME	"Enter the Match Time in minutes.\n\n"#C_YELLOW"Between "#MATCHTIME_MIN" and "#MATCHTIME_MAX"."
 
 
@@ -141,15 +141,25 @@ forward ResetKitEquip(playerid);
 
 enum E_PLAYER_DEATHMATCH_DATA
 {
-	RoundExp,
-	RoundKills,
-	RoundDeaths,
+	dm_Kills,
+	dm_Deaths,
+	dm_Exp,
+	dm_Rank,
+	dm_HeadShots,
+	dm_TeamKills,
+	dm_HighStreak,
+	dm_Wins,
+	dm_Losses,
 
-	Team,
-	Kit,
-	Gear,
-	Streak,
-	Combo
+	dm_RoundExp,
+	dm_RoundKills,
+	dm_RoundDeaths,
+
+	dm_Team,
+	dm_Kit,
+	dm_Gear,
+	dm_Streak,
+	dm_Combo
 }
 enum (<<=1)
 {
@@ -311,7 +321,7 @@ new const
 	    "San Andreas Original"
     },
 
-//======================Team Names
+//======================dm_Team Names
 
 	dm_TeamNames[3][6]=
 	{
@@ -320,7 +330,7 @@ new const
 		"Free"
 	},
 
-//======================Kit Names
+//======================dm_Kit Names
 
 	dm_KitNames[MAX_KIT][10]=
 	{
@@ -331,7 +341,7 @@ new const
 		"Bomber"
 	},
 
-//======================Gear Names
+//======================dm_Gear Names
 
 	dm_GearNames[13][19]=
 	{
@@ -358,10 +368,10 @@ new const
 		"Allows you to be invisible on the enemy's radar at all times.",
 		"Gives you an RPG with one rocket when you spawn, useful for taking out tanks or vehicles.",
 		"This gives you twice the amount of ammo in your primary and secondary weapon. Does not apply to throwables.",
-		"This gives you 4 mines on the Bomber kit instead of 2",
+		"This gives you 4 mines on the Bomber dm_Kit instead of 2",
 		"Increases bullet penetration for all weapons and adds and extra 10 hitpoints",
 		"Gives the enemy an explosive surprise when they kill you...",
-		"Throughout the match you will have an enemy team skin, useful unless they notice the absence of a nametag!",
+		"Throughout the match you will have an enemy dm_Team skin, useful unless they notice the absence of a nametag!",
 		"Spawns you with night vision goggles, make picking enemies out in the dark easy, good for night based maps",
 		"Spawns you with thermal vision goggles, enemies glow red when these are in use good for dark maps"
 	};
@@ -628,7 +638,7 @@ new
 		MineID_Used[mineID]=false;
 	}
 
-//======================Team Functions
+//======================dm_Team Functions
 
 stock GetPlayersInTeam(teamid)
 {
@@ -778,7 +788,7 @@ GiveXP(playerid, amount, text[])
 	PlayerTextDrawShow(playerid, XPtext);
 	XPtimer[playerid] = defer ExpMsgDestroy(playerid);
 
-	dm_PlayerData[playerid][RoundExp] += amount;
+	dm_PlayerData[playerid][dm_RoundExp] += amount;
 	pExp(playerid) += amount;
 
 	if(RankCheck(playerid))
@@ -793,7 +803,7 @@ timer ExpMsgDestroy[EXP_TEXT_HIDE](playerid)
 	oldmsg[playerid][0]=EOS;
 	xpMsgLines[playerid]=0;
 	bitFalse(bPlayerDeathmatchSettings[playerid], dm_ExpNotif);
-	if(dm_PlayerData[playerid][Combo]>0)dm_PlayerData[playerid][Combo]=0;
+	if(dm_PlayerData[playerid][dm_Combo]>0)dm_PlayerData[playerid][dm_Combo]=0;
 }
 
 //======================Player Award Notification
@@ -1738,7 +1748,7 @@ script_Deathmatch_OnPlayerKill(playerid, killerid, reason, head=0)
 	}
 	else
 	{
-		gPlayerData[killerid][ply_TeamKills]++;
+		dm_PlayerData[killerid][dm_TeamKills]++;
 		GiveXP(killerid, -10, "Teamkill");
 		dm_SetPlayerHP(killerid, 0.0);
 		GivePlayerScore(killerid, -1);
@@ -1794,13 +1804,13 @@ ShowDeathMSG(playerid, killerid, reason)
 	format(tmpStr, 48, "%02f", gPlayerHP[killerid]);
 	PlayerTextDrawSetString(playerid, KillMsg_killerHlth, tmpStr);
 
-	format(tmpStr, 48, "%d", dm_PlayerData[killerid][RoundExp]);
+	format(tmpStr, 48, "%d", dm_PlayerData[killerid][dm_RoundExp]);
 	PlayerTextDrawSetString(playerid, KillMsg_killerScor, tmpStr);
 
-	format(tmpStr, 48, "%d", dm_PlayerData[killerid][RoundKills]);
+	format(tmpStr, 48, "%d", dm_PlayerData[killerid][dm_RoundKills]);
 	PlayerTextDrawSetString(playerid, KillMsg_killerKill, tmpStr);
 
-	format(tmpStr, 48, "%d", dm_PlayerData[killerid][RoundDeaths]);
+	format(tmpStr, 48, "%d", dm_PlayerData[killerid][dm_RoundDeaths]);
 	PlayerTextDrawSetString(playerid, KillMsg_killerDeat, tmpStr);
 
 	format(tmpStr, 48, "%s", dm_GearNames[pGear(killerid)]);
@@ -1859,8 +1869,8 @@ KillStatsUpdate(playerid, killerid, weapon, head)
 	if(tmpWepGroup != -1)pStatCount[killerid][st_Wgp][WEP_GROUP_ENUM:tmpWepGroup]++;
 	else printf("ERROR: tmpWepGrp = %d :: weapon = %d", tmpWepGroup, weapon);
 
-    dm_PlayerData[killerid][RoundKills] += 1;
-	dm_PlayerData[playerid][RoundDeaths] += 1;
+    dm_PlayerData[killerid][dm_RoundKills] += 1;
+	dm_PlayerData[playerid][dm_RoundDeaths] += 1;
 	pKills(killerid) += 1;
 	pDeaths(playerid) += 1;
 
@@ -1891,10 +1901,10 @@ KillStatsUpdate(playerid, killerid, weapon, head)
 
 // Streaks
 	pStreak(killerid)++;
-	if(pStreak(playerid)>=3)MsgDeathmatchF(YELLOW, " >  %P"#C_YELLOW" Ended %P"#C_YELLOW"'s Streak of %d", killerid, playerid, pStreak(playerid));
-	if(pStreak(playerid)>gPlayerData[killerid][ply_HighStreak])
+	if(pStreak(playerid)>=3)MsgDeathmatchF(YELLOW, " >  %P"#C_YELLOW" Ended %P"#C_YELLOW"'s dm_Streak of %d", killerid, playerid, pStreak(playerid));
+	if(pStreak(playerid)>dm_PlayerData[killerid][dm_HighStreak])
 	{
-		gPlayerData[killerid][ply_HighStreak]=pStreak(playerid);
+		dm_PlayerData[killerid][dm_HighStreak]=pStreak(playerid);
 		if(pStreak(playerid)>3)Msg(playerid, BLUE, "You have beaten your highest Killchain!");
 	}
 
@@ -1922,16 +1932,16 @@ KillStatsUpdate(playerid, killerid, weapon, head)
 	}
 
 
-// Combo
+// dm_Combo
 	if(tickcount()-tick_LastKill[killerid]<2000)
 	{
-		dm_PlayerData[killerid][Combo]++;
-	    if(dm_PlayerData[killerid][Combo]>1)
+		dm_PlayerData[killerid][dm_Combo]++;
+	    if(dm_PlayerData[killerid][dm_Combo]>1)
 	    {
 			new sComboInfo[10];
-			format(sComboInfo, 10, "combo x%d", dm_PlayerData[killerid][Combo]);
-			GiveXP(killerid, (2*dm_PlayerData[killerid][Combo]), sComboInfo);
-			MsgF(killerid, WHITE, "** combo: %d tick: %d", dm_PlayerData[killerid][Combo], tickcount()-tick_LastKill[killerid]);
+			format(sComboInfo, 10, "dm_Combo x%d", dm_PlayerData[killerid][dm_Combo]);
+			GiveXP(killerid, (2*dm_PlayerData[killerid][dm_Combo]), sComboInfo);
+			MsgF(killerid, WHITE, "** dm_Combo: %d tick: %d", dm_PlayerData[killerid][dm_Combo], tickcount()-tick_LastKill[killerid]);
 		}
 	}
 
@@ -2420,9 +2430,9 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 0:
 				{
 				    if(dm_Mode==DM_MODE_TDM)ShowPlayerDialog(playerid, d_SettingsInfo, DIALOG_STYLE_MSGBOX, "Score Limit",			"Amount of kills teams need to win the game.\n0 for unlimited.", "Back", "");
-				    if(dm_Mode==DM_MODE_AD)ShowPlayerDialog(playerid, d_SettingsInfo, DIALOG_STYLE_MSGBOX, "Attackers Tickets",		"Amount of reinforcement tickets attackers get,\nteam loses a ticket when a player of that team dies.\ndefenders get unlimited tickets.", "Back", "");
+				    if(dm_Mode==DM_MODE_AD)ShowPlayerDialog(playerid, d_SettingsInfo, DIALOG_STYLE_MSGBOX, "Attackers Tickets",		"Amount of reinforcement tickets attackers get,\nteam loses a ticket when a player of that dm_Team dies.\ndefenders get unlimited tickets.", "Back", "");
 				    if(dm_Mode==DM_MODE_CTF)ShowPlayerDialog(playerid, d_SettingsInfo, DIALOG_STYLE_MSGBOX, "Flag Limit",			"Amount of flags teams need to capture to win the game.", "Back", "");
-				    if(dm_Mode==DM_MODE_CQS)ShowPlayerDialog(playerid, d_SettingsInfo, DIALOG_STYLE_MSGBOX, "Reinforcement Tickets","Reinforcement Tickets each team is allocated at the start of the game.\nTeam loses a ticket when a player of that team dies.", "Back", "");
+				    if(dm_Mode==DM_MODE_CQS)ShowPlayerDialog(playerid, d_SettingsInfo, DIALOG_STYLE_MSGBOX, "Reinforcement Tickets","Reinforcement Tickets each dm_Team is allocated at the start of the game.\nTeam loses a ticket when a player of that dm_Team dies.", "Back", "");
 				}
 				case 1:ShowPlayerDialog(playerid, d_SettingsInfo, DIALOG_STYLE_MSGBOX, "Time Limit",			"Amount of time before the game ends.\n 0 for unlimited.", "Back", "");
 				case 2:ShowPlayerDialog(playerid, d_SettingsInfo, DIALOG_STYLE_MSGBOX, "Start Deathmatch",		"Start the deathmatch with current settings.", "Back", "");
@@ -2744,14 +2754,14 @@ hook OnPlayerSelectedMenuRow(playerid, row, Menu:pMenu)
 			{
 				if(t0 > t1)
 				{
-					Msg(playerid, ORANGE, "This team is full");
+					Msg(playerid, ORANGE, "This dm_Team is full");
 					ShowMenuForPlayer(dm_TeamMenu, playerid);
 				}
 				else
 				{
 					SetPlayerToTeam(playerid, 0);
 					ShowMenuForPlayer(dm_LobbyMenu, playerid);
-					MsgDeathmatchF(GREEN, " >  %P"#C_GREEN" Has Joined The Raven Team", playerid);
+					MsgDeathmatchF(GREEN, " >  %P"#C_GREEN" Has Joined The Raven dm_Team", playerid);
 					dm_FormatLobbyInfoForAll();
 				}
 			}
@@ -2759,14 +2769,14 @@ hook OnPlayerSelectedMenuRow(playerid, row, Menu:pMenu)
 			{
 				if(t1 > t0)
 				{
-					Msg(playerid, ORANGE, "This team is full");
+					Msg(playerid, ORANGE, "This dm_Team is full");
 					ShowMenuForPlayer(dm_TeamMenu, playerid);
 				}
 				else
 				{
 					SetPlayerToTeam(playerid, 1);
 					ShowMenuForPlayer(dm_LobbyMenu, playerid);
-					MsgDeathmatchF(GREEN, " >  %P"#C_GREEN" Has Joined The Valor Team", playerid);
+					MsgDeathmatchF(GREEN, " >  %P"#C_GREEN" Has Joined The Valor dm_Team", playerid);
 					dm_FormatLobbyInfoForAll();
 				}
 			}
@@ -2791,7 +2801,7 @@ hook OnPlayerSelectedMenuRow(playerid, row, Menu:pMenu)
 				if(dm_Preset != DM_BAREBONES)dm_FormatGearMenu(playerid);
 				else
 				{
-					Msg(playerid, ORANGE, " >  Gear Items are disabled in "#C_BLUE"Barebones Mode");
+					Msg(playerid, ORANGE, " >  dm_Gear Items are disabled in "#C_BLUE"Barebones Mode");
 			    	ShowMenuForPlayer(dm_LobbyMenu, playerid);
 				}
 			}
@@ -2878,11 +2888,11 @@ dm_FormatLobbyInfo(playerid)
 
 	format(str, 290,
 	"~y~~k~~PED_JUMPING~ ~w~to show lobby menu~n~~n~\
-	Team: ~b~%s~n~\
+	dm_Team: ~b~%s~n~\
 	~%c~Raven: ~g~%d~n~\
 	~%c~Valor: ~g~%d~n~~n~\
-	~w~Kit: ~b~%s~n~\
-	~w~Gear: ~b~%s~n~~n~\
+	~w~dm_Kit: ~b~%s~n~\
+	~w~dm_Gear: ~b~%s~n~~n~\
 	~w~Map: ~r~%s~n~\
 	~w~Mode: ~r~%s~n~\
 	~w~Map Author: ~r~%s",
@@ -2929,7 +2939,7 @@ dm_FormatRegionInfo(playerid, region)
 	switch(region)
 	{
 	    case 0:szInfo="Built up areas with tight alley ways, side streets and open plazas perfect for ambushing and sniping.";
-	    case 1:szInfo="Woodlands, fields and overgrown farms, lots of bushes and trees to sneak around in with the Ghillie suit gear item.";
+	    case 1:szInfo="Woodlands, fields and overgrown farms, lots of bushes and trees to sneak around in with the Ghillie suit dm_Gear item.";
 	    case 2:szInfo="Open areas, rocks, desert villages but not a lot of bushes to hide in, ideal for assaults, but hiding my prove difficult.";
 	    case 3:szInfo="Islands, docks and desolate refuges, attack vehicles are boats and the camouflage is the sea, brilliant for sniping and complex tactical planning.";
 	    case 4:szInfo="Maps that are based around the original San Andreas towns and areas. There are modded map additions to most of these maps.";
@@ -2939,7 +2949,7 @@ dm_FormatRegionInfo(playerid, region)
 dm_FormatMapInfo(playerid, map)
 {
 	new szInfo[256];
-	format(szInfo, 256, ""#C_YELLOW"Size:\t"#C_WHITE"%s\n\n"#C_YELLOW"Kit:\t"#C_WHITE"%s\n\n"#C_YELLOW"Intel:\n\t"#C_WHITE"%s", dm_MapInfo_Size[map], dm_MapInfo_Kit[map], dm_MapInfo_Bio[map]);
+	format(szInfo, 256, ""#C_YELLOW"Size:\t"#C_WHITE"%s\n\n"#C_YELLOW"dm_Kit:\t"#C_WHITE"%s\n\n"#C_YELLOW"Intel:\n\t"#C_WHITE"%s", dm_MapInfo_Size[map], dm_MapInfo_Kit[map], dm_MapInfo_Bio[map]);
 	ShowPlayerDialog(playerid, d_MapInfo, DIALOG_STYLE_MSGBOX, dm_MapNames[map], szInfo, "Back", "");
 	return 1;
 }
@@ -3015,10 +3025,10 @@ dm_FormatKitInfo(playerid, kit)
 	new str[128];
 	switch(kit)
 	{
-	    case 0:str = "The Support kit can drop ammo boxes for the team that allow for 5 ammo refills.";
+	    case 0:str = "The Support kit can drop ammo boxes for the dm_Team that allow for 5 ammo refills.";
 	    case 1:str = "Mechanics can fix vehicles and deply motion sensors that make enemies appear on the map when nearby.";
 	    case 2:str = "Medics can drop health kits and revive allies who are bleeding out.";
-	    case 3:str = "Spec Ops players can place spawn beacons for fast team deployment and hack computer terminals.";
+	    case 3:str = "Spec Ops players can place spawn beacons for fast dm_Team deployment and hack computer terminals.";
 	    case 4:str = "The Bomber can place trip-mines and blow open certain doors with time bombs.";
 	}
 	ShowPlayerDialog(playerid, d_KitInfo, DIALOG_STYLE_MSGBOX, dm_KitNames[kit], str, "Back", "");
@@ -3323,7 +3333,7 @@ AutoAssignTeam(playerid)
 {
 	if(GetPlayersInTeam(0)>GetPlayersInTeam(1))pTeam(playerid)=1;
 	else pTeam(playerid)=0;
-	MsgF(playerid, YELLOW, " >  You have been auto-assigned to "#C_BLUE"%s"#C_YELLOW" team.", dm_TeamNames[pTeam(playerid)]);
+	MsgF(playerid, YELLOW, " >  You have been auto-assigned to "#C_BLUE"%s"#C_YELLOW" dm_Team.", dm_TeamNames[pTeam(playerid)]);
 }
 timer JoinLobby[3000](playerid)
 {
@@ -3444,7 +3454,7 @@ UpdateScoreStatus(playerid=-1)
 
 SetScoreStatus(team, status, playerid)
 {
-	if(playerid!=-1)
+	if(playerid != -1)
 	{
 	    TextDrawHideForPlayer(playerid, ScoreStatus_Tie);
 		TextDrawHideForPlayer(playerid, ScoreStatus_Losing);
@@ -3456,7 +3466,7 @@ SetScoreStatus(team, status, playerid)
 	}
 	PlayerLoop(i)
 	{
-	    if(pTeam(i)==team && bPlayerGameSettings[i]&Spawned)
+	    if(pTeam(i) == team && bPlayerGameSettings[i]&Spawned)
 	    {
 			TextDrawHideForPlayer(i, ScoreStatus_Tie);
 			TextDrawHideForPlayer(i, ScoreStatus_Losing);
@@ -3817,12 +3827,12 @@ EndRound(WinningTeam)
 		{
 			if(WinningTeam==pTeam(i))
 			{
-				GameTextForPlayer(i, "~n~~n~~b~Your team won!", 3000, 5);
+				GameTextForPlayer(i, "~n~~n~~b~Your dm_Team won!", 3000, 5);
 				GiveXP(i, 30, "Winning");
 			}
 			if(WinningTeam==poTeam(i))
 			{
-				GameTextForPlayer(i, "~n~~n~~b~Your team lost!", 3000, 5);
+				GameTextForPlayer(i, "~n~~n~~b~Your dm_Team lost!", 3000, 5);
 				GiveXP(i, 10, "Taking Part");
 			}
 			if(WinningTeam==-1)
@@ -3846,9 +3856,9 @@ EndRound(WinningTeam)
 	    else
 	    {
 			dm_Leaderboard[i][lb_ID] = i;
-			dm_Leaderboard[i][lb_Exp] =  dm_PlayerData[i][RoundExp];
-			dm_Leaderboard[i][lb_Kills] = dm_PlayerData[i][RoundKills];
-			dm_Leaderboard[i][lb_Deaths] = dm_PlayerData[i][RoundDeaths];
+			dm_Leaderboard[i][lb_Exp] =  dm_PlayerData[i][dm_RoundExp];
+			dm_Leaderboard[i][lb_Kills] = dm_PlayerData[i][dm_RoundKills];
+			dm_Leaderboard[i][lb_Deaths] = dm_PlayerData[i][dm_RoundDeaths];
 	    }
 	}
 
@@ -3865,12 +3875,12 @@ EndRound(WinningTeam)
 			Msg(i, BLUE, HORIZONTAL_RULE);
 			Msg(i, YELLOW, " >  Match Stats:");
 
-			MsgF(i, BLUE, " >  Most Exp: %P "#C_YELLOW"(%d)", HighestExp, dm_PlayerData[HighestExp][RoundExp]);
-			MsgF(i, BLUE, " >  Most Kills: %P "#C_YELLOW"(%d)", HighestKills, dm_PlayerData[HighestKills][RoundKills]);
-			MsgF(i, BLUE, " >  Most Deaths: %P "#C_YELLOW"(%d)", HighestDeaths, dm_PlayerData[HighestDeaths][RoundDeaths]);
+			MsgF(i, BLUE, " >  Most Exp: %P "#C_YELLOW"(%d)", HighestExp, dm_PlayerData[HighestExp][dm_RoundExp]);
+			MsgF(i, BLUE, " >  Most Kills: %P "#C_YELLOW"(%d)", HighestKills, dm_PlayerData[HighestKills][dm_RoundKills]);
+			MsgF(i, BLUE, " >  Most Deaths: %P "#C_YELLOW"(%d)", HighestDeaths, dm_PlayerData[HighestDeaths][dm_RoundDeaths]);
 
 			MsgF(i, YELLOW, " >  Your Stats: Exp: "#C_WHITE"%d"#C_YELLOW" - Kills: "#C_WHITE"%d"#C_YELLOW" - Deaths: "#C_WHITE"%d",
-				dm_PlayerData[i][RoundExp], dm_PlayerData[i][RoundKills], dm_PlayerData[i][RoundDeaths]);
+				dm_PlayerData[i][dm_RoundExp], dm_PlayerData[i][dm_RoundKills], dm_PlayerData[i][dm_RoundDeaths]);
 
 			Msg(i, BLUE, HORIZONTAL_RULE);
 
@@ -4025,28 +4035,28 @@ LoadDMStats(playerid)
 	tmpResult = db_query(gAccounts, tmpQuery);
 
 	db_get_field(tmpResult, 1, result, 12);
-	gPlayerData[playerid][ply_Kills]		=	strval(result);
+	dm_PlayerData[playerid][dm_Kills]		=	strval(result);
 
 	db_get_field(tmpResult, 2, result, 12);
-	gPlayerData[playerid][ply_Deaths]		=	strval(result);
+	dm_PlayerData[playerid][dm_Deaths]		=	strval(result);
 
 	db_get_field(tmpResult, 3, result, 12);
-	gPlayerData[playerid][ply_Exp]			=	strval(result);
+	dm_PlayerData[playerid][dm_Exp]			=	strval(result);
 
 	db_get_field(tmpResult, 4, result, 12);
-	gPlayerData[playerid][ply_HeadShots]	=	strval(result);
+	dm_PlayerData[playerid][dm_HeadShots]	=	strval(result);
 
 	db_get_field(tmpResult, 5, result, 12);
-	gPlayerData[playerid][ply_TeamKills]	=	strval(result);
+	dm_PlayerData[playerid][dm_TeamKills]	=	strval(result);
 
 	db_get_field(tmpResult, 6, result, 12);
-	gPlayerData[playerid][ply_HighStreak]	=	strval(result);
+	dm_PlayerData[playerid][dm_HighStreak]	=	strval(result);
 
 	db_get_field(tmpResult, 7, result, 12);
-	gPlayerData[playerid][ply_Wins]			=	strval(result);
+	dm_PlayerData[playerid][dm_Wins]		=	strval(result);
 
 	db_get_field(tmpResult, 8, result, 12);
-	gPlayerData[playerid][ply_Losses]		=	strval(result);
+	dm_PlayerData[playerid][dm_Losses]		=	strval(result);
 
 
     db_free_result(tmpResult);
@@ -4106,14 +4116,14 @@ SaveDMStats(playerid)
 		`"#ROW_WINS"` = '%d', \
 		`"#ROW_LOSSES"` = '%d' \
 		WHERE `"#ROW_NAME"` = '%s'",
-		gPlayerData[playerid][ply_Kills],
-		gPlayerData[playerid][ply_Deaths],
-		gPlayerData[playerid][ply_Exp],
-		gPlayerData[playerid][ply_HeadShots],
-		gPlayerData[playerid][ply_TeamKills],
-		gPlayerData[playerid][ply_HighStreak],
-		gPlayerData[playerid][ply_Wins],
-		gPlayerData[playerid][ply_Losses],
+		dm_PlayerData[playerid][dm_Kills],
+		dm_PlayerData[playerid][dm_Deaths],
+		dm_PlayerData[playerid][dm_Exp],
+		dm_PlayerData[playerid][dm_HeadShots],
+		dm_PlayerData[playerid][dm_TeamKills],
+		dm_PlayerData[playerid][dm_HighStreak],
+		dm_PlayerData[playerid][dm_Wins],
+		dm_PlayerData[playerid][dm_Losses],
 		gPlayerName[playerid]);
 
 	db_free_result(db_query(gAccounts, tmpQuery));
@@ -4220,9 +4230,9 @@ UnloadDM()
 
 ResetPlayerMatchStats(playerid)
 {
-	dm_PlayerData[playerid][RoundExp] = 0;
-	dm_PlayerData[playerid][RoundKills] = 0;
-	dm_PlayerData[playerid][RoundDeaths] = 0;
+	dm_PlayerData[playerid][dm_RoundExp] = 0;
+	dm_PlayerData[playerid][dm_RoundKills] = 0;
+	dm_PlayerData[playerid][dm_RoundDeaths] = 0;
 }
 ResetPlayerDMVariables(playerid)
 {
@@ -4370,13 +4380,13 @@ CMD:raven(playerid, params[])
 			SetPlayerArmour(playerid, 0.0);
 			SetPlayerToTeam(playerid, 0);
 
-			Msg(playerid, LGREEN, "Team: Raven, This is now your spawn point");
-			MsgAllF(GREEN, " >  %P"#C_GREEN" Has Joined The Raven Team", playerid);
+			Msg(playerid, LGREEN, "dm_Team: Raven, This is now your spawn point");
+			MsgAllF(GREEN, " >  %P"#C_GREEN" Has Joined The Raven dm_Team", playerid);
 
 			new Float:x, Float:y, Float:z, Float:rot;
 			GetPlayerPos(playerid, x, y, z);
 			GetPlayerFacingAngle(playerid, rot);
-			SetSpawnInfo(playerid, 0, KitSkins[0][dm_PlayerData[playerid][Kit]], x, y, z, rot, 0, 0, 0, 0, 0, 0);
+			SetSpawnInfo(playerid, 0, KitSkins[0][dm_PlayerData[playerid][dm_Kit]], x, y, z, rot, 0, 0, 0, 0, 0, 0);
 		}
 		else Msg(playerid, RED, "Free For All Deathmatch mode is disabled, ask an online admin to enable it.");
 	}
@@ -4393,13 +4403,13 @@ CMD:valor(playerid, params[])
 			SetPlayerArmour(playerid, 0.0);
 			SetPlayerToTeam(playerid, 1);
 
-			Msg(playerid, LGREEN, "Team: Valor, This is now your spawn point");
-			MsgAllF(GREEN, " >  %P"#C_GREEN" Has Joined The Valor Team", playerid);
+			Msg(playerid, LGREEN, "dm_Team: Valor, This is now your spawn point");
+			MsgAllF(GREEN, " >  %P"#C_GREEN" Has Joined The Valor dm_Team", playerid);
 
 			new Float:x, Float:y, Float:z, Float:rot;
 			GetPlayerPos(playerid, x, y, z);
 			GetPlayerFacingAngle(playerid, rot);
-			SetSpawnInfo(playerid, 1, KitSkins[1][dm_PlayerData[playerid][Kit]], x, y, z, rot, 0, 0, 0, 0, 0, 0);
+			SetSpawnInfo(playerid, 1, KitSkins[1][dm_PlayerData[playerid][dm_Kit]], x, y, z, rot, 0, 0, 0, 0, 0, 0);
 		}
 		else Msg(playerid, RED, "Free For All Deathmatch mode is disabled, ask an online admin to enable it.");
 	}
@@ -4416,7 +4426,7 @@ CMD:free(playerid, params[])
 			SetPlayerArmour(playerid, 0.0);
 			pTeam(playerid)=playerid+10;
 
-			Msg(playerid, LGREEN, "You have left your team, you are now fighting for yourself!");
+			Msg(playerid, LGREEN, "You have left your dm_Team, you are now fighting for yourself!");
 
 			new Float:x, Float:y, Float:z, Float:rot;
 			GetPlayerPos(playerid, x, y, z);
@@ -4518,7 +4528,7 @@ CMD:matchstats(playerid, params[])
 	new str[128];
 
 	format(str, 128, "Current Match Stats:\n\nExp: %d\nKills: %d\nDeaths: %d",
-		dm_PlayerData[playerid][RoundExp], dm_PlayerData[playerid][RoundKills], dm_PlayerData[playerid][RoundDeaths]);
+		dm_PlayerData[playerid][dm_RoundExp], dm_PlayerData[playerid][dm_RoundKills], dm_PlayerData[playerid][dm_RoundDeaths]);
 
 	ShowPlayerDialog(playerid, d_NULL, DIALOG_STYLE_MSGBOX, "Match Stats", str, "Close", "");
 	

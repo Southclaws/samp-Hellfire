@@ -703,7 +703,7 @@ ACMD:getdata[4](playerid, params[])
 	new id;
 	if (sscanf(params, "d", id)) Msg(playerid, YELLOW, "Usage: /getdata [playerid]");
 	else if(!IsPlayerConnected(id)) return Msg(playerid, RED, "Invalid ID");
-	else MsgF(playerid, ORANGE, "Team: %d - indm: %b - InLobby: %b - Interior: %d - VW: %d - State: %d - ReadyForDM: %d", dm_PlayerData[id][Team], bPlayerGameSettings[id]&InDM, bPlayerDeathmatchSettings[id]&dm_InLobby, GetPlayerInterior(id), GetPlayerVirtualWorld(id), GetPlayerState(id), bPlayerDeathmatchSettings[id]&dm_Ready);
+	else MsgF(playerid, ORANGE, "Team: %d - indm: %b - InLobby: %b - Interior: %d - VW: %d - State: %d - ReadyForDM: %d", dm_PlayerData[id][dm_Team], bPlayerGameSettings[id]&InDM, bPlayerDeathmatchSettings[id]&dm_InLobby, GetPlayerInterior(id), GetPlayerVirtualWorld(id), GetPlayerState(id), bPlayerDeathmatchSettings[id]&dm_Ready);
 	return 1;
 }
 ACMD:loadmap[4](playerid, params[])
@@ -843,6 +843,26 @@ public OnPlayerEditObject(playerid, playerobject, objectid, response, Float:fX, 
 	}
 }
 
+CMD:additem(playerid, params[])
+{
+	new
+	    ItemType:type = ItemType:strval(params),
+	    Float:x,
+	    Float:y,
+	    Float:z,
+		Float:r;
+
+	GetPlayerPos(playerid, x, y, z);
+	GetPlayerFacingAngle(playerid, r);
+
+	SetItemExtraData(CreateItem(type,
+			x + (0.5 * floatsin(-r, degrees)),
+			y + (0.5 * floatcos(-r, degrees)),
+			z-0.8568, .rz = r, .zoffset = 0.7), 50);
+
+
+	return 1;
+}
 
 
 /*
