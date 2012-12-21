@@ -192,7 +192,6 @@ timer hlo_Spawn[1000]()
 	SetPlayerVirtualWorld(hlo_CurrentPlayer, MINIGAME_WORLD);
 	GivePlayerWeapon(hlo_CurrentPlayer, 46, 1);
 
-	TogglePlayerSpectating(hlo_CurrentPlayer, false);
 	SetPlayerVirtualWorld(hlo_CurrentPlayer, MINIGAME_WORLD);
 	TogglePlayerControllable(hlo_CurrentPlayer, false);
 
@@ -339,6 +338,8 @@ timer hlo_Finish[3000](playerid)
 		hlo_Queue[hlo_NextQueueSlot()] = playerid;
 	}
 	else hlo_Join(playerid, false);
+
+	TogglePlayerSpectating(hlo_CurrentPlayer, false);
 
 	defer hlo_Spawn();
 

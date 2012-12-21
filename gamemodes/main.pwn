@@ -1,18 +1,14 @@
 #include <a_samp>
 
-enum e_data
-{
-	arr1[3],
-	arr2[4]
-}
-new data[e_data];
-
+#define size (4)
 main()
 {
-	new cell = 3; // Out of arr1's bounds [0, 1, 2]
-	data[arr1][cell] = 5;
-	// arr2[0] is now 5
-	printf("arr2[0] = %d", data[arr2][0]);
+	func("h3i");
+}
+
+func(arr[size])
+{
+	print(arr);
 }
 
 

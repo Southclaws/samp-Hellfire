@@ -212,8 +212,8 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 #include <YSI\y_hooks>
 
 
-#define MAX_ITEMS			(1024)
-#define MAX_ITEM_TYPES		(ItemType:64)
+#define MAX_ITEMS			(4096)
+#define MAX_ITEM_TYPES		(ItemType:256)
 #define MAX_ITEM_NAME		(32)
 #define ITM_ATTACH_INDEX	(0)
 
@@ -224,7 +224,7 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 #define INVALID_ITEM_SIZE	(-1)
 #define ITEM_SIZE_SMALL		(0) // pocket
 #define ITEM_SIZE_MEDIUM	(1) // backpack
-#define ITEM_SIZE_LARGE		(2) // two handed carry only
+#define ITEM_SIZE_LARGE		(2) // carry only
 
 
 enum E_ITEM_DATA
@@ -331,6 +331,12 @@ hook OnPlayerConnect(playerid)
 stock CreateItem(ItemType:type, Float:x, Float:y, Float:z, Float:rx = 0.0, Float:ry = 0.0, Float:rz = 0.0, Float:zoffset = 0.0, world = 0, interior = 0, label = 1)
 {
 	new id = Iter_Free(itm_Index);
+
+	if(id == -1)
+	{
+		print("ERROR: MAX_ITEMS reached, please increase this constant!");
+		return INVALID_ITEM_ID;
+	}
 	
 	if(!IsValidItemType(type))
 		return printf("ERROR: Item creation with undefined typeid (%d) failed.", _:type);
@@ -625,7 +631,7 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 		if( (animidx == 1164 || animidx == 1189) && itm_Interacting[playerid] == INVALID_ITEM_ID && Iter_Contains(itm_Index, itm_Holding[playerid]))
 		{
-			PlayerLoop(i)
+			foreach(new i : Player)
 			{
 				if(i == playerid || itm_Holding[i] != INVALID_ITEM_ID || itm_Interacting[i] != INVALID_ITEM_ID)
 					continue;
@@ -692,7 +698,7 @@ forward itm_OnPlayerLeavePlayerArea(playerid, targetid);
 
 internal_OnPlayerUseItem(playerid, itemid)
 {
-	new buttonid = GetPlayerButtonArea(playerid);
+	new buttonid = GetPlayerButtonID(playerid);
 
 	if(buttonid != -1)
 		return CallLocalFunction("OnPlayerUseItemWithButton", "ddd", playerid, buttonid, itm_Holding[playerid]);
@@ -743,12 +749,12 @@ public OnButtonPress(playerid, buttonid)
 			}
 		}
 	}
-    return CallLocalFunction("itm_OnButtonPress", "dd", playerid, buttonid);
+	return CallLocalFunction("itm_OnButtonPress", "dd", playerid, buttonid);
 }
 #if defined _ALS_OnButtonPress
-    #undef OnButtonPress
+	#undef OnButtonPress
 #else
-    #define _ALS_OnButtonPress
+	#define _ALS_OnButtonPress
 #endif
 #define OnButtonPress itm_OnButtonPress
 forward itm_OnButtonPress(playerid, buttonid);
@@ -797,8 +803,11 @@ timer DropItemDelay[400](playerid)
 	CreateItemInWorld(id,
 		x + (0.5 * floatsin(-r, degrees)),
 		y + (0.5 * floatcos(-r, degrees)),
-		z-0.868, 0.0, 0.0, r, 0.7,
-		GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), 1);
+		z - 0.868,
+		itm_TypeData[itm_Data[id][itm_type]][itm_rotX],
+		itm_TypeData[itm_Data[id][itm_type]][itm_rotY],
+		itm_TypeData[itm_Data[id][itm_type]][itm_rotZ] + r,
+		0.7, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), 1);
 
 	ApplyAnimation(playerid, "BOMBER", "BOM_PLANT_2IDLE", 4.0, 0, 0, 0, 0, 0);
 

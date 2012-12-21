@@ -4,7 +4,7 @@
 
 // Max Values
 #define MAX_TURRET				(8)
-#define MAX_ROCKET				(32)
+#define MAX_ROCKET				(4)
 #define MAX_RKTNODE				(8)
 
 #define ROCKET_OBJECT			(354)
@@ -273,6 +273,11 @@ CreateRocket(baseid, Float:x, Float:y, Float:z, Float:rotation, Float:elevation,
 {
 	new id = Iter_Free(rkt_Index);
 
+	printf("Created Rocket, ID: %d", id);
+
+	if(id == -1)
+		return -1;
+
     rkt_turretID[id]	= baseid;
 	rkt_posX[id]		= x;
 	rkt_posY[id]		= y;
@@ -310,6 +315,8 @@ ExplodeRocket(id)
 {
 	if(!Iter_Contains(rkt_Index, id))return 0;
 
+	printf("Destorying Rocket, ID: %d", id);
+
 	if(rkt_type[id] == TURRET_TYPE_TRAJ)
 	{
 		CreateExplosion(
@@ -338,7 +345,7 @@ ExplodeRocket(id)
 	rkt_velo[id] = 0.0;
 	rkt_node[id] = 0;
 	
-	Iter_Remove(rkt_Index, id);
+	Iter_SafeRemove(rkt_Index, id, id);
 
 	return 1;
 }

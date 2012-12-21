@@ -1,3 +1,6 @@
+// Setup
+
+
 #include <YSI\y_hooks>
 
 
@@ -7,7 +10,15 @@
 new
 	inv_Data[MAX_PLAYERS][INV_MAX_SLOTS],
 	inv_SelectedSlot[MAX_PLAYERS];
-	
+
+
+forward OnPlayerAddToInventory(playerid, itemid);
+
+
+
+// Zeroing
+
+
 
 hook OnGameModeInit()
 {
@@ -28,31 +39,11 @@ hook OnPlayerConnect(playerid)
 	return;
 }
 
-hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
-{
-	if(newkeys & KEY_CTRL_BACK)
-	{
-		if(!IsPlayerInAnyVehicle(playerid))
-			DisplayPlayerInventory(playerid, d_Inventory, "Options");
-	}
-	if(newkeys & KEY_YES)
-	{
-		new itemid = GetPlayerItem(playerid);
-		
-		if(IsValidItem(itemid))
-		{
-			if(GetItemSize(itemid) != ITEM_SIZE_SMALL)Msg(playerid, ORANGE, " >  That item is too big for your pocket!");
-			else
-			{
-				if(AddItemToInventory(playerid, itemid))
-					ShowMsgBox(playerid, "Item added to inventory", 3000, 150);
 
-				else
-					ShowMsgBox(playerid, "Inventory full", 3000, 100);
-			}
-		}
-	}
-}
+
+// Core
+
+
 
 stock AddItemToInventory(playerid, itemid)
 {
@@ -72,11 +63,8 @@ stock AddItemToInventory(playerid, itemid)
 }
 stock RemoveItemFromInventory(playerid, slotid)
 {
-	printf("Removing from slot: %d ITEM: %d", slotid, inv_Data[playerid][slotid]);
 	if(!(0 <= slotid < INV_MAX_SLOTS))
 		return 0;
-
-	print("continuing");
 
 	inv_Data[playerid][slotid] = INVALID_ITEM_ID;
 	
@@ -88,19 +76,6 @@ stock RemoveItemFromInventory(playerid, slotid)
 		inv_Data[playerid][(INV_MAX_SLOTS - 1)] = INVALID_ITEM_ID;
 	}
 	
-	return 1;
-}
-
-stock GetInventorySlotItem(playerid, slotid)
-{
-	if(!(0 <= slotid < INV_MAX_SLOTS))return INVALID_ITEM_ID;
-	return inv_Data[playerid][slotid];
-}
-
-stock IsInventorySlotUsed(playerid, slotid)
-{
-	if(!(0 <= slotid < INV_MAX_SLOTS))return -1;
-	if(!IsValidItem(inv_Data[playerid][slotid]))return 0;
 	return 1;
 }
 
@@ -122,6 +97,45 @@ stock DisplayPlayerInventory(playerid, dialogid, optiontext[])
 	}
 	
 	ShowPlayerDialog(playerid, dialogid, DIALOG_STYLE_LIST, "Inventory", list, optiontext, "Close");
+}
+
+
+
+// Internal
+
+
+
+hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
+{
+	if(newkeys & KEY_CTRL_BACK)
+	{
+		if(!IsPlayerInAnyVehicle(playerid))
+			DisplayPlayerInventory(playerid, d_Inventory, "Options");
+	}
+	if(newkeys & KEY_YES)
+	{
+		new itemid = GetPlayerItem(playerid);
+		
+		if(IsValidItem(itemid))
+		{
+			if(CallLocalFunction("OnPlayerAddToInventory", "dd", playerid, itemid))
+				return 0;
+
+			if(GetItemSize(itemid) != ITEM_SIZE_SMALL)
+				Msg(playerid, ORANGE, " >  That item is too big for your pocket!");
+
+			else
+			{
+				if(AddItemToInventory(playerid, itemid))
+					ShowMsgBox(playerid, "Item added to inventory", 3000, 150);
+
+				else
+					ShowMsgBox(playerid, "Inventory full", 3000, 100);
+			}
+		}
+	}
+
+	return 1;
 }
 
 DisplayPlayerInventoryOptions(playerid, slotid)
@@ -166,3 +180,24 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	return 1;
 }
 
+
+// Interface
+
+
+stock GetInventorySlotItem(playerid, slotid)
+{
+	if(!(0 <= slotid < INV_MAX_SLOTS))return INVALID_ITEM_ID;
+	return inv_Data[playerid][slotid];
+}
+
+stock IsInventorySlotUsed(playerid, slotid)
+{
+	if(!(0 <= slotid < INV_MAX_SLOTS))return -1;
+	if(!IsValidItem(inv_Data[playerid][slotid]))return 0;
+	return 1;
+}
+
+stock IsPlayerInventoryFull(playerid)
+{
+	return IsValidItem(inv_Data[playerid][INV_MAX_SLOTS-1]);
+}

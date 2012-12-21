@@ -3059,43 +3059,113 @@ new const
 		{ 19150, !"PinSpotLight8" }, { 19151, !"PinSpotLight9" }, { 19152, !"PinSpotLight10" }, { 19153, !"PinSpotLight11" },
 		{ 19154, !"PinSpotLight12" }, { 19155, !"PinSpotLight13" }, { 19156, !"PinSpotLight14" }, { 19157, !"MetalLightBars1" },
 		{ 19158, !"MetalLightBars2" }, { 19159, !"MirrorBall1" }, { 19160, !"HardHat3" }, { 19161, !"PoliceHat1" },
-		{ 19162, !"PoliceHat2" }, { 19163, !"GimpMask1" }, { 19164, !"GTASAMap1vert" }, { 19165, !"GTASAMap2" },
-		{ 19166, !"GTASAMap3" }, { 19167, !"GTASAMap4" }, { 19168, !"GTASAMap5" }, { 19169, !"GTASAMap6" },
-		{ 19170, !"GTASAMap7" }, { 19171, !"GTASAMap8" }, { 19172, !"SAMPPicture1" }, { 19173, !"SAMPPicture2" },
-		{ 19174, !"SAMPPicture3" }, { 19175, !"SAMPPicture4" }, { 19176, !"LSOffice1Door1" }, { 19177, !"MapMarkerNew1" },
-		{ 19178, !"MapMarkerNew2" }, { 19179, !"MapMarkerNew3" }, { 19180, !"MapMarkerNew4" }, { 19181, !"MapMarkerNew5" },
-		{ 19182, !"MapMarkerNew6" }, { 19183, !"MapMarkerNew7" }, { 19184, !"MapMarkerNew8" }, { 19185, !"MapMarkerNew9" },
-		{ 19186, !"MapMarkerNew10" }, { 19187, !"MapMarkerNew11" }, { 19188, !"MapMarkerNew12" }, { 19189, !"MapMarkerNew13" },
-		{ 19190, !"MapMarkerNew14" }, { 19191, !"MapMarkerNew15" }, { 19192, !"MapMarkerNew16" }, { 19193, !"MapMarkerNew17" },
-		{ 19194, !"MapMarkerNew18" }, { 19195, !"MapMarkerNew19" }, { 19196, !"MapMarkerNew20" }, { 19197, !"EnExMarker2" },
-		{ 19198, !"EnExMarker3" }, { 19199, !"LCObservatory" }, { 19200, !"PoliceHelmet1" }, { 19201, !"MapMarker1" },
-		{ 19202, !"MapMarker2" }, { 19203, !"MapMarker3" }, { 19204, !"MapMarker4" }, { 19205, !"MapMarker5" },
-		{ 19206, !"MapMarker6" }, { 19207, !"MapMarker7" }, { 19208, !"MapMarker8" }, { 19209, !"MapMarker9" },
-		{ 19210, !"MapMarker10" }, { 19211, !"MapMarker11" }, { 19212, !"MapMarker12" }, { 19213, !"MapMarker13" },
-		{ 19214, !"MapMarker14" }, { 19215, !"MapMarker15" }, { 19216, !"MapMarker16" }, { 19217, !"MapMarker17" },
-		{ 19218, !"MapMarker18" }, { 19219, !"MapMarker19" }, { 19220, !"MapMarker20" }, { 19221, !"MapMarker21" },
-		{ 19222, !"MapMarker22" }, { 19223, !"MapMarker23" }, { 19224, !"MapMarker24" }, { 19225, !"MapMarker25" },
-		{ 19226, !"MapMarker26" }, { 19227, !"MapMarker27" }, { 19228, !"MapMarker28" }, { 19229, !"MapMarker29" },
-		{ 19230, !"MapMarker30" }, { 19231, !"MapMarker31" }, { 19232, !"MapMarker32" }, { 19233, !"MapMarker33" },
-		{ 19234, !"MapMarker34" }, { 19235, !"MapMarker35" }, { 19236, !"MapMarker36" }, { 19237, !"MapMarker37" },
-		{ 19238, !"MapMarker38" }, { 19239, !"MapMarker39" }, { 19240, !"MapMarker40" }, { 19241, !"MapMarker41" },
-		{ 19242, !"MapMarker42" }, { 19243, !"MapMarker43" }, { 19244, !"MapMarker44" }, { 19245, !"MapMarker45" },
-		{ 19246, !"MapMarker46" }, { 19247, !"MapMarker47" }, { 19248, !"MapMarker48" }, { 19249, !"MapMarker49" },
-		{ 19250, !"MapMarker50" }, { 19251, !"MapMarker51" }, { 19252, !"MapMarker52" }, { 19253, !"MapMarker53" },
-		{ 19254, !"MapMarker54" }, { 19255, !"MapMarker55" }, { 19256, !"MapMarker56" }, { 19257, !"MapMarker57" },
-		{ 19258, !"MapMarker58" }, { 19259, !"MapMarker59" }, { 19260, !"MapMarker60" }, { 19261, !"MapMarker61" },
-		{ 19262, !"MapMarker62" }, { 19263, !"MapMarker63" }, { 19264, !"MapMarker1a" }, { 19265, !"MapMarker1b" },
-		{ 19266, !"MapMarker31a" }, { 19267, !"MapMarker31b" }, { 19268, !"MapMarker31c" }, { 19269, !"MapMarker31d" },
-		{ 19270, !"MapMarkerFire1" }, { 19271, !"MapMarkerLight1" }, { 19272, !"DMCage3" }, { 19273, !"KeypadNonDynamic" },
-		{ 19274, !"Hair5" }, { 19275, !"SAMPLogo2" }, { 19276, !"SAMPLogo3" }, { 19277, !"LiftType1" },
-		{ 19278, !"LiftPlatform1" }, { 19279, !"LCSmallLight1" }, { 19280, !"CarRoofLight1" }, { 19281, !"PointLight1" },
-		{ 19282, !"PointLight2" }, { 19283, !"PointLight3" }, { 19284, !"PointLight4" }, { 19285, !"PointLight5" },
-		{ 19286, !"PointLight6" }, { 19287, !"PointLight7" }, { 19288, !"PointLight8" }, { 19289, !"PointLight9" },
-		{ 19290, !"PointLight10" }, { 19291, !"PointLight11" }, { 19292, !"PointLight12" }, { 19293, !"PointLight13" },
-		{ 19294, !"PointLight14" }, { 19295, !"PointLight15" }, { 19296, !"PointLight16" }, { 19297, !"PointLight17" },
-		{ 19298, !"PointLight18" }, { 19299, !"PointLightMoon1" }, { 19300, !"bridge_liftsec" }, { 19301, !"subbridge01" },
-		{ 19302, !"subbridge07" }, { 19303, !"subbridge19" }, { 19304, !"subbridge20" }, { 19305, !"subbridge_lift" },
-		{ 19306, !"verticalift_bridg2" }, { 19307, !"verticalift_bridge" }
+		{ 19162, !"PoliceHat2" }, { 19163, !"GimpMask1" }, { 19164, !"GTASAMap1vert" }, { 19165, !"GTASAMap2" }, 
+		{ 19166, !"GTASAMap3" }, { 19167, !"GTASAMap4" }, { 19168, !"GTASAMap5" }, { 19169, !"GTASAMap6" }, 
+		{ 19170, !"GTASAMap7" }, { 19171, !"GTASAMap8" }, { 19172, !"SAMPPicture1" }, { 19173, !"SAMPPicture2" }, 
+		{ 19174, !"SAMPPicture3" }, { 19175, !"SAMPPicture4" }, { 19176, !"LSOffice1Door1" }, { 19177, !"MapMarkerNew1" }, 
+		{ 19178, !"MapMarkerNew2" }, { 19179, !"MapMarkerNew3" }, { 19180, !"MapMarkerNew4" }, { 19181, !"MapMarkerNew5" }, 
+		{ 19182, !"MapMarkerNew6" }, { 19183, !"MapMarkerNew7" }, { 19184, !"MapMarkerNew8" }, { 19185, !"MapMarkerNew9" }, 
+		{ 19186, !"MapMarkerNew10" }, { 19187, !"MapMarkerNew11" }, { 19188, !"MapMarkerNew12" }, { 19189, !"MapMarkerNew13" }, 
+		{ 19190, !"MapMarkerNew14" }, { 19191, !"MapMarkerNew15" }, { 19192, !"MapMarkerNew16" }, { 19193, !"MapMarkerNew17" }, 
+		{ 19194, !"MapMarkerNew18" }, { 19195, !"MapMarkerNew19" }, { 19196, !"MapMarkerNew20" }, { 19197, !"EnExMarker2" }, 
+		{ 19198, !"EnExMarker3" }, { 19199, !"LCObservatory" }, { 19200, !"PoliceHelmet1" }, { 19201, !"MapMarker1" }, 
+		{ 19202, !"MapMarker2" }, { 19203, !"MapMarker3" }, { 19204, !"MapMarker4" }, { 19205, !"MapMarker5" }, 
+		{ 19206, !"MapMarker6" }, { 19207, !"MapMarker7" }, { 19208, !"MapMarker8" }, { 19209, !"MapMarker9" }, 
+		{ 19210, !"MapMarker10" }, { 19211, !"MapMarker11" }, { 19212, !"MapMarker12" }, { 19213, !"MapMarker13" }, 
+		{ 19214, !"MapMarker14" }, { 19215, !"MapMarker15" }, { 19216, !"MapMarker16" }, { 19217, !"MapMarker17" }, 
+		{ 19218, !"MapMarker18" }, { 19219, !"MapMarker19" }, { 19220, !"MapMarker20" }, { 19221, !"MapMarker21" }, 
+		{ 19222, !"MapMarker22" }, { 19223, !"MapMarker23" }, { 19224, !"MapMarker24" }, { 19225, !"MapMarker25" }, 
+		{ 19226, !"MapMarker26" }, { 19227, !"MapMarker27" }, { 19228, !"MapMarker28" }, { 19229, !"MapMarker29" }, 
+		{ 19230, !"MapMarker30" }, { 19231, !"MapMarker31" }, { 19232, !"MapMarker32" }, { 19233, !"MapMarker33" }, 
+		{ 19234, !"MapMarker34" }, { 19235, !"MapMarker35" }, { 19236, !"MapMarker36" }, { 19237, !"MapMarker37" }, 
+		{ 19238, !"MapMarker38" }, { 19239, !"MapMarker39" }, { 19240, !"MapMarker40" }, { 19241, !"MapMarker41" }, 
+		{ 19242, !"MapMarker42" }, { 19243, !"MapMarker43" }, { 19244, !"MapMarker44" }, { 19245, !"MapMarker45" }, 
+		{ 19246, !"MapMarker46" }, { 19247, !"MapMarker47" }, { 19248, !"MapMarker48" }, { 19249, !"MapMarker49" }, 
+		{ 19250, !"MapMarker50" }, { 19251, !"MapMarker51" }, { 19252, !"MapMarker52" }, { 19253, !"MapMarker53" }, 
+		{ 19254, !"MapMarker54" }, { 19255, !"MapMarker55" }, { 19256, !"MapMarker56" }, { 19257, !"MapMarker57" }, 
+		{ 19258, !"MapMarker58" }, { 19259, !"MapMarker59" }, { 19260, !"MapMarker60" }, { 19261, !"MapMarker61" }, 
+		{ 19262, !"MapMarker62" }, { 19263, !"MapMarker63" }, { 19264, !"MapMarker1a" }, { 19265, !"MapMarker1b" }, 
+		{ 19266, !"MapMarker31a" }, { 19267, !"MapMarker31b" }, { 19268, !"MapMarker31c" }, { 19269, !"MapMarker31d" }, 
+		{ 19270, !"MapMarkerFire1" }, { 19271, !"MapMarkerLight1" }, { 19272, !"DMCage3" }, { 19273, !"KeypadNonDynamic" }, 
+		{ 19274, !"Hair5" }, { 19275, !"SAMPLogo2" }, { 19276, !"SAMPLogo3" }, { 19277, !"LiftType1" }, 
+		{ 19278, !"LiftPlatform1" }, { 19279, !"LCSmallLight1" }, { 19280, !"CarRoofLight1" }, { 19281, !"PointLight1" }, 
+		{ 19282, !"PointLight2" }, { 19283, !"PointLight3" }, { 19284, !"PointLight4" }, { 19285, !"PointLight5" }, 
+		{ 19286, !"PointLight6" }, { 19287, !"PointLight7" }, { 19288, !"PointLight8" }, { 19289, !"PointLight9" }, 
+		{ 19290, !"PointLight10" }, { 19291, !"PointLight11" }, { 19292, !"PointLight12" }, { 19293, !"PointLight13" }, 
+		{ 19294, !"PointLight14" }, { 19295, !"PointLight15" }, { 19296, !"PointLight16" }, { 19297, !"PointLight17" }, 
+		{ 19298, !"PointLight18" }, { 19299, !"PointLightMoon1" }, { 19300, !"bridge_liftsec" }, { 19301, !"subbridge01" }, 
+		{ 19302, !"subbridge07" }, { 19303, !"subbridge19" }, { 19304, !"subbridge20" }, { 19305, !"subbridge_lift" }, 
+		{ 19306, !"verticalift_bridg2" }, { 19307, !"verticalift_bridge" },
+
+		{ 19308, !"taxi01" },
+		{ 19309, !"taxi02" },
+		{ 19310, !"taxi03" },
+		{ 19311, !"taxi04" },
+		{ 19312, !"a51fencing" },
+		{ 19313, !"a51fensin" },
+		{ 19314, !"bullhorns01" },
+		{ 19315, !"deer01" },
+		{ 19316, !"FerrisCageBit01" },
+		{ 19317, !"bassguitar01" },
+		{ 19318, !"flyingv01" },
+		{ 19319, !"warlock01" },
+		{ 19320, !"pumpkin01" },
+		{ 19321, !"cuntainer" },
+
+		{ 19322, !"mallb_laW02" },
+		{ 19323, !"lsmall_shop01" },
+		{ 19325, !"lsmall_window01" },
+		{ 19326, !"7_11_sign01" },
+		{ 19327, !"7_11_sign02" },
+		{ 19328, !"7_11_sign03" },
+		{ 19329, !"7_11_sign04" },
+		{ 19330, !"fire_hat01" },
+		{ 19331, !"fire_hat02" },
+		{ 19332, !"Hot_Air_Balloon01" },
+		{ 19333, !"Hot_Air_Balloon02" },
+		{ 19334, !"Hot_Air_Balloon03" },
+		{ 19335, !"Hot_Air_Balloon04" },
+		{ 19336, !"Hot_Air_Balloon05" },
+		{ 19337, !"Hot_Air_Balloon06" },
+		{ 19338, !"Hot_Air_Balloon07" },
+
+		{ 19339, !"coffin01" },
+		{ 19340, !"cslab01" },
+		{ 19341, !"easter_egg01" },
+		{ 19342, !"easter_egg02" },
+		{ 19343, !"easter_egg03" },
+		{ 19344, !"easter_egg04" },
+		{ 19345, !"easter_egg05" },
+		{ 19346, !"hotdog01" },
+	
+		{ 19347, !"badge01" },
+		{ 19348, !"cane01" },
+		{ 19349, !"monocle01" },
+		{ 19350, !"moustache01" },
+		{ 19351, !"moustache02" },
+		{ 19352, !"tophat01" },
+	
+		{ 19418, !"handcuffs01" },
+		{ 19419, !"police_lights01" },
+		{ 19420, !"police_lights02" },
+		{ 19421, !"headphones01" },
+		{ 19422, !"headphones02" },
+		{ 19423, !"headphones03" },
+		{ 19424, !"headphones04" },
+		{ 19425, !"speed_bump01" },
+	
+		{ 19468, !"bucket01" },
+		{ 19469, !"scarf01" },
+		{ 19470, !"forsale01" },
+		{ 19471, !"forsale02" },
+		{ 19472, !"gasmask01" },
+		{ 19473, !"grassplant01" },
+		{ 19474, !"pokertable01" },
+		{ 19487, !"tophat02" },
+		{ 19488, !"HatBowler6" },
+		{ 19513, !"whitephone" },
+		{ 19514, !"SWATHgrey" },
+		{ 19515, !"SWATAgrey" }
 	}
 ;
 
@@ -3120,15 +3190,15 @@ SetPlayerAttachedObject@( iPlayer, iIndex, iModel, bone, Float:fOffsetX = 0.0, F
 	new
 		iVehicle = GetPlayerVehicleID( iPlayer )
 	;
-
+	
 	if ( iVehicle )
 	{
 		if ( IsPlayerAttachedObjectSlotUsed( iPlayer, iIndex ) )
 			RemovePlayerAttachedObject( iPlayer, iIndex );
-
+		
 		if ( g_iVehicleObject[ iPlayer ] == INVALID_OBJECT_ID )
 			g_iVehicleObject[ iPlayer ] = CreateObject( iModel, 0, 0, 0, 0, 0, 0, 300.0 );
-
+		
 		AttachObjectToVehicle( g_iVehicleObject[ iPlayer ], iVehicle, fOffsetX, fOffsetY, fOffsetZ, fRotZ, fRotY, fRotZ );
 	}
 	else
@@ -3136,10 +3206,10 @@ SetPlayerAttachedObject@( iPlayer, iIndex, iModel, bone, Float:fOffsetX = 0.0, F
 		if ( g_iVehicleObject[ iPlayer ] != INVALID_OBJECT_ID )
 		{
 			DestroyObject( g_iVehicleObject[ iPlayer ] );
-
+			
 			g_iVehicleObject[ iPlayer ] = INVALID_OBJECT_ID;
 		}
-
+		
 		SetPlayerAttachedObject( iPlayer, iIndex, iModel, bone, fOffsetX, fOffsetY, fOffsetZ, fRotX, fRotY, fRotZ, fScaleX, fScaleY, fScaleZ );
 	}
 }
@@ -3149,14 +3219,14 @@ RemovePlayerAttachedObject@( iPlayer, iIndex )
 	new
 		iVehicle = GetPlayerVehicleID( iPlayer )
 	;
-
+	
 	if ( g_iVehicleObject[ iPlayer ] != INVALID_OBJECT_ID )
 	{
 		DestroyObject( g_iVehicleObject[ iPlayer ] );
-
+		
 		g_iVehicleObject[ iPlayer ] = INVALID_OBJECT_ID;
 	}
-
+	
 	if ( !iVehicle )
 		RemovePlayerAttachedObject( iPlayer, iIndex );
 }
@@ -3166,7 +3236,7 @@ IsPlayerAttachedObjectSlotUsed@( iPlayer, iIndex )
 	new
 		iVehicle = GetPlayerVehicleID( iPlayer )
 	;
-
+	
 	if ( iVehicle )
 		return ( g_iVehicleObject[ iPlayer ] != INVALID_OBJECT_ID );
 	else
@@ -3181,7 +3251,7 @@ IsPlayerAttachedObjectSlotUsed@( iPlayer, iIndex )
 public OnFilterScriptInit( )
 {
 	printf( "  Hold Studio v" #VERSION_MINOR "." #VERSION_MAJOR "." #VERSION_BUILD " by Slice loaded." );
-
+	
 	for ( new iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++ )
 	{
 		if ( IsPlayerConnected( iPlayer ) )
@@ -3312,7 +3382,7 @@ skip:
 		static
 			Float:fHealth
 		;
-
+		
 		GetPlayerHealth( playerid, fHealth );
 
 		if ( fHealth != 0.0 && fHealth != g_fPreviousHealth[ playerid ] )
@@ -3389,10 +3459,10 @@ repeat_1:
 		else
 		{
 			g_cPlayerAction{ playerid } += iSearchDirection;
-
+			
 			g_cPlayerAction{ playerid } %= MAX_ACTIONS;
 		}
-
+		
 		if ( !g_cPlayerAction{ playerid } )
 			goto repeat_1;
 
@@ -3731,7 +3801,7 @@ public OnPlayerCommandText( playerid, cmdtext[ ] )
 
 			SendClientMessage( playerid, 0xC0C000FF, "* You stopped holding the object." );
 		}
-
+		
 		return 1;
 	}
 
@@ -4180,7 +4250,7 @@ public  ActionUpdate( )
 		      iUnused,
 		Float:fIncrement
 	;
-
+	
 	for ( iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++ )
 	{
 		if ( g_cPlayerAction{ iPlayer } == ACTION_NONE )
@@ -4213,7 +4283,7 @@ public  ActionUpdate( )
 				if ( g_fActionSpeed[ iPlayer ] > MOVESPEED_LIMIT )
 					g_fActionSpeed[ iPlayer ] = MOVESPEED_LIMIT;
 			}
-
+			
 			case ACTION_ROTATE_X, ACTION_ROTATE_Y, ACTION_ROTATE_Z:
 			{
 				if ( ( iKeys & KEY_WALK ) )
@@ -4234,7 +4304,7 @@ public  ActionUpdate( )
 				if ( g_fActionSpeed[ iPlayer ] > ROTATESPEED_LIMIT )
 					g_fActionSpeed[ iPlayer ] = ROTATESPEED_LIMIT;
 			}
-
+			
 			case ACTION_SCALE_X, ACTION_SCALE_Y, ACTION_SCALE_Z:
 			{
 				if ( ( iKeys & KEY_WALK ) )
@@ -4323,13 +4393,13 @@ UpdateHoldingObject( iPlayer )
 
 		while ( g_HoldingObject[ iPlayer ][ e_fRotZ ] > 360.0 )
 			g_HoldingObject[ iPlayer ][ e_fRotZ ] -= 360.0;
-
+		
 		new
 			Float:fScaleX = g_HoldingObject[ iPlayer ][ e_fScaleX ], // workaround for a compiler freeze
 			Float:fScaleY = g_HoldingObject[ iPlayer ][ e_fScaleY ],
 			Float:fScaleZ = g_HoldingObject[ iPlayer ][ e_fScaleZ ]
 		;
-
+		
 		SetPlayerAttachedObject( iPlayer, HOLDING_OBJECT_SLOT, g_HoldingObject[ iPlayer ][ e_iModel ], g_HoldingObject[ iPlayer ][ e_iBone ], g_HoldingObject[ iPlayer ][ e_fOffsetX ], g_HoldingObject[ iPlayer ][ e_fOffsetY ], g_HoldingObject[ iPlayer ][ e_fOffsetZ ], g_HoldingObject[ iPlayer ][ e_fRotX ], g_HoldingObject[ iPlayer ][ e_fRotY ], g_HoldingObject[ iPlayer ][ e_fRotZ ], fScaleX, fScaleY, fScaleZ );
 	}
 }
@@ -4344,9 +4414,9 @@ IsValidHoldModel( iModel )
 		{
 			case 1326, 320, 16330, 13051, 1385, 1382, 1373:
 				return 0;
-
-			//case 18631 .. 19053, 19901:
-			//	return 1;
+			
+			case 19308 .. 19515:
+				return 1;
 		}
 
 		return ( g_baValidModels[ iModel >>> 5 ] & ( 1 << ( ( iModel ) & ( cellbits - 1 ) ) ) ) ? 1 : 0;

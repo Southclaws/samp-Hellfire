@@ -66,7 +66,7 @@ forward wep_OnPlayerGiveItem(playerid, targetid, itemid);
 hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
 	if(GetPlayerItem(playerid) != INVALID_ITEM_ID)
-	    return 1;
+		return 1;
 
 	if(newkeys & KEY_NO && !(newkeys & 128))
 	{
@@ -94,8 +94,34 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 	    	}
 	    }
 	}
+	if(newkeys & KEY_YES)
+	{
+		new ItemType:type = ItemType:GetPlayerWeapon(playerid);
+
+		if(0 < _:type <= WEAPON_PARACHUTE)
+		{
+			new
+				containerid = GetPlayerContainerID(playerid),
+				ammo = GetPlayerAmmo(playerid),
+				itemid = CreateItem(ItemType:type, 0.0, 0.0, 0.0,
+					.world = GetPlayerVirtualWorld(playerid),
+					.interior = GetPlayerInterior(playerid));
+
+			RemovePlayerWeapon(playerid, _:type);
+			SetItemExtraData(itemid, ammo);
+			if(containerid != INVALID_CONTAINER_ID)
+			{
+				AddItemToContainer(containerid, itemid);
+			}
+			else
+			{
+				AddItemToInventory(playerid, itemid);
+			}
+		}
+	}
 	return 1;
 }
+
 
 PlayerDropWeapon(playerid)
 {

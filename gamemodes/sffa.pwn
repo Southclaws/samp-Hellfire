@@ -17,13 +17,14 @@
 #include <YSI\y_va>
 #include <YSI\y_timers>
 #include <YSI\y_hooks>
+#include <YSI\y_iterate>
 
 #include <formatex>
 #include <strlib>
 #include <md-sort>
 #include <geoip>
 #include <sscanf2>
-#include <foreach>
+//#include <foreach>
 #include <streamer>
 #include <CTime>
 #include <IniFiles>
@@ -321,6 +322,9 @@ enum
 	d_Inventory,
 	d_InventoryOptions,
 	d_InventoryCombine,
+	d_ContainerInventory,
+	d_ContainerPlayerInv,
+	d_SignEdit,
 
 	d_CarBuy,
 	d_CarBuyConfirm,
@@ -372,7 +376,7 @@ new
 		{-2037.54, 245.96, 62.20,	-2033.24, 247.60, 60.24,	-1986.24, 288.51, 34.26, 270.0},	// SF
 		{1212.34, -1394.96, 42.63,	1211.34, -1390.35, 40.99,	1186.82,-1324.14,13.55, 0.0},		// LS
 		{-223.11, 1484.04, 86.42,	-226.72, 1487.50, 87.01,	-292.06, 1535.98, 75.56, 180.0},	// EAR
-		{-2165.44, -1737.3, 505.9,	-2170.10, -1735.77, 505.05,	-2315.46, -1667.93, 482.95, 90.0},	// CHILLIAD
+		{-2165.44, -1737.3, 505.9,	-2170.10, -1735.77, 505.05,	-2315.46, -1667.93, 482.95, 270.0},	// CHILLIAD
 		{1374.24, 1307.99, 21.92,	1370.60, 1304.73, 20.84,	1324.44, 1485.65, 10.82, 0.0},		// LV Airport
 		{-1132.24, 26.62, 45.91,	-1136.89, 26.54, 44.05,		-1225.17, 45.78, 14.13, 0.0},		// SF Airport
 		{2091.90, -2653.24, 37.73,	2088.02, -2650.29, 36.61,	2056.75, -2620.56, 13.54, 0.0}		// LS Airport
@@ -407,7 +411,7 @@ new
 		"Alderaan"
 	};
 	new
-		ls_GeneralStore,
+		ItemIndex:GeneralStore,
 		AmmuArea[5];
 
 //=====================Player Skins
@@ -558,7 +562,7 @@ DispenserType:	disp_HealoMatic;
 
 //==============================================================PLAYER VARIABLES
 
-enum (<<= 1) // 28
+enum (<<= 1) // 30
 {
 		HasAccount = 1,
 		LoggedIn,
@@ -577,6 +581,8 @@ enum (<<= 1) // 28
 		JumpBoost,
 		AntiFallOffBike,
 
+		RegenHP,
+		RegenAP,
 		Invis,
 		GodMode,
 		Frozen,
@@ -630,6 +636,7 @@ new
 
 		gPlayerName				[MAX_PLAYERS][MAX_PLAYER_NAME],
 Float:	gPlayerHP				[MAX_PLAYERS],
+Float:	gPlayerAP				[MAX_PLAYERS],
 		gPlayerColour			[MAX_PLAYERS],
 		gPlayerVehicleID		[MAX_PLAYERS],
 		gPlayerArea				[MAX_PLAYERS],
@@ -646,9 +653,11 @@ Float:	gPlayerVelocity			[MAX_PLAYERS],
 		Hidden					[MAX_PLAYERS][MAX_PLAYERS],
 		gCurrentMinigame		[MAX_PLAYERS],
 
-        tick_ExitVehicle		[MAX_PLAYERS],
-        tick_LastChatMessage	[MAX_PLAYERS],
-		ChatMessageStreak       [MAX_PLAYERS],
+		tick_StartRegenHP		[MAX_PLAYERS],
+		tick_StartRegenAP		[MAX_PLAYERS],
+		tick_ExitVehicle		[MAX_PLAYERS],
+		tick_LastChatMessage	[MAX_PLAYERS],
+		ChatMessageStreak		[MAX_PLAYERS],
 		ChatMuteTick			[MAX_PLAYERS],
 Text3D:	gPlayerAfkLabel			[MAX_PLAYERS],
 Float:	TankHeat				[MAX_PLAYERS],
@@ -722,6 +731,7 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/SIF/Item.pwn"
 #include "../scripts/SIF/Inventory.pwn"
 #include "../scripts/SIF/Craft.pwn"
+#include "../scripts/SIF/Container.pwn"
 
 #include "../scripts/API/Balloon/Balloon.pwn"
 #include "../scripts/API/Checkpoint/Checkpoint.pwn"
@@ -736,6 +746,12 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/Items/beer.pwn"
 #include "../scripts/Items/dispenser.pwn"
 #include "../scripts/Items/timebomb.pwn"
+#include "../scripts/Items/Sign.pwn"
+#include "../scripts/Items/adrenaline.pwn"
+#include "../scripts/Items/electroap.pwn"
+#include "../scripts/Items/misc.pwn"
+
+#include "../scripts/Items/loot.pwn"
 
 #include "../scripts/CountDown.pwn"
 
@@ -944,6 +960,33 @@ public OnGameModeInit()
 	item_battery		= DefineItemType("Battery",			2040,	ITEM_SIZE_MEDIUM);
 	item_fusebox		= DefineItemType("Fuse Box",		2038,	ITEM_SIZE_SMALL);
 	item_Beer			= DefineItemType("Beer",			1543,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.063184, 0.132318, 0.249579, 338.786285, 175.964538, 0.000000, 5);
+	item_Sign			= DefineItemType("Sign",			19471,	ITEM_SIZE_LARGE, 0.0, 0.0, 270.0);
+	item_HealthRegen	= DefineItemType("Adrenaline",		1575,	ITEM_SIZE_SMALL);
+	item_ArmourRegen	= DefineItemType("ElectroArmour",	19515,	ITEM_SIZE_SMALL);
+
+	item_FishRod		= DefineItemType("Fishing Rod",		18632,	ITEM_SIZE_LARGE, 0.0, 0.0, 0.0, 0.091496, 0.019614, 0.000000, 185.619995, 354.958374, 0.000000);
+	item_Wrench			= DefineItemType("Wrench",			18633,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.084695, -0.009181, 0.152275, 98.865089, 270.085449, 0.000000);
+	item_Crowbar		= DefineItemType("Crowbar",			18634,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.066177, 0.011153, 0.038410, 97.289527, 270.962554, 1.114514);
+	item_Hammer			= DefineItemType("Hammer",			18635,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.000000, -0.008230, 0.000000, 6.428617, 0.000000, 0.000000);
+	item_Shield			= DefineItemType("Shield",			18637,	ITEM_SIZE_LARGE, 0.0, 0.0, 0.0, -0.262389, 0.016478, -0.151046, 103.597534, 6.474381, 38.321765);
+	item_Flashlight		= DefineItemType("Flashlight",		18641,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.061910, 0.022700, 0.039052, 190.938354, 0.000000, 0.000000);
+	item_Taser			= DefineItemType("Taser",			18642,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.079878, 0.014009, 0.029525, 180.000000, 0.000000, 0.000000);
+	item_LaserPoint		= DefineItemType("Laser Pointer",	18643,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.066244, 0.010838, -0.000024, 6.443027, 287.441467, 0.000000);
+	item_Screwdriver	= DefineItemType("Screwdriver",		18644,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.099341, 0.021018, 0.009145, 193.644195, 0.000000, 0.000000);
+	item_MobilePhone	= DefineItemType("Mobile Phone",	18865,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.103904, -0.003697, -0.015173, 94.655189, 184.031860, 0.000000);
+	item_Pager			= DefineItemType("Pager",			18875,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.097277, 0.027625, 0.013023, 90.819244, 191.427993, 0.000000);
+	item_Rake			= DefineItemType("Rake",			18890,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, -0.002599, 0.003984, 0.026356, 190.231231, 0.222518, 271.565185);
+	item_HotDog			= DefineItemType("Hotdog",			19346,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.088718, 0.035828, 0.008570, 272.851745, 354.704772, 9.342185);
+	item_EasterEgg1		= DefineItemType("Easter Egg",		19341,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.000000, 0.000000, 0.000000, 0.000000, 90.000000, 0.000000);
+	item_EasterEgg2		= DefineItemType("Easter Egg",		19342,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.000000, 0.000000, 0.000000, 0.000000, 90.000000, 0.000000);
+	item_EasterEgg3		= DefineItemType("Easter Egg",		19343,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.000000, 0.000000, 0.000000, 0.000000, 90.000000, 0.000000);
+	item_EasterEgg4		= DefineItemType("Easter Egg",		19344,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.000000, 0.000000, 0.000000, 0.000000, 90.000000, 0.000000);
+	item_EasterEgg5		= DefineItemType("Easter Egg",		19345,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.000000, 0.000000, 0.000000, 0.000000, 90.000000, 0.000000);
+	item_Cane			= DefineItemType("Cane",			19348,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.041865, 0.022883, -0.079726, 4.967216, 10.411237, 0.000000);
+	item_HandCuffs		= DefineItemType("Handcuffs",		19418,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.077635, 0.011612, 0.000000, 0.000000, 90.000000, 0.000000);
+	item_Bucket			= DefineItemType("Bucket",			19468,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.293691, -0.074108, 0.020810, 148.961685, 280.067260, 151.782791);
+	item_GasMask		= DefineItemType("Gas Mask",		19472,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.062216, 0.055396, 0.001138, 90.000000, 0.000000, 180.000000);
+	item_Flag			= DefineItemType("Flag",			2993,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.045789, 0.026306, -0.078802, 8.777217, 0.272155, 0.000000);
 
 
 	disp_HealoMatic		= DefineDispenserType("Heal-O-Matic", item_Medkit, 50);
@@ -980,10 +1023,23 @@ public OnGameModeInit()
 	CreateTeleporter(-1979.7510, 884.3353, 45.0397, FREEROAM_WORLD, STUNT_WORLD);
 	CreateTeleporter(2082.2910, 1683.4525, 10.6566, FREEROAM_WORLD, STUNT_WORLD);
 */
-	ls_GeneralStore = CreateShop("Los Santos General Store", 1158.2169, -1443.7321, 15.7981, 1157.36, -1443.48, 15.84);
+	DefineStoreIndexItem(GeneralStore, item_FireworkBox, 100);
+	DefineStoreIndexItem(GeneralStore, item_FireLighter, 1);
+	DefineStoreIndexItem(GeneralStore, item_Bucket, 5);
+	DefineStoreIndexItem(GeneralStore, item_Rake, 8);
+	DefineStoreIndexItem(GeneralStore, item_FishRod, 15);
+	DefineStoreIndexItem(GeneralStore, item_Wrench, 5);
+	DefineStoreIndexItem(GeneralStore, item_Crowbar, 10);
+	DefineStoreIndexItem(GeneralStore, item_Hammer, 10);
+	DefineStoreIndexItem(GeneralStore, item_Flashlight, 10);
+	DefineStoreIndexItem(GeneralStore, item_LaserPoint, 10);
+	DefineStoreIndexItem(GeneralStore, item_Screwdriver, 3);
+	DefineStoreIndexItem(GeneralStore, item_MobilePhone, 50);
+	DefineStoreIndexItem(GeneralStore, item_Pager, 30);
+	DefineStoreIndexItem(GeneralStore, item_Flag, 5);
+	
+	CreateShop("Los Santos General Store", GeneralStore, 1158.2169, -1443.7321, 15.7981, 1157.36, -1443.48, 15.84);
 
-	DefineStoreItem(ls_GeneralStore, item_FireworkBox, 100);
-	DefineStoreItem(ls_GeneralStore, item_FireLighter, 1);
 
 	CallLocalFunction("OnLoad", "");
 
@@ -1018,6 +1074,12 @@ forward INSERT_OnLoad();
 	CreateTurret(287.0, 2047.0, 17.5, 270.0, .type = 1);
 	CreateTurret(335.0, 1843.0, 17.5, 270.0, .type = 1);
 	CreateTurret(10.0, 1805.0, 17.40, 180.0, .type = 1);
+
+
+	AddItemToContainer(
+		CreateContainer("Generator", -2318.9067, -1636.5662, 483.7031, 6),
+		CreateItem(item_Medkit, -2322.9257, -1639.8038, 483.7031));
+
 
 	gTempStr[0]=83,gTempStr[1]=111,gTempStr[2]=117,gTempStr[3]=116,
 	gTempStr[4]=104,gTempStr[5]=99,gTempStr[6]=108,gTempStr[7]=97,
@@ -1055,7 +1117,13 @@ public OnGameModeExit()
 }
 RestartGamemode()
 {
-	PlayerLoop(i)OnPlayerDisconnect(i, -1);
+	PlayerLoop(i)
+	{
+		SavePlayerData(i);
+		ResetVariables(i);
+		UnloadPlayerTextDraws(i);
+	}
+
 	UnloadVehicles();
 
 	db_close(gAccounts);
@@ -1134,7 +1202,24 @@ ptask PlayerUpdate[100](playerid)
 		if((tickcount() - rc_StartTick[playerid]) > 5000 && gPlayerVelocity[playerid] == 0.0)
 			rc_Leave(playerid);
 	}
-	
+
+	if(bPlayerGameSettings[playerid] & RegenHP)
+	{
+		if(tickcount() - tick_StartRegenHP[playerid] > REGEN_HP_TIME)
+			f:bPlayerGameSettings[playerid]<RegenHP>;
+
+		if(tickcount() - tick_LastDamg[playerid] > 6000)
+			gPlayerHP[playerid] += 0.1;
+	}
+	if(bPlayerGameSettings[playerid] & RegenAP)
+	{
+		if(tickcount() - tick_StartRegenAP[playerid] > REGEN_AP_TIME)
+			f:bPlayerGameSettings[playerid]<RegenAP>;
+
+		if(tickcount() - tick_LastDamg[playerid] > 6000)
+			gPlayerAP[playerid] += 0.1;
+	}
+
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		new
@@ -1829,7 +1914,7 @@ public OnPlayerDisconnect(playerid, reason)
 		case 0:MsgAllF(GREY, " >  %s lost connection.", gPlayerName[playerid]);
 		case 1:MsgAllF(GREY, " >  %s left the server.", gPlayerName[playerid]);
 	}
-	
+
 	if(Iter_Count(Player) == 1)
 	{
 		if(bServerGlobalSettings & ScheduledRestart)RestartGamemode();
@@ -1897,6 +1982,7 @@ SavePlayerData(playerid)
 ResetVariables(playerid)
 {
 	gPlayerHP[playerid] = 100.0;
+	gPlayerAP[playerid] = 0.0;
 
 	bPlayerGameSettings[playerid]			= 0; // Empty the bit-array
 	bPlayerDeathmatchSettings[playerid]		= 0;
@@ -2393,6 +2479,7 @@ public OnPlayerSpawn(playerid)
 	LevelUpWeaponSkills(playerid, 999);
 
 	gPlayerHP[playerid] = 100.0;
+	gPlayerAP[playerid] = 0.0;
 
 	return 1;
 }
@@ -2515,7 +2602,7 @@ public OnPlayerUpdate(playerid)
 		if(bPlayerGameSettings[playerid] & GodMode)
 		{
 			gPlayerHP[playerid] = 1000.0;
-			SetPlayerArmour(playerid, 100.0);
+			gPlayerAP[playerid] = 1000.0;
 			if(IsPlayerInAnyVehicle(playerid))
 			{
 				static pCar;
@@ -2524,7 +2611,10 @@ public OnPlayerUpdate(playerid)
 			}
 		}
 	}
+
 	SetPlayerHealth(playerid, gPlayerHP[playerid]);
+	SetPlayerArmour(playerid, gPlayerAP[playerid]);
+
 	return 1;
 }
 public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid)
@@ -2650,6 +2740,22 @@ internal_HitPlayer(playerid, targetid, weaponid)
 }
 GivePlayerHP(playerid, Float:hp, shooterid = INVALID_PLAYER_ID, weaponid = 54)
 {
+	if(gPlayerAP[playerid] > 0.0)
+	{
+		switch(weaponid)
+		{
+			case 0..7, 10..15:
+				hp *= 0.8;
+
+			case 22..32, 38:
+				hp *= 0.7;
+
+			case 33, 34:
+				hp *= 0.99;
+		}
+		gPlayerAP[playerid] = hp / 2.0;
+	}
+
 	SetPlayerHP(playerid, (gPlayerHP[playerid] + hp), shooterid, weaponid);
 
 	if(hp > 0.0)
@@ -3476,7 +3582,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				HomeSpawnData[gHomeSpawn[playerid]][spn_posX], HomeSpawnData[gHomeSpawn[playerid]][spn_posY], HomeSpawnData[gHomeSpawn[playerid]][spn_posZ], HomeSpawnData[gHomeSpawn[playerid]][spn_rotZ], 0,0,0,0,0,0);
 
 			f:bPlayerGameSettings[playerid]<GodMode>;
-			SetPlayerArmour(playerid, 0.0);
 			SetPlayerVirtualWorld(playerid, FREEROAM_WORLD);
 			gHomeSpawn[playerid] = listitem;
 		}

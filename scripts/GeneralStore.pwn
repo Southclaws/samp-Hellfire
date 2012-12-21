@@ -1,21 +1,22 @@
 #include <YSI\y_hooks>
 
-#define MAX_STORE			(8)
-#define MAX_STORE_ITEMS		(8)
-#define MAX_STORE_NAME		(32)
-#define MAX_STORE_ITEM_NAME	(32)
+#define MAX_STORE				(8)
+#define MAX_STORE_NAME			(32)
+#define MAX_STORE_ITEM_NAME		(32)
+#define MAX_ITEM_INDEX			ItemIndex:(8)
+#define MAX_ITEM_INDEX_ITEMS	(32)
 
-#define INVALID_SHOP_ID		(-1)
+#define INVALID_SHOP_ID			(-1)
 
 
 enum E_STORE_DATA
 {
 			shp_name[MAX_STORE_NAME],
+ItemIndex:	shp_itemIndex,
 			shp_pickupModel,
+			shp_button,
 			shp_pickup,
-Text3D:		shp_label,
 			shp_itemid,
-			shp_totalItems,
 
 Float:		shp_posX,
 Float:		shp_posY,
@@ -37,24 +38,26 @@ ItemType:	item_type,
 
 
 new
-			shp_Data[MAX_STORE][E_STORE_DATA],
+			shp_Data				[MAX_STORE][E_STORE_DATA],
 Iterator:	shp_Index<MAX_STORE>,
-			shp_ItemIndex[MAX_STORE][MAX_STORE_ITEMS][E_STORE_ITEM_DATA];
+			shp_ItemIndexSize		[MAX_ITEM_INDEX],
+			shp_ItemIndex			[MAX_ITEM_INDEX][MAX_ITEM_INDEX_ITEMS][E_STORE_ITEM_DATA];
 
 new
-			shp_CurrentShop[MAX_PLAYERS],
-			shp_MenuTick[MAX_PLAYERS];
+			shp_CurrentShop[MAX_PLAYERS];
 
 
-CreateShop(name[], Float:x, Float:y, Float:z, Float:itemx, Float:itemy, Float:itemz, pickupmodel = 1274, world = -1, interior = -1)
+CreateShop(name[], ItemIndex:itemindex, Float:x, Float:y, Float:z, Float:itemx, Float:itemy, Float:itemz, pickupmodel = 1274, world = -1, interior = -1)
 {
 	new id = Iter_Free(shp_Index);
 
 
 	shp_Data[id][shp_name][0] = EOS;
 	strcat(shp_Data[id][shp_name], name);
+	shp_Data[id][shp_itemIndex] = itemindex;
+
+	shp_Data[id][shp_button] = CreateButton(x, y, z, name, world, interior, 1.0, 1, name);
 	shp_Data[id][shp_pickup] = CreateDynamicPickup(pickupmodel, 1, x, y, z, world, 0);
-	shp_Data[id][shp_label] = CreateDynamic3DTextLabel(name, YELLOW, x, y, z + 0.5, 100.0, .worldid = world, .testlos = 1);
 
 	shp_Data[id][shp_posX] = x;
 	shp_Data[id][shp_posY] = y;
@@ -73,18 +76,18 @@ CreateShop(name[], Float:x, Float:y, Float:z, Float:itemx, Float:itemy, Float:it
 
 	return id;
 }
-DefineStoreItem(shopid, ItemType:itemid, price)
+DefineStoreIndexItem(ItemIndex:itemindex, ItemType:itemid, price)
 {
 	new id;
-	while(id < MAX_STORE_ITEMS && shp_ItemIndex[shopid][id][item_used])id++;
-	if(id == MAX_STORE_ITEMS)
+	while(id < MAX_ITEM_INDEX_ITEMS && shp_ItemIndex[itemindex][id][item_used])id++;
+	if(id == MAX_ITEM_INDEX_ITEMS)
 		return -1;
 
-	shp_ItemIndex[shopid][id][item_price] = price;
-	shp_ItemIndex[shopid][id][item_type] = itemid;
-	shp_ItemIndex[shopid][id][item_used] = true;
+	shp_ItemIndex[itemindex][id][item_price] = price;
+	shp_ItemIndex[itemindex][id][item_type] = itemid;
+	shp_ItemIndex[itemindex][id][item_used] = true;
 
-	shp_Data[shopid][shp_totalItems]++;
+	shp_ItemIndexSize[itemindex]++;
 
 	return id;
 }
@@ -92,14 +95,15 @@ DefineStoreItem(shopid, ItemType:itemid, price)
 FormatStoreList(playerid, shopid)
 {
 	new
-		list[MAX_STORE_ITEMS * (MAX_STORE_ITEM_NAME + 5)],
+		list[MAX_ITEM_INDEX_ITEMS * (MAX_STORE_ITEM_NAME + 5)],
 		tmp[(MAX_STORE_ITEM_NAME + 5)],
-		itemname[MAX_STORE_ITEM_NAME];
+		itemname[MAX_STORE_ITEM_NAME],
+		ItemIndex:index = shp_Data[shopid][shp_itemIndex];
 
-	for(new i; i < shp_Data[shopid][shp_totalItems]; i++)
+	for(new i; i < shp_ItemIndexSize[index]; i++)
 	{
-		GetItemTypeName(shp_ItemIndex[shopid][i][item_type], itemname);
-		format(tmp, sizeof(tmp), "%s - $%d\n", itemname, shp_ItemIndex[shopid][i][item_price]);
+		GetItemTypeName(shp_ItemIndex[index][i][item_type], itemname);
+		format(tmp, sizeof(tmp), "%s - $%d\n", itemname, shp_ItemIndex[index][i][item_price]);
 		strcat(list, tmp);
 	}
 
@@ -113,56 +117,56 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			shp_MenuTick[playerid] = tickcount();
+			new ItemIndex:index = shp_Data[shp_CurrentShop[playerid]][shp_itemIndex];
 
 			if(GetPlayerItem(playerid) != INVALID_ITEM_ID)
 				return Msg(playerid, RED, " >  You are already holding an item");
 
-			if(GetPlayerMoney(playerid) < shp_ItemIndex[shp_CurrentShop[playerid]][listitem][item_price])
+			if(GetPlayerMoney(playerid) < shp_ItemIndex[index][listitem][item_price])
 				return Msg(playerid, RED, " >  You don't have enough money for that.");
 
 			new name[MAX_STORE_ITEM_NAME];
 
-			GetItemTypeName(shp_ItemIndex[shp_CurrentShop[playerid]][listitem][item_type], name);
+			GetItemTypeName(shp_ItemIndex[index][listitem][item_type], name);
 
 			shp_Data[shp_CurrentShop[playerid]][shp_itemid] = CreateItem(
-				shp_ItemIndex[shp_CurrentShop[playerid]][listitem][item_type],
+				shp_ItemIndex[index][listitem][item_type],
 				shp_Data[shp_CurrentShop[playerid]][shp_itemX],
 				shp_Data[shp_CurrentShop[playerid]][shp_itemY],
 				shp_Data[shp_CurrentShop[playerid]][shp_itemZ]);
 
-			DestroyDynamicPickup(shp_Data[shp_CurrentShop[playerid]][shp_pickup]);
-			shp_Data[shp_CurrentShop[playerid]][shp_pickup] = -1;
+			DestroyButton(shp_Data[shp_CurrentShop[playerid]][shp_button]);
+			shp_Data[shp_CurrentShop[playerid]][shp_button] = INVALID_BUTTON_ID;
 
-			GivePlayerMoney(playerid, -shp_ItemIndex[shp_CurrentShop[playerid]][listitem][item_price]);
+			GivePlayerMoney(playerid, -shp_ItemIndex[index][listitem][item_price]);
 
 			MsgF(playerid, YELLOW, " >  You have bought "#C_BLUE"%s for "#C_ORANGE"$%d.",
-				name, shp_ItemIndex[shp_CurrentShop[playerid]][listitem][item_price]);
+				name, shp_ItemIndex[index][listitem][item_price]);
 		}
 		shp_CurrentShop[playerid] = INVALID_SHOP_ID;
 	}
 	return 1;
 }
 
-public OnPlayerPickUpDynamicPickup(playerid, pickupid)
+public OnButtonPress(playerid, buttonid)
 {
 	foreach(new i : shp_Index)
 	{
-		if(pickupid == shp_Data[i][shp_pickup] && tickcount() - shp_MenuTick[playerid] > 3000)
+		if(buttonid == shp_Data[i][shp_button])
 		{
 			FormatStoreList(playerid, i);
 			return 1;
 		}
 	}
-    return CallLocalFunction("shp_OnPlayerPickUpDynPickup", "dd", playerid, pickupid);
+    return CallLocalFunction("shp_OnButtonPress", "dd", playerid, buttonid);
 }
-#if defined _ALS_OnPlayerPickUpDynPickup
-    #undef OnPlayerPickUpDynamicPickup
+#if defined _ALS_OnButtonPress
+    #undef OnButtonPress
 #else
-    #define _ALS_OnPlayerPickUpDynPickup
+    #define _ALS_OnButtonPress
 #endif
-#define OnPlayerPickUpDynamicPickup shp_OnPlayerPickUpDynPickup
-forward shp_OnPlayerPickUpDynPickup(playerid, pickupid);
+#define OnButtonPress shp_OnButtonPress
+forward shp_OnButtonPress(playerid, buttonid);
 
 public OnPlayerPickedUpItem(playerid, itemid)
 {
@@ -172,8 +176,10 @@ public OnPlayerPickedUpItem(playerid, itemid)
 		{
 			shp_Data[i][shp_itemid] = INVALID_ITEM_ID;
 
-			shp_Data[i][shp_pickup] = CreateDynamicPickup(shp_Data[i][shp_pickupModel], 1,
-				shp_Data[i][shp_posX], shp_Data[i][shp_posY], shp_Data[i][shp_posZ], shp_Data[i][shp_world], shp_Data[i][shp_interior]);
+			shp_Data[i][shp_button] = CreateButton(
+				shp_Data[i][shp_posX], shp_Data[i][shp_posY], shp_Data[i][shp_posZ],
+				shp_Data[i][shp_name], shp_Data[i][shp_world], shp_Data[i][shp_interior],
+				1.0, 1, shp_Data[i][shp_name]);
 		}
 	}
 	return CallLocalFunction("shp_OnPlayerPickedUpItem", "dd", playerid, itemid);

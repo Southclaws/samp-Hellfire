@@ -2,11 +2,7 @@
 
 new
 	ItemType:item_HardDrive		= INVALID_ITEM_TYPE,
-	ItemType:item_Key			= INVALID_ITEM_TYPE,
-	ItemType:item_timer			= INVALID_ITEM_TYPE,
-	ItemType:item_explosive		= INVALID_ITEM_TYPE,
-	ItemType:item_battery		= INVALID_ITEM_TYPE,
-	ItemType:item_fusebox		= INVALID_ITEM_TYPE;
+	ItemType:item_Key			= INVALID_ITEM_TYPE;
 
 new
 	RanchPcButton,

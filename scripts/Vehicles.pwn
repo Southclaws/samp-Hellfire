@@ -230,6 +230,29 @@ Float:	rot,
 
 			tmpid = CreateVehicle(model, posX, posY, posZ, rot, -1, -1, -1);
 
+			if(gCurModelGroup != VEHICLE_GROUP_BIKE)
+			{
+				new
+					containerid,
+					itemid,
+					ItemType:itemtype;
+
+				containerid = CreateContainer("Trunk", 0.0, 0.0, 0.0, 12);
+				AttachContainerToVehicle(containerid, tmpid);
+
+				itemtype = GenerateLoot();
+				itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
+
+				AddItemToContainer(containerid, itemid);
+
+				if(random(100) < 10)
+				{
+					itemtype = GenerateLoot();
+					itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
+					AddItemToContainer(containerid, itemid);
+				}
+			}
+
 			SetVehicleNumberPlate(tmpid, RandomNumberPlateString());
 
 			TotalVehicles++;

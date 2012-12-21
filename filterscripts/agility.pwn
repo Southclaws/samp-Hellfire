@@ -11,7 +11,8 @@ new
 	key_LeftRight[MAX_PLAYERS],
 
 	tick_keyJump[MAX_PLAYERS],
-	tick_dive[MAX_PLAYERS];
+	tick_dive[MAX_PLAYERS],
+	tick_dropkick[MAX_PLAYERS];
 
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
@@ -19,7 +20,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 	if(newkeys & KEY_JUMP)
 	{
-	    new animidx = GetPlayerAnimationIndex(playerid);
+		new animidx = GetPlayerAnimationIndex(playerid);
 		switch(animidx)
 		{
 			case 1189, 1266, 1231, 1195, 1196, 1197:
@@ -42,6 +43,26 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			GetPlayerFacingAngle(playerid, a);
 			SetPlayerFacingAngle(playerid, a-90.0);
 			ApplyAnimation(playerid, "PED", "GETUP_FRONT", 4.0, 0, 1, 1, 0, 0);
+		}
+	}
+	if(newkeys & KEY_FIRE)
+	{
+		new animidx = GetPlayerAnimationIndex(playerid);
+		switch(animidx)
+		{
+			case 1189, 1266, 1231, 1195, 1196, 1197:
+			{
+				if(tickcount() - tick_keyJump[playerid] < 1000)
+				{
+					new k, ud, lr;
+					GetPlayerKeys(playerid, k, ud, lr);
+					if(k & KEY_JUMP)
+					{
+						ApplyAnimation(playerid, "FIGHT_C", "FightC_M", 4.0, 0, 1, 1, 0, 0);
+					}
+					tick_dropkick[playerid] = tickcount();
+				}
+			}
 		}
 	}
 	
