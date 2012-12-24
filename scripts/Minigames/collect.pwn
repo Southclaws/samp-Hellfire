@@ -121,7 +121,7 @@ clt_StartCount(playerid)
 		clt_CheckPointPos[clt_CurrentCourse[playerid]][0][1],
 		clt_CheckPointPos[clt_CurrentCourse[playerid]][0][2]);
 
-	SetPlayerFacingAngle(playerid, -tmpAngle);
+	SetPlayerFacingAngle(playerid, tmpAngle);
 	SetPlayerVirtualWorld(playerid, MINIGAME_WORLD);
 
 	TogglePlayerControllable(playerid, false);

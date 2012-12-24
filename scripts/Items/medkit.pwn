@@ -147,7 +147,7 @@ timer MedkitHealUpdate[100](playerid)
 
 		GetPlayerPos(playerid, x1, y1, z1);
 		GetPlayerPos(gPlayerMedkitTarget[playerid], x2, y2, z2);
-		SetPlayerFacingAngle(playerid, -GetAngleToPoint(x1, y1, x2, y2));
+		SetPlayerFacingAngle(playerid, GetAngleToPoint(x1, y1, x2, y2));
 
 		SetPlayerProgressBarValue(gPlayerMedkitTarget[playerid], ActionBar, gPlayerMedkitProgress[playerid]);
 		ShowPlayerProgressBar(gPlayerMedkitTarget[playerid], ActionBar);

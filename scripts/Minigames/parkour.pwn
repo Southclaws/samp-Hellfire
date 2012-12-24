@@ -120,7 +120,7 @@ prk_StartCount(playerid)
 		prk_CheckPointPos[prk_CurrentCourse[playerid]][0][1],
 		prk_CheckPointPos[prk_CurrentCourse[playerid]][0][2]);
 
-	SetPlayerFacingAngle(playerid, -tmpAngle);
+	SetPlayerFacingAngle(playerid, tmpAngle);
 	SetPlayerVirtualWorld(playerid, MINIGAME_WORLD);
 
 	TogglePlayerControllable(playerid, false);

@@ -460,7 +460,7 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 #include <YSI\y_hooks>
 
 
-#define MAX_BUTTON			(3000)
+#define MAX_BUTTON			(4096)
 #define MAX_BUTTON_TEXT		(128)
 
 #define INVALID_BUTTON_ID	(-1)
@@ -510,7 +510,7 @@ hook OnGameModeInit()
 {
 	for(new i; i < MAX_PLAYERS; i++)
 	{
-	    btn_Pressing[i] = INVALID_BUTTON_ID;
+		btn_Pressing[i] = INVALID_BUTTON_ID;
 	}
 }
 
@@ -671,52 +671,55 @@ stock DetatchButtonFromVehicle(buttonid)
 
 hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
-	if(newkeys & 16)
+	if(!IsPlayerInAnyVehicle(playerid) && IsPlayerInAnyDynamicArea(playerid))
 	{
-		foreach(new i : btn_Index)
+		if(newkeys & 16)
 		{
-			if(IsPlayerInDynamicArea(playerid, btn_Data[i][btn_area]))
+			foreach(new i : btn_Index)
 			{
-				if(IsValidVehicle(btn_Data[i][btn_attachVehicle]))
+				if(IsPlayerInDynamicArea(playerid, btn_Data[i][btn_area]))
 				{
-					new
-						Float:px,
-						Float:py,
-						Float:pz,
-						Float:vx,
-						Float:vy,
-						Float:vz,
-						Float:vr,
-						Float:angle;
-
-					GetVehiclePos(btn_Data[i][btn_attachVehicle], vx, vy, vz);
-					GetVehicleZAngle(btn_Data[i][btn_attachVehicle], vr);
-					GetPlayerPos(playerid, px, py, pz);
-
-					angle = -(90-(atan2((py - vy), (px - vx))));
-
-					if(-btn_Data[i][btn_attachAngleRange] < (btn_Data[i][btn_attachAngle] - (vr-angle)) < btn_Data[i][btn_attachAngleRange])
+					if(IsValidVehicle(btn_Data[i][btn_attachVehicle]))
 					{
-						SetPlayerPos(playerid, px, py, pz);
-						SetPlayerFacingAngle(playerid, angle-180.0);
-						ClearAnimations(playerid);
-						Internal_OnButtonPress(playerid, i);
+						new
+							Float:px,
+							Float:py,
+							Float:pz,
+							Float:vx,
+							Float:vy,
+							Float:vz,
+							Float:vr,
+							Float:angle;
+
+						GetVehiclePos(btn_Data[i][btn_attachVehicle], vx, vy, vz);
+						GetVehicleZAngle(btn_Data[i][btn_attachVehicle], vr);
+						GetPlayerPos(playerid, px, py, pz);
+
+						angle = -(90-(atan2((py - vy), (px - vx))));
+
+						if(-btn_Data[i][btn_attachAngleRange] < (btn_Data[i][btn_attachAngle] - (vr-angle)) < btn_Data[i][btn_attachAngleRange])
+						{
+							SetPlayerPos(playerid, px, py, pz);
+							SetPlayerFacingAngle(playerid, angle-180.0);
+							ClearAnimations(playerid);
+							Internal_OnButtonPress(playerid, i);
+						}
 					}
+					else Internal_OnButtonPress(playerid, i);
+					break;
 				}
-				else Internal_OnButtonPress(playerid, i);
-				break;
+			}
+		}
+		if(oldkeys & 16)
+		{
+			if(btn_Pressing[playerid] != INVALID_BUTTON_ID)
+			{
+				CallLocalFunction("OnButtonRelease", "dd", playerid, btn_Pressing[playerid]);
+				btn_Pressing[playerid] = INVALID_BUTTON_ID;
 			}
 		}
 	}
-	if(oldkeys & 16)
-	{
-	    if(btn_Pressing[playerid] != INVALID_BUTTON_ID)
-	    {
-			CallLocalFunction("OnButtonRelease", "dd", playerid, btn_Pressing[playerid]);
-			btn_Pressing[playerid] = INVALID_BUTTON_ID;
-	    }
-	}
-    return 1;
+	return 1;
 }
 
 Internal_OnButtonPress(playerid, buttonid)
@@ -758,7 +761,7 @@ Internal_OnButtonPress(playerid, buttonid)
 		SetPlayerPos(playerid, x, y, z);
 		SetPlayerFacingAngle(playerid, a);
 
-        btn_Pressing[playerid] = buttonid;
+		btn_Pressing[playerid] = buttonid;
 		CallLocalFunction("OnButtonPress", "dd", playerid, buttonid);
 	}
 	return 1;
@@ -771,7 +774,7 @@ timer btn_Unfreeze[1000](playerid)
 
 public OnPlayerEnterDynamicArea(playerid, areaid)
 {
-    foreach(new i : btn_Index)
+	foreach(new i : btn_Index)
 	{
 		if(areaid == btn_Data[i][btn_area])
 		{
@@ -780,12 +783,12 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 			break;
 		}
 	}
-    return CallLocalFunction("btn_OnPlayerEnterDynamicArea", "dd", playerid, areaid);
+	return CallLocalFunction("btn_OnPlayerEnterDynamicArea", "dd", playerid, areaid);
 }
 #if defined _ALS_OnPlayerEnterDynamicArea
-    #undef OnPlayerEnterDynamicArea
+	#undef OnPlayerEnterDynamicArea
 #else
-    #define _ALS_OnPlayerEnterDynamicArea
+	#define _ALS_OnPlayerEnterDynamicArea
 #endif
 #define OnPlayerEnterDynamicArea btn_OnPlayerEnterDynamicArea
 forward btn_OnPlayerEnterDynamicArea(playerid, areaid);
@@ -793,21 +796,21 @@ forward btn_OnPlayerEnterDynamicArea(playerid, areaid);
 
 public OnPlayerLeaveDynamicArea(playerid, areaid)
 {
-    foreach(new i : btn_Index)
+	foreach(new i : btn_Index)
 	{
 		if(areaid == btn_Data[i][btn_area])
 		{
-		    CallLocalFunction("OnPlayerLeaveButtonArea", "dd", playerid, i);
+			CallLocalFunction("OnPlayerLeaveButtonArea", "dd", playerid, i);
 			HideMsgBox(playerid);
 			break;
 		}
 	}
-    return CallLocalFunction("btn_OnPlayerLeaveDynamicArea", "dd", playerid, areaid);
+	return CallLocalFunction("btn_OnPlayerLeaveDynamicArea", "dd", playerid, areaid);
 }
 #if defined _ALS_OnPlayerLeaveDynamicArea
-    #undef OnPlayerLeaveDynamicArea
+	#undef OnPlayerLeaveDynamicArea
 #else
-    #define _ALS_OnPlayerLeaveDynamicArea
+	#define _ALS_OnPlayerLeaveDynamicArea
 #endif
 #define OnPlayerLeaveDynamicArea btn_OnPlayerLeaveDynamicArea
 forward btn_OnPlayerLeaveDynamicArea(playerid, areaid);
@@ -845,15 +848,15 @@ stock SetButtonPos(buttonid, Float:x, Float:y, Float:z)
 	if(!Iter_Contains(btn_Index, buttonid))
 		return 0;
 
-	Streamer_SetFloatData(STREAMER_TYPE_AREA, btn_Data[id][btn_area], E_STREAMER_X, x);
-	Streamer_SetFloatData(STREAMER_TYPE_AREA, btn_Data[id][btn_area], E_STREAMER_Y, y);
-	Streamer_SetFloatData(STREAMER_TYPE_AREA, btn_Data[id][btn_area], E_STREAMER_Z, z);
+	Streamer_SetFloatData(STREAMER_TYPE_AREA, btn_Data[buttonid][btn_area], E_STREAMER_X, x);
+	Streamer_SetFloatData(STREAMER_TYPE_AREA, btn_Data[buttonid][btn_area], E_STREAMER_Y, y);
+	Streamer_SetFloatData(STREAMER_TYPE_AREA, btn_Data[buttonid][btn_area], E_STREAMER_Z, z);
 
-	if(IsValidDynamic3DTextLabel(btn_Data[id][btn_label]))
+	if(IsValidDynamic3DTextLabel(btn_Data[buttonid][btn_label]))
 	{
-		Streamer_SetFloatData(STREAMER_TYPE_3D_TEXT_LABEL, btn_Data[id][btn_label], E_STREAMER_X, x);
-		Streamer_SetFloatData(STREAMER_TYPE_3D_TEXT_LABEL, btn_Data[id][btn_label], E_STREAMER_Y, y);
-		Streamer_SetFloatData(STREAMER_TYPE_3D_TEXT_LABEL, btn_Data[id][btn_label], E_STREAMER_Z, z);
+		Streamer_SetFloatData(STREAMER_TYPE_3D_TEXT_LABEL, btn_Data[buttonid][btn_label], E_STREAMER_X, x);
+		Streamer_SetFloatData(STREAMER_TYPE_3D_TEXT_LABEL, btn_Data[buttonid][btn_label], E_STREAMER_Y, y);
+		Streamer_SetFloatData(STREAMER_TYPE_3D_TEXT_LABEL, btn_Data[buttonid][btn_label], E_STREAMER_Z, z);
 	}
 
 	btn_Data[buttonid][btn_posX] = x;
@@ -884,7 +887,7 @@ stock SetButtonMessage(buttonid, msg[])
 	if(!Iter_Contains(btn_Index, buttonid))
 		return 0;
 
-    btn_Data[buttonid][btn_text][0] = EOS;
+	btn_Data[buttonid][btn_text][0] = EOS;
 	strcpy(btn_Data[buttonid][btn_text], msg);
 
 	foreach(new i : Player)

@@ -2,7 +2,7 @@
 
 
 #define MAX_CONTAINER			(3000)
-#define MAX_CONTAINER_NAME		(128)
+#define MAX_CONTAINER_NAME		(32)
 #define MAX_CONTAINER_SLOTS		(12)
 
 #define INVALID_CONTAINER_ID	(-1)
@@ -28,17 +28,20 @@ new
 Iterator:	cnt_Index<MAX_CONTAINER>;
 
 new
-			cnt_CurrentContainer	[MAX_PLAYERS];
+			cnt_CurrentContainer	[MAX_PLAYERS],
+			cnt_SelectedSlot		[MAX_PLAYERS],
+			cnt_ContainerOptions	[MAX_PLAYERS];
 
 
-stock CreateContainer(name[MAX_CONTAINER_NAME], Float:x, Float:y, Float:z, size, world = 0, interior = 0, label = 1)
+stock CreateContainer(name[MAX_CONTAINER_NAME], size, Float:x = 0.0, Float:y = 0.0, Float:z = 0.0, world = 0, interior = 0, label = 1, virtual = 0)
 {
 	new id = Iter_Free(cnt_Index);
 
 	if(id == -1)
 		return INVALID_CONTAINER_ID;
 
-	cnt_Data[id][cnt_button]	= CreateButton(x, y, z, "Press F to open", world, interior, 1.0, label, name);
+	if(!virtual)
+		cnt_Data[id][cnt_button] = CreateButton(x, y, z, "Press F to open", world, interior, 1.0, label, name);
 
 	cnt_Data[id][cnt_name]		= name;
 	cnt_Data[id][cnt_posX]		= x;
@@ -74,7 +77,7 @@ stock DestroyContainer(containerid)
 	cnt_Data[containerid][cnt_world]	= 0;
 	cnt_Data[containerid][cnt_interior]	= 0;
 
-	Iter_Remove(cnt_Index, id);
+	Iter_Remove(cnt_Index, containerid);
 
 	return 1;
 }
@@ -146,7 +149,7 @@ stock RemoveItemFromContainer(containerid, slotid)
 	return 1;
 }
 
-stock DisplayContainerInventory(playerid, containerid)
+stock DisplayContainerInventory(playerid, containerid, showoptions = 0)
 {
 	new
 		list[MAX_CONTAINER_SLOTS * (MAX_ITEM_NAME + 1)],
@@ -166,7 +169,14 @@ stock DisplayContainerInventory(playerid, containerid)
 	strcat(list, "My Inventory >");
 
 	cnt_CurrentContainer[playerid] = containerid;
-	ShowPlayerDialog(playerid, d_ContainerInventory, DIALOG_STYLE_LIST, cnt_Data[containerid][cnt_name], list, "Take", "Close");
+	cnt_ContainerOptions[playerid] = showoptions;
+
+	if(showoptions)
+		ShowPlayerDialog(playerid, d_ContainerInventory, DIALOG_STYLE_LIST, cnt_Data[containerid][cnt_name], list, "Options", "Close");
+
+	else
+		ShowPlayerDialog(playerid, d_ContainerInventory, DIALOG_STYLE_LIST, cnt_Data[containerid][cnt_name], list, "Take", "Close");
+
 }
 
 
@@ -175,7 +185,7 @@ stock DisplayContainerInventory(playerid, containerid)
 
 
 
-DisplayContainerPlayerInv(playerid)
+DisplayContainerPlayerInv(playerid, showoptions = 0)
 {
 	new
 		list[INV_MAX_SLOTS * (MAX_ITEM_NAME + 1)],
@@ -193,8 +203,12 @@ DisplayContainerPlayerInv(playerid)
 	}
 	strcat(list, cnt_Data[cnt_CurrentContainer[playerid]][cnt_name]);
 	strcat(list, " Inventory >");
-	
-	ShowPlayerDialog(playerid, d_ContainerPlayerInv, DIALOG_STYLE_LIST, "Inventory", list, "Remove", "Close");
+
+	if(showoptions)
+		ShowPlayerDialog(playerid, d_ContainerPlayerInv, DIALOG_STYLE_LIST, "Inventory", list, "Options", "Close");
+
+	else
+		ShowPlayerDialog(playerid, d_ContainerPlayerInv, DIALOG_STYLE_LIST, "Inventory", list, "Remove", "Close");
 }
 
 public OnButtonPress(playerid, buttonid)
@@ -220,6 +234,7 @@ public OnButtonPress(playerid, buttonid)
 					GetVehicleParamsEx(cnt_Data[i][cnt_attachedVehicle], engine, lights, alarm, doors, bonnet, boot, objective);
 					SetVehicleParamsEx(cnt_Data[i][cnt_attachedVehicle], engine, lights, alarm, doors, bonnet, 1, objective);
 				}
+				break;
 			}
 		}
 	}
@@ -234,6 +249,29 @@ public OnButtonPress(playerid, buttonid)
 #define OnButtonPress cnt_OnButtonPress
 forward OnButtonPress(playerid, buttonid);
 
+DisplayContainerOptions(playerid, slotid)
+{
+	new tmp[MAX_ITEM_NAME];
+
+	GetItemTypeName(GetItemType(cnt_Items[cnt_CurrentContainer[playerid]][slotid]), tmp);
+
+	if(GetItemSize(cnt_Items[cnt_CurrentContainer[playerid]][slotid]) == ITEM_SIZE_SMALL)
+		ShowPlayerDialog(playerid, d_ContainerOptions, DIALOG_STYLE_LIST, tmp, "Equip\nUse\nTake", "Accept", "Back");
+
+	else
+		ShowPlayerDialog(playerid, d_ContainerOptions, DIALOG_STYLE_LIST, tmp, "Equip\nUse", "Accept", "Back");
+}
+
+DisplayContainerPlayerOptions(playerid, slotid)
+{
+	new tmp[MAX_ITEM_NAME];
+
+	GetItemTypeName(GetItemType(GetInventorySlotItem(playerid, slotid)), tmp);
+
+	ShowPlayerDialog(playerid, d_ContainerPlayerInvOptions, DIALOG_STYLE_LIST, tmp, "Equip\nUse\nRemove", "Accept", "Back");
+}
+
+
 hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
 	if(dialogid == d_ContainerInventory)
@@ -241,11 +279,76 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			if(listitem == cnt_Data[cnt_CurrentContainer[playerid]][cnt_size])
-				DisplayContainerPlayerInv(playerid);
+				DisplayContainerPlayerInv(playerid, cnt_ContainerOptions[playerid]);
 
 			else
 			{
-				new id = cnt_Items[cnt_CurrentContainer[playerid]][listitem];
+				if(cnt_ContainerOptions[playerid])
+				{
+					cnt_SelectedSlot[playerid] = listitem;
+					DisplayContainerOptions(playerid, listitem);
+				}
+				else
+				{
+					new id = cnt_Items[cnt_CurrentContainer[playerid]][listitem];
+
+					if(IsPlayerInventoryFull(playerid) || !IsValidItem(id))
+					{
+						DisplayContainerInventory(playerid, cnt_CurrentContainer[playerid]);
+						return 0;
+					}
+
+					RemoveItemFromContainer(cnt_CurrentContainer[playerid], listitem);
+					AddItemToInventory(playerid, id);
+					DisplayContainerInventory(playerid, cnt_CurrentContainer[playerid]);
+				}
+			}
+		}
+		else
+		{
+			if(cnt_Data[cnt_CurrentContainer[playerid]][cnt_attachedVehicle])
+			{
+				new
+					engine,
+					lights,
+					alarm,
+					doors,
+					bonnet,
+					boot,
+					objective;
+
+				GetVehicleParamsEx(cnt_Data[cnt_CurrentContainer[playerid]][cnt_attachedVehicle], engine, lights, alarm, doors, bonnet, boot, objective);
+				SetVehicleParamsEx(cnt_Data[cnt_CurrentContainer[playerid]][cnt_attachedVehicle], engine, lights, alarm, doors, bonnet, 0, objective);
+			}
+			cnt_CurrentContainer[playerid] = INVALID_CONTAINER_ID;
+		}
+	}
+
+	if(dialogid == d_ContainerOptions)
+	{
+		switch(listitem)
+		{
+			case 0:
+			{
+				if(GetPlayerItem(playerid) == INVALID_ITEM_ID && GetPlayerWeapon(playerid) == 0)
+				{
+					CreateItemInWorld(cnt_Items[cnt_CurrentContainer[playerid]][cnt_SelectedSlot[playerid]], 0.0, 0.0, 0.0);
+					GiveWorldItemToPlayer(playerid, cnt_Items[cnt_CurrentContainer[playerid]][cnt_SelectedSlot[playerid]], 1);
+					RemoveItemFromContainer(playerid, cnt_SelectedSlot[playerid]);
+				}
+				else
+				{
+					Msg(playerid, ORANGE, " >  You are already holding something");
+					DisplayContainerInventory(playerid, cnt_CurrentContainer[playerid], 1);
+				}
+			}
+			case 1:
+			{
+				PlayerUseItem(playerid, cnt_Items[cnt_CurrentContainer[playerid]][cnt_SelectedSlot[playerid]]);
+			}
+			case 2:
+			{
+				new id = cnt_Items[cnt_CurrentContainer[playerid]][cnt_SelectedSlot[playerid]];
 
 				if(IsPlayerInventoryFull(playerid) || !IsValidItem(id))
 				{
@@ -253,28 +356,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 0;
 				}
 
-				RemoveItemFromContainer(cnt_CurrentContainer[playerid], listitem);
+				RemoveItemFromContainer(cnt_CurrentContainer[playerid], cnt_SelectedSlot[playerid]);
 				AddItemToInventory(playerid, id);
 				DisplayContainerInventory(playerid, cnt_CurrentContainer[playerid]);
 			}
-		}
-		else
-		{
-			if(cnt_Data[cnt_CurrentContainer[playerid]][cnt_attachedVehicle])
-			{
-				new
-					engine,
-					lights,
-					alarm,
-					doors,
-					bonnet,
-					boot,
-					objective;
-
-				GetVehicleParamsEx(cnt_Data[cnt_CurrentContainer[playerid]][cnt_attachedVehicle], engine, lights, alarm, doors, bonnet, boot, objective);
-				SetVehicleParamsEx(cnt_Data[cnt_CurrentContainer[playerid]][cnt_attachedVehicle], engine, lights, alarm, doors, bonnet, 0, objective);
-			}
-			cnt_CurrentContainer[playerid] = INVALID_CONTAINER_ID;
 		}
 	}
 
@@ -282,22 +367,30 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			if(listitem)
-				DisplayContainerInventory(playerid, cnt_CurrentContainer[playerid]);
+			if(listitem == INV_MAX_SLOTS)
+				DisplayContainerInventory(playerid, cnt_CurrentContainer[playerid], cnt_ContainerOptions[playerid]);
 
 			else
 			{
-				new id = GetInventorySlotItem(playerid, listitem);
-
-				if(IsValidItem(cnt_Items[cnt_CurrentContainer[playerid]][cnt_Data[cnt_CurrentContainer[playerid]][cnt_size]-1]) || !IsValidItem(id))
+				if(cnt_ContainerOptions[playerid])
 				{
-					DisplayContainerPlayerInv(playerid);
-					return 0;
+					cnt_SelectedSlot[playerid] = listitem;
+					DisplayContainerPlayerOptions(playerid, listitem);
 				}
+				else
+				{
+					new id = GetInventorySlotItem(playerid, listitem);
 
-				RemoveItemFromInventory(playerid, listitem);
-				AddItemToContainer(cnt_CurrentContainer[playerid], id);
-				DisplayContainerPlayerInv(playerid);
+					if(IsValidItem(cnt_Items[cnt_CurrentContainer[playerid]][cnt_Data[cnt_CurrentContainer[playerid]][cnt_size]-1]) || !IsValidItem(id))
+					{
+						DisplayContainerPlayerInv(playerid, cnt_ContainerOptions[playerid]);
+						return 0;
+					}
+
+					RemoveItemFromInventory(playerid, listitem);
+					AddItemToContainer(cnt_CurrentContainer[playerid], id);
+					DisplayContainerPlayerInv(playerid, cnt_ContainerOptions[playerid]);
+				}
 			}
 		}
 		else
@@ -319,11 +412,53 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			cnt_CurrentContainer[playerid] = INVALID_CONTAINER_ID;
 		}
 	}
+
+	if(dialogid == d_ContainerPlayerInvOptions)
+	{
+		switch(listitem)
+		{
+			case 0:
+			{
+				if(GetPlayerItem(playerid) == INVALID_ITEM_ID && GetPlayerWeapon(playerid) == 0)
+				{
+					CreateItemInWorld(GetInventorySlotItem(playerid, cnt_SelectedSlot[playerid]), 0.0, 0.0, 0.0);
+					GiveWorldItemToPlayer(playerid, GetInventorySlotItem(playerid, cnt_SelectedSlot[playerid]), 1);
+					RemoveItemFromInventory(playerid, cnt_SelectedSlot[playerid]);
+				}
+				else
+				{
+				    Msg(playerid, ORANGE, " >  You are already holding something");
+					DisplayContainerPlayerInv(playerid, cnt_ContainerOptions[playerid]);
+				}
+			}
+			case 1:
+			{
+				PlayerUseItem(playerid, GetInventorySlotItem(playerid, cnt_SelectedSlot[playerid]));
+			}
+			case 2:
+			{
+				new id = GetInventorySlotItem(playerid, cnt_SelectedSlot[playerid]);
+
+				if(IsValidItem(cnt_Items[cnt_CurrentContainer[playerid]][cnt_Data[cnt_CurrentContainer[playerid]][cnt_size]-1]) || !IsValidItem(id))
+				{
+					DisplayContainerPlayerInv(playerid, cnt_ContainerOptions[playerid]);
+					return 0;
+				}
+
+				RemoveItemFromInventory(playerid, cnt_SelectedSlot[playerid]);
+				AddItemToContainer(cnt_CurrentContainer[playerid], id);
+				DisplayContainerPlayerInv(playerid, cnt_ContainerOptions[playerid]);
+			}
+		}
+	}
 	return 1;
 }
 
 public OnPlayerAddToInventory(playerid, itemid)
 {
+	if(!IsPlayerInAnyDynamicArea(playerid))
+		return 1;
+
 	if(IsValidItem(itemid))
 	{
 		foreach(new i : cnt_Index)
@@ -379,4 +514,15 @@ stock GetPlayerContainerID(playerid)
 		if(button == cnt_Data[i][cnt_button]) return i;
 
 	return INVALID_CONTAINER_ID;
+}
+
+stock GetContainerName(containerid, name[])
+{
+	if(!Iter_Contains(cnt_Index, containerid))
+		return 0;
+
+	name[0] = EOS;
+	strcat(name, cnt_Data[containerid][cnt_name], MAX_CONTAINER_NAME);
+
+	return 1;
 }

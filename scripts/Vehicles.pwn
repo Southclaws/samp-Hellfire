@@ -44,7 +44,8 @@ new
 	TotalVehicles,
 	TotalPersonalVehicles,
 	gCurModelGroup,
-	bVehicleSettings[MAX_VEHICLES];
+	bVehicleSettings[MAX_VEHICLES],
+	gVehicleContainer[MAX_VEHICLES];
 
 new
 	pv_Data[MAX_PERSONAL_VEHICLE][E_PVEHICLE_DATA],
@@ -138,7 +139,13 @@ LoadVehicles(bool:prints = true)
 UnloadVehicles()
 {
 	for(new i; i < MAX_VEHICLES; i++)
-		if(IsValidVehicle(i))DestroyVehicle(i);
+	{
+		if(IsValidVehicle(i))
+		{
+			DestroyVehicle(i);
+			DestroyContainer(gVehicleContainer[i]);
+		}
+	}
 
     TotalVehicles = 0;
 }
@@ -175,15 +182,15 @@ LoadStaticVehiclesFromFile(file[], bool:prints = true)
 		Float:posX,
 		Float:posY,
 		Float:posZ,
-		Float:rot,
+		Float:rotZ,
 		model,
 		count;
 
 	while(fread(f, line))
 	{
-		if(!sscanf(line, "p<,>ffffD(0)", posX, posY, posZ, rot, model))
+		if(!sscanf(line, "p<,>ffffD(0)", posX, posY, posZ, rotZ, model))
 		{
-			AddStaticVehicle(model, posX, posY, posZ, rot, -1, -1);
+			AddStaticVehicle(model, posX, posY, posZ, rotZ, -1, -1);
 			TotalVehicles++;
 			count++;
 		}
@@ -203,17 +210,17 @@ LoadVehiclesFromFile(file[], bool:prints = true)
 	new
 	    File:f=fopen(file, io_read),
 		line[128],
-Float:	posX,
-Float:	posY,
-Float:	posZ,
-Float:	rot,
+		Float:posX,
+		Float:posY,
+		Float:posZ,
+		Float:rotZ,
 		model,
 		count,
 		tmpid;
 
 	while(fread(f, line))
 	{
-		if(!sscanf(line, "p<,>ffffD(-1)", posX, posY, posZ, rot, model))
+		if(!sscanf(line, "p<,>ffffD(-1)", posX, posY, posZ, rotZ, model))
 		{
 		    if(random(100) < 10)continue;
 
@@ -228,28 +235,57 @@ Float:	rot,
 				model == 514 ||
 				model == 515) posZ += 2.0;
 
-			tmpid = CreateVehicle(model, posX, posY, posZ, rot, -1, -1, -1);
+			tmpid = CreateVehicle(model, posX, posY, posZ, rotZ, -1, -1, -1);
 
-			if(gCurModelGroup != VEHICLE_GROUP_BIKE)
+			if(IsValidVehicle(tmpid))
 			{
-				new
-					containerid,
-					itemid,
-					ItemType:itemtype;
-
-				containerid = CreateContainer("Trunk", 0.0, 0.0, 0.0, 12);
-				AttachContainerToVehicle(containerid, tmpid);
-
-				itemtype = GenerateLoot();
-				itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
-
-				AddItemToContainer(containerid, itemid);
-
-				if(random(100) < 10)
+				if(gCurModelGroup != VEHICLE_GROUP_BIKE && gCurModelGroup != VEHICLE_GROUP_FASTBIKE && gCurModelGroup != VEHICLE_GROUP_SMALLPLANE)
 				{
-					itemtype = GenerateLoot();
+					new
+						itemid,
+						ItemType:itemtype,
+						Float:x,
+						Float:y,
+						Float:z;
+
+					GetVehicleModelInfo(model, VEHICLE_MODEL_INFO_SIZE, x, y, z);
+
+					gVehicleContainer[tmpid] = CreateContainer("Trunk", 12);
+					AttachContainerToVehicle(gVehicleContainer[tmpid], tmpid);
+
+					itemtype = GenerateLoot(LOOT_TYPE_LOW);
 					itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
-					AddItemToContainer(containerid, itemid);
+					AddItemToContainer(gVehicleContainer[tmpid], itemid);
+
+					if(random(100) < 50)
+					{
+						itemtype = GenerateLoot(LOOT_TYPE_LOW);
+						itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
+						AddItemToContainer(gVehicleContainer[tmpid], itemid);
+
+						if(1 <= _:itemtype <= 46)
+							SetItemExtraData(itemid, WepData[_:itemtype][MagSize] * (random(2) + 1));
+
+						if(random(100) < 50)
+						{
+							itemtype = GenerateLoot(LOOT_TYPE_MEDIUM);
+							itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
+							AddItemToContainer(gVehicleContainer[tmpid], itemid);
+
+							if(1 <= _:itemtype <= 46)
+								SetItemExtraData(itemid, WepData[_:itemtype][MagSize] * (random(2) + 1));
+
+							if(random(100) < 50)
+							{
+								itemtype = GenerateLoot(LOOT_TYPE_HIGH);
+								itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
+								AddItemToContainer(gVehicleContainer[tmpid], itemid);
+
+								if(1 <= _:itemtype <= 46)
+									SetItemExtraData(itemid, WepData[_:itemtype][MagSize] * (random(2) + 1));
+							}
+						}
+					}
 				}
 			}
 
@@ -347,7 +383,6 @@ hook OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 			    GetPlayerPos(playerid, x, y, z);
 				SetPlayerPos(playerid, x, y, z);
 */
-
 			    new str[128];
 				format(str, 128, " >  This car belongs to %s", pv_Data[i][pv_owner]);
 				SendClientMessage(playerid, YELLOW, str);
@@ -502,3 +537,5 @@ CMD:reloadvehicles(playerid, params[])
 	Msg(playerid, YELLOW, " >  Reloading Vehicles...");
 	return 1;
 }
+
+

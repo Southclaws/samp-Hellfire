@@ -278,6 +278,18 @@ ACMD:time[2](playerid, params[])
 	}
 	else if(strlen(params) > 2)
 	{
+		if(!strcmp(params, "stop"))
+		{
+			Msg(playerid, YELLOW, " >  Time has been "#C_BLUE"stopped.");
+			f:bServerGlobalSettings<ServerTimeFlow>;
+			return 1;
+		}
+		if(!strcmp(params, "start"))
+		{
+			Msg(playerid, YELLOW, " >  Time has been "#C_BLUE"started.");
+			t:bServerGlobalSettings<ServerTimeFlow>;
+			return 1;
+		}
 		for(new i;i<sizeof(TimeData);i++)
 		{
 			if(strfind(TimeData[i][time_name], params, true) != -1)

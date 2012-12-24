@@ -323,7 +323,9 @@ enum
 	d_InventoryOptions,
 	d_InventoryCombine,
 	d_ContainerInventory,
+	d_ContainerOptions,
 	d_ContainerPlayerInv,
+	d_ContainerPlayerInvOptions,
 	d_SignEdit,
 
 	d_CarBuy,
@@ -449,6 +451,7 @@ enum (<<=1)
 	ScheduledRestart,
 
 	Realtime,
+	ServerTimeFlow,
 	FreeroamCommands,
 
 	FreeDM,
@@ -740,6 +743,7 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/API/Ladder/Ladder.pwn"
 #include "../scripts/API/Turret/Turret.pwn"
 
+#include "../scripts/Items/misc.pwn"
 #include "../scripts/Items/weapons.pwn"
 #include "../scripts/Items/firework.pwn"
 #include "../scripts/Items/medkit.pwn"
@@ -749,7 +753,10 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/Items/Sign.pwn"
 #include "../scripts/Items/adrenaline.pwn"
 #include "../scripts/Items/electroap.pwn"
-#include "../scripts/Items/misc.pwn"
+#include "../scripts/Items/briefcase.pwn"
+#include "../scripts/Items/backpack.pwn"
+#include "../scripts/Items/wrench.pwn"
+#include "../scripts/Items/shield.pwn"
 
 #include "../scripts/Items/loot.pwn"
 
@@ -893,6 +900,8 @@ public OnGameModeInit()
 	ShowNameTags(true);
 
 	t:bServerGlobalSettings<FreeroamCommands>;
+	t:bServerGlobalSettings<ServerTimeFlow>;
+	f:bServerGlobalSettings<WeaponLock>;
 	dm_Host				= -1;
 
 	gTimeMinute			= random(60);
@@ -988,6 +997,9 @@ public OnGameModeInit()
 	item_GasMask		= DefineItemType("Gas Mask",		19472,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.062216, 0.055396, 0.001138, 90.000000, 0.000000, 180.000000);
 	item_Flag			= DefineItemType("Flag",			2993,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.045789, 0.026306, -0.078802, 8.777217, 0.272155, 0.000000);
 
+	item_Briefcase		= DefineItemType("Briefcase",		1210,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 90.0, 0.285915, 0.078406, -0.009429, 0.000000, 270.000000, 0.000000);
+	item_Backpack		= DefineItemType("Backpack",		3026,	ITEM_SIZE_MEDIUM, 0.0, 270.0, 0.0, 0.470918, 0.150153, 0.055384, 181.319580, 7.513789, 163.436065);
+
 
 	disp_HealoMatic		= DefineDispenserType("Heal-O-Matic", item_Medkit, 50);
 
@@ -1037,6 +1049,7 @@ public OnGameModeInit()
 	DefineStoreIndexItem(GeneralStore, item_MobilePhone, 50);
 	DefineStoreIndexItem(GeneralStore, item_Pager, 30);
 	DefineStoreIndexItem(GeneralStore, item_Flag, 5);
+	DefineStoreIndexItem(GeneralStore, ItemType:WEAPON_SPRAYCAN, 15);
 	
 	CreateShop("Los Santos General Store", GeneralStore, 1158.2169, -1443.7321, 15.7981, 1157.36, -1443.48, 15.84);
 
@@ -1077,7 +1090,7 @@ forward INSERT_OnLoad();
 
 
 	AddItemToContainer(
-		CreateContainer("Generator", -2318.9067, -1636.5662, 483.7031, 6),
+		CreateContainer("Generator", 6, -2318.9067, -1636.5662, 483.7031),
 		CreateItem(item_Medkit, -2322.9257, -1639.8038, 483.7031));
 
 
@@ -1138,42 +1151,45 @@ task GameUpdate[1000]()
 {
 	if(tickcount() / 1000 % 5 == 0)TextDrawSetString(InfoBar, InfoBarText[random(sizeof(InfoBarText))]);
 
-	new
-		szClockText[6],
-		szMinute[3],
-		szHour[3],
-		hour,
-		minute,
-		second;
+	if(bServerGlobalSettings & ServerTimeFlow)
+	{
+		new
+			szClockText[6],
+			szMinute[3],
+			szHour[3],
+			hour,
+			minute,
+			second;
 
-	gettime(hour, minute, second);
-	
-	if(hour == 0 && minute == 0 && second < 6)
-	{
-	    if(Iter_Count(Player) == 0)RestartGamemode();
-	    else t:bServerGlobalSettings<ScheduledRestart>;
-	}
-
-	if(bServerGlobalSettings&Realtime)
-	{
-		gTimeMinute = minute;
-		gTimeHour = hour;
-	}
-	else
-	{
-		gTimeMinute++;
-		if(gTimeMinute == 60)
+		gettime(hour, minute, second);
+		
+		if(hour == 0 && minute == 0 && second < 6)
 		{
-			gTimeMinute = 0;
-			if(gTimeHour == 24)gTimeHour = 0;
-			gTimeHour++;
+		    if(Iter_Count(Player) == 0)RestartGamemode();
+		    else t:bServerGlobalSettings<ScheduledRestart>;
 		}
+
+		if(bServerGlobalSettings&Realtime)
+		{
+			gTimeMinute = minute;
+			gTimeHour = hour;
+		}
+		else
+		{
+			gTimeMinute++;
+			if(gTimeMinute == 60)
+			{
+				gTimeMinute = 0;
+				if(gTimeHour == 24)gTimeHour = 0;
+				gTimeHour++;
+			}
+		}
+		format(szMinute, 5, "%02d", gTimeMinute);
+		format(szHour, 5, "%02d", gTimeHour);
+		format(szClockText, 6, "%s:%s", szHour, szMinute);
+		TextDrawSetString(ClockText, szClockText);
 	}
-	format(szMinute, 5, "%02d", gTimeMinute);
-	format(szHour, 5, "%02d", gTimeHour);
-	format(szClockText, 6, "%s:%s", szHour, szMinute);
-	TextDrawSetString(ClockText, szClockText);
-	
+
 	if(tickcount() - gLastWeatherChange > 480000 && RandomCondition(5))
 	{
 	    new id = random(sizeof(WeatherData));
@@ -1318,8 +1334,8 @@ ptask AfkCheckUpdate[3000](playerid)
 
 ptask TimeReward[3600000](playerid)
 {
-	GivePlayerMoney(playerid, 100);
-	Msg(playerid, BLUE, " >  You have been awarded "#C_YELLOW"$100"#C_BLUE" for staying on the server for an hour!");
+	GivePlayerMoney(playerid, 10);
+	Msg(playerid, BLUE, " >  You have been awarded "#C_YELLOW"$10"#C_BLUE" for staying on the server for an hour!");
 }
 timer TankHeatUpdate[100](playerid)
 {
@@ -2713,26 +2729,53 @@ internal_HitPlayer(playerid, targetid, weaponid)
 	{
 		if(!(bPlayerGameSettings[targetid] & GodMode))
 		{
-
 			new
-				Float:trgDist = GetPlayerDist3D(playerid, targetid),
+				Float:px,
+				Float:py,
+				Float:pz,
+				Float:tx,
+				Float:ty,
+				Float:tz,
+				Float:trgDist,
 				Float:HpLoss;
+
+			GetPlayerPos(playerid, px, py, pz);
+			GetPlayerPos(playerid, tx, ty, tz);
+
+			trgDist = Distance(px, py, pz, tx, ty, tz);
 
 			if(trgDist < WepData[weaponid][MinDis])HpLoss = WepData[weaponid][MaxDam];
 			if(trgDist > WepData[weaponid][MaxDis])HpLoss = WepData[weaponid][MinDam];
 			else HpLoss = ((WepData[weaponid][MinDam]-WepData[weaponid][MaxDam])/(WepData[weaponid][MaxDis]-WepData[weaponid][MinDis])) * (trgDist-WepData[weaponid][MaxDis]) + WepData[weaponid][MinDam];
 
+			if(GetItemType(GetPlayerItem(playerid)) == item_Shield)
+			{
+				new
+					Float:angleto,
+					Float:playerangle;
+
+				GetPlayerFacingAngle(playerid, playerangle);
+
+				angleto = -(90-(atan2((py - ty), (px - tx))));
+
+				if(-30 < (270.0 - (playerangle - angleto)) < 30)
+				{
+					GameTextForPlayer(playerid, "Shield!", 1000, 5);
+					HpLoss *= 0.4;
+				}
+			}
+
 			GivePlayerHP(targetid, -HpLoss, playerid, weaponid);
 			ShowHitMarker(playerid, weaponid);
 
-/*
+
 			if(pAdmin(playerid) >= 4)
 			{
 				new str[32];
 				format(str, 32, "did %.2f", HpLoss);
 				ShowMsgBox(playerid, str, 1000, 120);
 			}
-*/
+
 		}
 	}
 	
@@ -3545,13 +3588,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				buffer[MAX_PASSWORD_LEN];
 
 			WP_Hash(buffer, MAX_PASSWORD_LEN, inputtext);
-			GivePlayerMoney(playerid, 5000);
+			GivePlayerMoney(playerid, 500);
 
 			CreateNewUserfile(playerid, buffer);
 
 			new tmpStr[512];
 			strcat(tmpStr, HORIZONTAL_RULE);
-			strcat(tmpStr, "\n"#C_WHITE"Your new account has been created! You have "C_YELLOW"$5000"C_WHITE" as a welcome gift!\n");
+			strcat(tmpStr, "\n"#C_WHITE"Your new account has been created! You have "C_YELLOW"$500"C_WHITE" as a welcome gift!\n");
 			strcat(tmpStr, "Please take some time to read the "#C_BLUE"/rules"#C_WHITE" and abide by them\n");
 			strcat(tmpStr, "Enjoy your time playing on the Hellfire server :)\n");
 			strcat(tmpStr, HORIZONTAL_RULE);

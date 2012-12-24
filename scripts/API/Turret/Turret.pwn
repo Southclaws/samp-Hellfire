@@ -214,16 +214,18 @@ FireTurret(id)
 	tur_tipY[id] = tur_posY[id] + ( (TURRET_LENGTH * floatcos(tmpRot[0], degrees)) * floatcos(tmpRot[1], degrees));
 	tur_tipZ[id] = tur_posZ[id] + BARREL_TIP_OFFSET + (TURRET_LENGTH * floatsin(tmpRot[0], degrees));
 
-	tmpObjId = CreateDynamicObject(18730,
-		tur_tipX[id], tur_tipY[id], tur_tipZ[id]+BARREL_Z_OFFSET,
-		objRot[0]+90.0, objRot[1], objRot[2]);
+	if(CreateRocket(id, tur_tipX[id], tur_tipY[id], tur_tipZ[id], tmpRot[1], tmpRot[0], tur_velocity[id], tur_type[id]) != -1)
+	{
+		tmpObjId = CreateDynamicObject(18730,
+			tur_tipX[id], tur_tipY[id], tur_tipZ[id]+BARREL_Z_OFFSET,
+			objRot[0]+90.0, objRot[1], objRot[2]);
 
-	defer DestroyParticle(tmpObjId);
+		defer DestroyParticle(tmpObjId);
 
-	for(new i;i<MAX_PLAYERS;i++)
-		PlayerPlaySound(i, 1159, tur_tipX[id], tur_tipY[id], tur_tipZ[id]);
+		for(new i;i<MAX_PLAYERS;i++)
+			PlayerPlaySound(i, 1159, tur_tipX[id], tur_tipY[id], tur_tipZ[id]);
+	}
 
-	CreateRocket(id, tur_tipX[id], tur_tipY[id], tur_tipZ[id], tmpRot[1], tmpRot[0], tur_velocity[id], tur_type[id]);
 	return 1;
 }
 timer DestroyParticle[3000](id)
@@ -273,8 +275,6 @@ CreateRocket(baseid, Float:x, Float:y, Float:z, Float:rotation, Float:elevation,
 {
 	new id = Iter_Free(rkt_Index);
 
-	printf("Created Rocket, ID: %d", id);
-
 	if(id == -1)
 		return -1;
 
@@ -315,8 +315,6 @@ ExplodeRocket(id)
 {
 	if(!Iter_Contains(rkt_Index, id))return 0;
 
-	printf("Destorying Rocket, ID: %d", id);
-
 	if(rkt_type[id] == TURRET_TYPE_TRAJ)
 	{
 		CreateExplosion(
@@ -347,7 +345,7 @@ ExplodeRocket(id)
 	
 	Iter_SafeRemove(rkt_Index, id, id);
 
-	return 1;
+	return id;
 }
 
 timer TurretRotationUpdate[100](playerid)
@@ -374,7 +372,7 @@ timer TurretRotationUpdate[100](playerid)
 	GetPlayerCameraPos(tur_userID[id], camX, camY, camZ);
 	GetPlayerCameraFrontVector(tur_userID[id], vecX, vecY, vecZ);
 
-	camR = GetAngleToPoint(camX, camY, camX+vecX, camY+vecY);
+	camR = -GetAngleToPoint(camX, camY, camX+vecX, camY+vecY);
     camE = 90-floatabs(atan2(floatsqroot(floatpower(vecX, 2.0) + floatpower(vecY, 2.0)), vecZ)); // Thanks to RyDeR
 
 	if(camR != tur_rotation[id] || camE != tur_elevation[id])SetTurretAngles(id, camR, camE);
@@ -387,7 +385,6 @@ timer TurretRotationUpdate[100](playerid)
 
 /*
  *  The hooked callbacks from the main script
- *  I really should update to y_hooks...
  *
  */
 
@@ -405,6 +402,7 @@ public OnDynamicObjectMoved(objectid)
 	}
 	foreach(new i : rkt_Index)
 	{
+		if(i > MAX_ROCKET)continue;
 		if(objectid == rkt_object[i])
 		{
 			if(rkt_type[i] == TURRET_TYPE_TRAJ)
@@ -418,7 +416,11 @@ public OnDynamicObjectMoved(objectid)
 						rkt_posY[i] + (rkt_trajData[i][MAX_RKTNODE-1][FLIGHT_DISTANCE] * floatcos(rkt_rotR[i], degrees)),
 						tur_posZ[rkt_turretID[i]], rkt_velo[i]);
 				}
-				else if(rkt_node[i] == MAX_RKTNODE)ExplodeRocket(i);
+				else if(rkt_node[i] == MAX_RKTNODE)
+				{
+					i = ExplodeRocket(i);
+					return 1;
+				}
 				else
 				{
 					MoveDynamicObject(rkt_object[i],
@@ -430,7 +432,10 @@ public OnDynamicObjectMoved(objectid)
 			if(rkt_type[i] == TURRET_TYPE_FLAK)
 			{
 				if(rkt_node[i] == 20)
-					ExplodeRocket(i);
+				{
+					i = ExplodeRocket(i);
+					return 1;
+				}
 
 			    new
 			        Float:x,
@@ -443,7 +448,7 @@ public OnDynamicObjectMoved(objectid)
 				{
 					if(IsPointInDynamicArea(gPlayerArea[j], x, y, z))
 					{
-						ExplodeRocket(i);
+						i = ExplodeRocket(i);
 						return 1;
 					}
 				}

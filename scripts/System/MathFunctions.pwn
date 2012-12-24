@@ -1,6 +1,7 @@
 forward Float:GetDistancePointLine(Float:line_x,Float:line_y,Float:line_z,Float:vector_x,Float:vector_y,Float:vector_z,Float:point_x,Float:point_y,Float:point_z);
 forward Float:GetDist3D(Float:x, Float:y, Float:z, Float:x2, Float:y2, Float:z2);
 forward Float:GetDist2D(Float:x, Float:y, Float:x2, Float:y2);
+forward Float:absoluteangle(Float:angle);
 
 /*
 	Distance between 2 points in 3D space
@@ -24,7 +25,7 @@ stock Float:GetDistancePointLine(Float:line_x,Float:line_y,Float:line_z,Float:ve
 	Angle from point to dest
 */
 stock Float:GetAngleToPoint(Float:fPointX, Float:fPointY, Float:fDestX, Float:fDestY)
-	return 90-(atan2((fDestY - fPointY), (fDestX - fPointX)));
+	return absoluteangle(-(90-(atan2((fDestY - fPointY), (fDestX - fPointX)))));
 
 /*
 	2D Projection position based on distance and angle
@@ -79,4 +80,18 @@ stock abs(int)
 		return -int;
 
 	return int;
+}
+
+
+/*
+	Returns the absolute value of an angle
+*/
+stock Float:absoluteangle(Float:angle)
+{
+	while(!(0.0 <= angle <= 360.0))
+	{
+		if(angle < 0.0)angle += 360.0;
+		if(angle > 360.0)angle -= 360.0;
+	}
+	return angle;
 }

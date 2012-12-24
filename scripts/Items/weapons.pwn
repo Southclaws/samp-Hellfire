@@ -2,7 +2,7 @@
 
 hook OnGameModeInit()
 {
-	DefineItemType("Flare", 345, ITEM_SIZE_SMALL);
+	DefineItemType("Flare", 354, ITEM_SIZE_SMALL);
 
 	ShiftItemTypeIndex(ItemType:1, 46);
 
@@ -70,29 +70,28 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 	if(newkeys & KEY_NO && !(newkeys & 128))
 	{
-		if(IsPlayerIdle(playerid))
-			PlayerDropWeapon(playerid);
-	}
-	if(newkeys & 16)
-	{
-	    PlayerLoop(i)
-	    {
-	        if(i == playerid)continue;
+		PlayerLoop(i)
+		{
+			if(i == playerid)continue;
 
 			if(IsPlayerInDynamicArea(playerid, gPlayerArea[i]) && !IsPlayerInAnyVehicle(i))
-	    	{
-	    	    if(GetPlayerWeapon(i) != 0)
-	    	        continue;
+			{
+				if(GetPlayerWeapon(i) != 0)
+					continue;
 
-	    	    if(GetPlayerItem(playerid) != INVALID_ITEM_ID || GetPlayerItem(i) != INVALID_ITEM_ID)
-	    	        continue;
+				if(GetPlayerItem(playerid) != INVALID_ITEM_ID || GetPlayerItem(i) != INVALID_ITEM_ID)
+					continue;
 
 				if(!IsPlayerIdle(playerid) || !IsPlayerIdle(i))
-				    continue;
+					continue;
 
 				PlayerGiveWeapon(playerid, i);
-	    	}
-	    }
+				return 1;
+			}
+		}
+
+		if(IsPlayerIdle(playerid))
+			PlayerDropWeapon(playerid);
 	}
 	if(newkeys & KEY_YES)
 	{
@@ -111,11 +110,35 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			SetItemExtraData(itemid, ammo);
 			if(containerid != INVALID_CONTAINER_ID)
 			{
-				AddItemToContainer(containerid, itemid);
+
+				if(AddItemToContainer(containerid, itemid))
+				{
+					new
+						name[MAX_CONTAINER_NAME],
+						str[MAX_CONTAINER_NAME + 14];
+
+					GetContainerName(containerid, name);
+					str = "Item added to ";
+					strcat(str, name);
+					ShowMsgBox(playerid, str, 3000, 100);
+				}
+				else
+				{
+					new
+						str[MAX_CONTAINER_NAME];
+
+					GetContainerName(containerid, str);
+					strcat(str, " full");
+					ShowMsgBox(playerid, str, 3000, 100);
+				}
 			}
 			else
 			{
-				AddItemToInventory(playerid, itemid);
+				if(AddItemToInventory(playerid, itemid))
+					ShowMsgBox(playerid, "Item added to inventory", 3000, 150);
+
+				else
+					ShowMsgBox(playerid, "Inventory full", 3000, 100);
 			}
 		}
 	}

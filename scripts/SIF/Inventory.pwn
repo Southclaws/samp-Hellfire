@@ -13,6 +13,7 @@ new
 
 
 forward OnPlayerAddToInventory(playerid, itemid);
+forward OnPlayerOpenInventory(playerid, list[]);
 
 
 
@@ -82,7 +83,7 @@ stock RemoveItemFromInventory(playerid, slotid)
 stock DisplayPlayerInventory(playerid, dialogid, optiontext[])
 {
 	new
-		list[INV_MAX_SLOTS * (MAX_ITEM_NAME + 1)],
+		list[(INV_MAX_SLOTS * (MAX_ITEM_NAME + 1)) + 32],
 		tmp[MAX_ITEM_NAME];
 	
 	for(new i; i < INV_MAX_SLOTS; i++)
@@ -95,8 +96,12 @@ stock DisplayPlayerInventory(playerid, dialogid, optiontext[])
 			strcat(list, "\n");
 		}
 	}
+	if(CallRemoteFunction("OnPlayerOpenInventory", "ds", playerid, list))
+		return 0;
 	
 	ShowPlayerDialog(playerid, dialogid, DIALOG_STYLE_LIST, "Inventory", list, optiontext, "Close");
+
+	return 1;
 }
 
 
@@ -144,7 +149,7 @@ DisplayPlayerInventoryOptions(playerid, slotid)
 
 	GetItemTypeName(GetItemType(inv_Data[playerid][slotid]), tmp);
 
-	ShowPlayerDialog(playerid, d_InventoryOptions, DIALOG_STYLE_LIST, tmp, "Equip\nCombine", "Accept", "Back");
+	ShowPlayerDialog(playerid, d_InventoryOptions, DIALOG_STYLE_LIST, tmp, "Equip\nUse\nCombine", "Accept", "Back");
 }
 
 hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
@@ -174,7 +179,11 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					DisplayPlayerInventory(playerid, d_Inventory, "Options");
 				}
 			}
-			case 1: DisplayPlayerInventory(playerid, d_InventoryCombine, "Combine");
+			case 1:
+			{
+				PlayerUseItem(playerid, inv_Data[playerid][inv_SelectedSlot[playerid]]);
+			}
+			case 2: DisplayPlayerInventory(playerid, d_InventoryCombine, "Combine");
 		}
 	}
 	return 1;

@@ -5,10 +5,28 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 
 	SIF/Overview
 	{
+		SIF is a collection of high-level include scripts to make the
+		development of interactive features easy for the developer while
+		maintaining quality front-end gameplay for players.
 	}
 
 	SIF/Item/Description
 	{
+		A complex and flexible script to replace the use of pickups as a means
+		of displaying objects that the player can pick up and use. Item offers
+		picking up, dropping and even giving items to other players. Items in
+		the game world consist of static objects combined with buttons from
+		SIF/Button to provide a means of interacting.
+
+		Item aims to be an extremely flexible script offering a callback for
+		almost every action the player can do with an item. The script also
+		allows the ability to add the standard GTA:SA weapons as items that can
+		be dropped, given and anything else you script items to do.
+
+		When picked up, items will appear on the character model bone specified
+		in the item definition. This combines the visible aspect of weapons and
+		items that are already in the game with the scriptable versitility of
+		server created and scriptable entities.
 	}
 
 	SIF/Item/Dependencies
@@ -25,6 +43,9 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 		SA:MP Community					- Inspiration and support
 		Incognito						- Very useful streamer plugin
 		Y_Less							- YSI framework
+		Patrik356b						- Testing
+		Kevin							- Testing
+		Cagatay							- Testing
 	}
 
 	SIF/Item/Core Functions
@@ -38,35 +59,152 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 		native CreateItem(ItemType:type, Float:x, Float:y, Float:z, Float:rx = 0.0, Float:ry = 0.0, Float:rz = 0.0, Float:zoffset = 0.0, world = 0, interior = 0, label = 1)
 		{
 			Description:
+				Creates an item in the game world at the specified coordinates
+				with the specified rotation with options for world, interior and
+				whether or not to display a 3D text label above the item.
+
 			Parameters:
+				<type> (int, ItemType)
+					An item type defined with DefineItemType to determine what
+					model the item will use and what characteristics it has.
+
+				<x>, <y>, <z> (float)
+					The position to create the object and button of the item.
+
+				<rx>, <ry>, <rz> (float)
+					The rotation value of the object, overrides item type data.
+
+				<zoffset> (float)
+					How high from the object the button will be created, this is
+					to ensure the item will always be in pickup range when
+					created on the floor.
+
+				<world> (int)
+					The virtual world in which the object, button and label will
+					appear, only players in this world can see or pick up the
+					item.
+
+				<interior> (int)
+					Interior world, same as above but for interior worlds.
+
+				<label> (boolean)
+					True to show a label with the item name at the item.
+
 			Returns:
+				(int, itemid)
+					Item ID handle of the newly created item.
+
+				INVALID_ITEM_ID
+					If the item index is full and no more items can be created.
 		}
 
-		native DestroyItem(id)
+		native DestroyItem(itemid)
 		{
 			Description:
+				Destroys an item.
+
 			Parameters:
+				<itemid> (int, itemid)
+					The item handle ID to delete.
+
 			Returns:
+				1
+					If destroying the item was successful
+
+				0
+					If <itemid> is an invalid item ID handle.
 		}
 
 		native ItemType:DefineItemType(name[], model, size, Float:rotx = 0.0, Float:roty = 0.0, Float:rotz = 0.0, Float:attx = 0.0, Float:atty = 0.0, Float:attz = 0.0, Float:attrx = 0.0, Float:attry = 0.0, Float:attrz = 0.0, boneid = 6)
 		{
 			Description:
+				Defines a new item type with the specified name and model. Item
+				types are the fundamental pieces of data that give items
+				specific characteristics. At least one item definition must
+				exist or CreateItem will have no data to use.
+
 			Parameters:
+				<name> (string)
+					The name of the item, this will be displayed on the label
+					of items created using this type (if one is present)
+
+				<model> (int, valid GTA:SA model)
+					The GTA:SA model id to use when the item is visible in the
+					game world or attached to a player.
+
+				<size> (int, pre-defined size definitions)
+					The size of the item has no current use in this script,
+					though it can be used in external scripts. It is used in
+					SIF/Inventory to disallow large objects in a player's
+					inventory.
+
+				<rotx>, <roty>, <rotz> (float)
+					The default rotation the item object will have when dropped.
+
+				<attx>, <atty>, <attz>, <attrx>, <attry>, <attrz> (float)
+					The attachment coordinates to use when the object is picked
+					up and held by a player.
+
+				<boneid> (int, valid SA:MP bones)
+					The attachment bone to use, by default this is a hand but
+					it's added for special circumstances such as an animation
+					problem with held and drinkable beer bottles.
+
 			Returns:
+				(int, ItemType)
+					Item Type ID handle of the newly defined item type.
+
+				INVALID_ITEM_TYPE
+					If the item type definition index is full and no more item
+					types can be defined.
 		}
 
 		native ShiftItemTypeIndex(ItemType:start, amount)
 		{
 			Description:
+				Shifts the entire item definition index to create <amount> empty
+				cells from cell <start>. This can be used to create free spaces
+				in the index for items that you want to have a specific ID. For 
+				instance, weapons that start from 1 and end at 46.
+
 			Parameters:
+				<start> (int, cell index)
+					The start cell to shift from, all definitions before this
+					won't be affected in any way. All definitions after this
+					will be moved up.
+
+				<amount> (int)
+					The amount of cells to shift the definitions up by.
+
 			Returns:
+				1
+					If the shift was successful.
+
+				0
+					If the entered values would result in an out-of-bounds
+					error with the index.
 		}
 
 		native PlayerPickUpItem(playerid, itemid, animtype)
 		{
 			Description:
+				A function to directly make a player pick up an item, regardless
+				of whether he is within the button range.
+
 			Parameters:
+				<playerid> (int)
+					The player to force into picking up something.
+
+				<itemid> (int, itemid)
+					The item ID handle to force the player to pick up.
+
+				<animtype> (int, pre-defined)
+					The animation type is internally determined by the height
+					of the item when the player picks up an item. With this
+					function you can specify which animation to use.
+						0 item on the ground (bend down)
+						1 item in front (reach forward)
+
 			Returns:
 		}
 
@@ -93,6 +231,18 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 		native SIF/Item/
 		native -
 
+		native OnItemCreate(itemid)
+		{
+			Called:
+				After an item is created.
+
+			Parameters:
+				<itemid>
+					The ID handle of the newly created item.
+
+			Returns:
+		}
+
 		native OnPlayerUseItem(playerid, itemid)
 		{
 			Called:
@@ -114,7 +264,8 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 		native OnPlayerUseItemWithButton(playerid, buttonid, itemid)
 		{
 			Called:
-				When a player uses an item while in a button area.
+				When a player uses an item while in the area of a button from an
+				item that is in the game world.
 
 			Parameters:
 
@@ -197,6 +348,59 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 		Hooked functions or callbacks, either SA:MP natives or from other
 		scripts or plugins.
 
+		SAMP/OnFilterScriptInit
+		{
+			Reason:
+				-
+		}
+
+		SAMP/OnGameModeInit
+		{
+			Reason:
+				-
+		}
+
+		SAMP/OnPlayerConnect
+		{
+			Reason:
+				-
+		}
+
+		SAMP/OnPlayerKeyStateChange
+		{
+			Reason:
+				-
+		}
+
+		SAMP/OnPlayerDeath
+		{
+			Reason:
+				-
+		}
+
+		SIF/Core/OnPlayerEnterPlayerArea
+		{
+			Reason:
+				-
+		}
+
+		SIF/Core/OnPlayerLeavePlayerArea
+		{
+			Reason:
+				-
+		}
+
+		SIF/Button/OnButtonPress
+		{
+			Reason:
+				-
+		}
+
+		SIF/Button/OnPlayerEnterButtonArea
+		{
+			Reason:
+				-
+		}
 	}
 
 ==============================================================================*/
@@ -278,6 +482,7 @@ Timer:		itm_InteractTimer	[MAX_PLAYERS],
 			itm_Interacting		[MAX_PLAYERS];
 
 
+forward OnItemCreate(itemid);
 forward OnPlayerUseItem(playerid, itemid);
 forward OnPlayerUseItemWithItem(playerid, itemid, withitemid);
 forward OnPlayerUseItemWithButton(playerid, buttonid, itemid);
@@ -341,47 +546,50 @@ stock CreateItem(ItemType:type, Float:x, Float:y, Float:z, Float:rx = 0.0, Float
 	if(!IsValidItemType(type))
 		return printf("ERROR: Item creation with undefined typeid (%d) failed.", _:type);
 
-	itm_Data[id][itm_type] = type;
-
 	Iter_Add(itm_Index, id);
+
+	itm_Data[id][itm_type] = type;
 
 	CreateItemInWorld(id,
 		Float:x, Float:y, Float:z,
 		Float:rx, Float:ry, Float:rz,
 		Float:zoffset, world, interior, label);
 
+	CallRemoteFunction("OnItemCreate", "d", id);
+
 	Iter_Add(itm_WorldIndex, id);
 
 	return id;
 }
 
-stock DestroyItem(id)
+stock DestroyItem(itemid)
 {
-	if(!Iter_Contains(itm_Index, id))return 0;
+	if(!Iter_Contains(itm_Index, itemid))return 0;
 
-	if(itm_Holder[id] != INVALID_PLAYER_ID)
+	if(itm_Holder[itemid] != INVALID_PLAYER_ID)
 	{
-		RemovePlayerAttachedObject(itm_Holder[id], ITM_ATTACH_INDEX);
-	    itm_Holding[itm_Holder[id]] = INVALID_ITEM_ID;
-	    itm_Interacting[itm_Holder[id]] = INVALID_ITEM_ID;
-		stop itm_InteractTimer[itm_Holder[id]];
+		RemovePlayerAttachedObject(itm_Holder[itemid], ITM_ATTACH_INDEX);
+	    itm_Holding[itm_Holder[itemid]] = INVALID_ITEM_ID;
+	    itm_Interacting[itm_Holder[itemid]] = INVALID_ITEM_ID;
+		stop itm_InteractTimer[itm_Holder[itemid]];
 	}
 	else
 	{
-		DestroyDynamicObject(itm_Data[id][itm_objId]);
-		DestroyButton(itm_Data[id][itm_button]);
-		itm_Data[id][itm_button] = INVALID_BUTTON_ID;
+		DestroyDynamicObject(itm_Data[itemid][itm_objId]);
+		DestroyButton(itm_Data[itemid][itm_button]);
+		itm_Data[itemid][itm_objId] = -1;
+		itm_Data[itemid][itm_button] = INVALID_BUTTON_ID;
 	}
 
-	itm_Data[id][itm_type]	= INVALID_ITEM_TYPE;
-	itm_Data[id][itm_posX]	= 0.0;
-	itm_Data[id][itm_posY]	= 0.0;
-	itm_Data[id][itm_posZ]	= 0.0;
-    itm_Holder[id]			= INVALID_PLAYER_ID;
-    itm_Interactor[id]		= INVALID_PLAYER_ID;
+	itm_Data[itemid][itm_type]	= INVALID_ITEM_TYPE;
+	itm_Data[itemid][itm_posX]	= 0.0;
+	itm_Data[itemid][itm_posY]	= 0.0;
+	itm_Data[itemid][itm_posZ]	= 0.0;
+    itm_Holder[itemid]			= INVALID_PLAYER_ID;
+    itm_Interactor[itemid]		= INVALID_PLAYER_ID;
 
-	Iter_Remove(itm_Index, id);
-	Iter_Remove(itm_WorldIndex, id);
+	Iter_Remove(itm_Index, itemid);
+	Iter_Remove(itm_WorldIndex, itemid);
 
 	return 1;
 }
@@ -538,8 +746,8 @@ stock PlayerGiveItem(playerid, targetid, call)
 		x2 + (0.5 * floatsin(-angle, degrees)),
 		y2 + (0.5 * floatcos(-angle, degrees)), z2);
 
-	SetPlayerFacingAngle(playerid, -angle);
-	SetPlayerFacingAngle(targetid, -angle+180.0);
+	SetPlayerFacingAngle(playerid, angle);
+	SetPlayerFacingAngle(targetid, angle+180.0);
 
 	ApplyAnimation(playerid, "CASINO", "SLOT_PLYR", 4.0, 0, 0, 0, 0, 450);
 	ApplyAnimation(targetid, "CASINO", "SLOT_PLYR", 4.0, 0, 0, 0, 0, 450);
@@ -551,6 +759,11 @@ stock PlayerGiveItem(playerid, targetid, call)
 	itm_InteractTimer[playerid] = defer GiveItemDelay(playerid, targetid);
 
 	return 1;
+}
+
+PlayerUseItem(playerid, itemid)
+{
+	internal_OnPlayerUseItem(playerid, itemid);
 }
 
 
@@ -586,7 +799,7 @@ CreateItemInWorld(itemid,
 
 	itm_Data[itemid][itm_objId]					= CreateDynamicObject(itm_TypeData[itemtype][itm_model], x, y, z, rx, ry, rz, world, interior);
 
-	itm_Data[itemid][itm_button] = CreateButton(x, y, z+zoffset, "Press F to pick up", world, interior, 1.0);
+	itm_Data[itemid][itm_button]				= CreateButton(x, y, z + zoffset, "Press F to pick up", world, interior, 1.0);
 
 	if(label)
 		SetButtonLabel(itm_Data[itemid][itm_button], itm_TypeData[itemtype][itm_name]);
@@ -610,8 +823,11 @@ RemoveItemFromWorld(itemid)
 	}
 	else
 	{
+		if(!Iter_Contains(itm_WorldIndex, _:itemid))return 0;
+
 		DestroyDynamicObject(itm_Data[itemid][itm_objId]);
 		DestroyButton(itm_Data[itemid][itm_button]);
+		itm_Data[itemid][itm_objId] = -1;
 		itm_Data[itemid][itm_button] = INVALID_BUTTON_ID;
 	}
 
@@ -652,8 +868,7 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 		if( (animidx == 1164 || animidx == 1189) && itm_Interacting[playerid] == INVALID_ITEM_ID && Iter_Contains(itm_Index, itm_Holding[playerid]))
 		{
-			if(internal_OnPlayerUseItem(playerid, itm_Holding[playerid]))
-				return 1;
+			PlayerUseItem(playerid, itm_Holding[playerid]);
 		}
 	}
     return 1;
@@ -734,13 +949,13 @@ public OnButtonPress(playerid, buttonid)
 				    Float:z;
 
 			    GetPlayerPos(playerid, x, y, z);
-			    SetPlayerFacingAngle(playerid, -GetAngleToPoint(x, y, itm_x, itm_y));
+			    SetPlayerFacingAngle(playerid, GetAngleToPoint(x, y, itm_x, itm_y));
 
-				if((itm_Data[i][itm_posZ] - z) < -0.7)
-					PlayerPickUpItem(playerid, i, 0);
+				if((itm_Data[i][itm_posZ] - z) > -0.9) // If the player is more than 0.9 units above the item
+					PlayerPickUpItem(playerid, i, 1);
 
 				else
-					PlayerPickUpItem(playerid, i, 1);
+					PlayerPickUpItem(playerid, i, 0);
 
 				itm_Interacting[playerid] = i;
 				itm_Interactor[i] = playerid;
@@ -870,6 +1085,7 @@ GiveWorldItemToPlayer(playerid, itemid, call)
 	{
 		DestroyDynamicObject(itm_Data[itemid][itm_objId]);
 		DestroyButton(itm_Data[itemid][itm_button]);
+		itm_Data[itemid][itm_objId] = -1;
 		itm_Data[itemid][itm_button] = INVALID_BUTTON_ID;
 	}
 
@@ -957,6 +1173,23 @@ stock GetItemPos(itemid, &Float:x, &Float:y, &Float:z)
 	z = itm_Data[itemid][itm_posZ];
 	return 1;
 }
+stock SetItemPos(itemid, Float:x, Float:y, Float:z)
+{
+	if(!Iter_Contains(itm_Index, itemid))return 0;
+	itm_Data[itemid][itm_posX] = x;
+	itm_Data[itemid][itm_posY] = y;
+	itm_Data[itemid][itm_posZ] = z;
+	SetButtonPos(itm_Data[itemid][itm_button], x, y, z);
+	SetDynamicObjectPos(itm_Data[itemid][itm_objId], x, y, z);
+	return 1;
+}
+stock SetItemRotation(itemid, Float:rx, Float:ry, Float:rz)
+{
+	if(!Iter_Contains(itm_Index, itemid))return 0;
+	if(!Iter_Contains(itm_WorldIndex, itemid))return 0;
+	SetDynamicObjectRot(itm_Data[itemid][itm_objId], rx, ry, rz);
+	return 1;	
+}
 stock ItemType:GetItemType(itemid)
 {
 	if(!Iter_Contains(itm_Index, itemid))return INVALID_ITEM_TYPE;
@@ -991,6 +1224,32 @@ stock ItemType:GetPlayerItemType(playerid)
 {
 	if(!Iter_Contains(itm_Index, itm_Holding[playerid]))return INVALID_ITEM_TYPE;
 	return itm_Data[itm_Holding[playerid]][itm_type];
+}
+stock RemoveCurrentItem(playerid)
+{
+	if(!Iter_Contains(itm_Index, itm_Holding[playerid]))return INVALID_ITEM_ID;
+
+	new
+	    id = itm_Holding[playerid],
+		Float:x,
+		Float:y,
+		Float:z,
+		Float:r;
+
+    itm_Holding[playerid] = INVALID_ITEM_ID;
+    itm_Interacting[playerid] = INVALID_ITEM_ID;
+    itm_Holder[id] = INVALID_PLAYER_ID;
+    itm_Interactor[id] = INVALID_PLAYER_ID;
+
+	GetPlayerPos(playerid, x, y, z);
+	GetPlayerFacingAngle(playerid, r);
+
+   	RemovePlayerAttachedObject(playerid, ITM_ATTACH_INDEX);
+
+	CreateItemInWorld(id, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.7, 0, 0, 1);
+
+	return 1;
+
 }
 
 stock SetItemExtraData(itemid, data)

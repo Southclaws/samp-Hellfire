@@ -846,20 +846,23 @@ public OnPlayerEditObject(playerid, playerobject, objectid, response, Float:fX, 
 CMD:additem(playerid, params[])
 {
 	new
-	    ItemType:type = ItemType:strval(params),
-	    Float:x,
-	    Float:y,
-	    Float:z,
+		ItemType:type = ItemType:strval(params),
+		itemid,
+		Float:x,
+		Float:y,
+		Float:z,
 		Float:r;
 
 	GetPlayerPos(playerid, x, y, z);
 	GetPlayerFacingAngle(playerid, r);
 
-	SetItemExtraData(CreateItem(type,
+	itemid = CreateItem(type,
 			x + (0.5 * floatsin(-r, degrees)),
 			y + (0.5 * floatcos(-r, degrees)),
-			z-0.8568, .rz = r, .zoffset = 0.7), 50);
+			z-0.8568, .rz = r, .zoffset = 0.7);
 
+	if(0 < _:type <= WEAPON_PARACHUTE)
+		SetItemExtraData(itemid, WepData[_:type][MagSize]);
 
 	return 1;
 }
