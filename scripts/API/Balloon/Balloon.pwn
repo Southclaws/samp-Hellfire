@@ -36,9 +36,9 @@ stock CreateBalloon(Float:x1, Float:y1, Float:z1, Float:r1, Float:x2, Float:y2, 
 	new id = Iter_Free(bln_Index);
 	if(id>MAX_BALLOON)return 0;
 
-	bln_Data[id][bln_object]	= CreateDynamicObject(19335, x1, y1, z1, r1, 0.0, 0.0, FREEROAM_WORLD);
-	bln_Data[id][bln_button][0]	= CreateButton(x1, y1, (z1+BLN_BASKET_OFFSET), "Press F to activate Balloon", FREEROAM_WORLD);
-	bln_Data[id][bln_button][1]	= CreateButton(x2, y2, (z2+BLN_BASKET_OFFSET), "Press F to activate Balloon", FREEROAM_WORLD);
+	bln_Data[id][bln_object]	= CreateDynamicObject(19335, x1, y1, z1, r1, 0.0, 0.0, 0);
+	bln_Data[id][bln_button][0]	= CreateButton(x1, y1, (z1+BLN_BASKET_OFFSET), "Press F to activate Balloon", 0);
+	bln_Data[id][bln_button][1]	= CreateButton(x2, y2, (z2+BLN_BASKET_OFFSET), "Press F to activate Balloon", 0);
 
 	bln_Data[id][bln_posX][0]=x1;
 	bln_Data[id][bln_posY][0]=y1;

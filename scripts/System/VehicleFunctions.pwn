@@ -479,17 +479,21 @@ stock v_Boot(v, t=-1)
 	return bt;
 }
 
-stock encode_lights(light1, light2, light3, light4)
-		return light1 | (light2 << 1) | (light3 << 2) | (light4 << 3);
-stock encode_tires(tire1, tire2, tire3, tire4)
-		return tire1 | (tire2 << 1) | (tire3 << 2) | (tire4 << 3);
-stock encode_panels(flp, frp, rlp, rrp, windshield, front_bumper, rear_bumper)
-		return flp | (frp << 4)  | (rlp << 8)  | (rrp << 12)  | (windshield << 16)  | (front_bumper << 20)  | (rear_bumper << 24);
-stock encode_tires_bike(rear, front)
-		return rear | (front << 1);
-stock encode_doors(bonnet, boot, driver_door, passenger_door/*, behind_driver_door, behind_passenger_door*/)
-		return bonnet | (boot << 8) | (driver_door << 16) | (passenger_door << 24);
-
+encode_tires(tire1, tire2, tire3, tire4) return tire1 | (tire2 << 1) | (tire3 << 2) | (tire4 << 3);
+encode_panels(flp, frp, rlp, rrp, windshield, front_bumper, rear_bumper)
+{
+    return flp | (frp << 4) | (rlp << 8) | (rrp << 12) | (windshield << 16) | (front_bumper << 20) | (rear_bumper << 24);
+}
+encode_doors(bonnet, boot, driver_door, passenger_door, behind_driver_door, behind_passenger_door)
+{
+    #pragma unused behind_driver_door
+    #pragma unused behind_passenger_door
+    return bonnet | (boot << 8) | (driver_door << 16) | (passenger_door << 24);
+}
+encode_lights(light1, light2, light3, light4)
+{
+    return light1 | (light2 << 1) | (light3 << 2) | (light4 << 3);
+}
 #define VTYPE_CAR 1
 #define VTYPE_HEAVY 2
 #define VTYPE_MONSTER 3

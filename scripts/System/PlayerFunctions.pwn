@@ -404,12 +404,11 @@ stock GetSkinGender(skinID)
 }
 stock IsValidSkin(skinid)
 {
-	new badSkins[14]={3, 4, 5, 6, 8, 42, 65, 74, 86, 119, 149, 208, 273, 289};
-	if(skinid < 0 || skinid > 299)return false;
-	for(new i;i<14;i++)if(skinid == badSkins[i])return false;
-	return true;
+    if(skinid == 74 || skinid > 299 || skinid < 0)
+        return 0;
+        
+    return 1;
 }
-
 
 //==============================================================================Camera Functions
 

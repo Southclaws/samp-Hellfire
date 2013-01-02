@@ -23,6 +23,7 @@ ApplyRandomFeaturesToVehicle(vehicleid)
 	new
 	    mod = GetVehicleModel(vehicleid),
 		Float:health;
+
 	if(chance(80))health=random(500);
 	else if(chance(10))health=(400+random(200));
 	else health=(600+random(400));

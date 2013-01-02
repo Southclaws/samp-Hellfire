@@ -5,7 +5,7 @@
 
 
 new
-ItemType:	item_Medkit,
+ItemType:	item_Medkit = INVALID_ITEM_TYPE,
 Timer:		gPlayerMedkitTimer[MAX_PLAYERS],
 Float:		gPlayerMedkitProgress[MAX_PLAYERS],
 			gPlayerMedkitTarget[MAX_PLAYERS],
@@ -14,7 +14,7 @@ Bit1:		gPlayerUsingMedkit<MAX_PLAYERS>;
 
 hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
-	if(GetPlayerItemType(playerid) == item_Medkit)
+	if(GetItemType(GetPlayerItem(playerid)) == item_Medkit)
 	{
 		if(newkeys == 16)
 		{

@@ -15,13 +15,8 @@ new
 	ItemType:item_Pager			= INVALID_ITEM_TYPE, // same as above
 	ItemType:item_Rake			= INVALID_ITEM_TYPE, // lol? some kind of special weapon... sword anims
 	ItemType:item_HotDog		= INVALID_ITEM_TYPE, // eat for hp (add more food if available)
-	ItemType:item_EasterEgg1	= INVALID_ITEM_TYPE, // open for random stuff, must remove oversized ones
-	ItemType:item_EasterEgg2	= INVALID_ITEM_TYPE,
-	ItemType:item_EasterEgg3	= INVALID_ITEM_TYPE,
-	ItemType:item_EasterEgg4	= INVALID_ITEM_TYPE,
-	ItemType:item_EasterEgg5	= INVALID_ITEM_TYPE,
+	ItemType:item_EasterEgg		= INVALID_ITEM_TYPE, // open for random stuff, must remove oversized ones
 	ItemType:item_Cane			= INVALID_ITEM_TYPE, // bling
-	ItemType:item_HandCuffs		= INVALID_ITEM_TYPE, // cuff unarmed players
 	ItemType:item_Bucket		= INVALID_ITEM_TYPE, // put on head... lol
 	ItemType:item_GasMask		= INVALID_ITEM_TYPE, // anti poison gas? (need poison gass wep/item!)
 	ItemType:item_Flag			= INVALID_ITEM_TYPE; // marking territory

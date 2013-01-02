@@ -142,7 +142,7 @@ stock SetLineSegmentPoint(id, Float:PointX, Float:PointY, Float:PointZ)
 	return 1;
 }
 
-UpdateLineSegment(id)
+stock UpdateLineSegment(id)
 {
 	new
 		Float:rx,

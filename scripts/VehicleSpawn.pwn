@@ -239,60 +239,11 @@ LoadVehiclesFromFile(file[], bool:prints = true)
 
 			if(IsValidVehicle(tmpid))
 			{
-				if(gCurModelGroup != VEHICLE_GROUP_BIKE && gCurModelGroup != VEHICLE_GROUP_FASTBIKE && gCurModelGroup != VEHICLE_GROUP_SMALLPLANE)
-				{
-					new
-						itemid,
-						ItemType:itemtype,
-						Float:x,
-						Float:y,
-						Float:z;
+				SetVehicleNumberPlate(tmpid, RandomNumberPlateString());
 
-					GetVehicleModelInfo(model, VEHICLE_MODEL_INFO_SIZE, x, y, z);
-
-					gVehicleContainer[tmpid] = CreateContainer("Trunk", 12);
-					AttachContainerToVehicle(gVehicleContainer[tmpid], tmpid);
-
-					itemtype = GenerateLoot(LOOT_TYPE_LOW);
-					itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
-					AddItemToContainer(gVehicleContainer[tmpid], itemid);
-
-					if(random(100) < 50)
-					{
-						itemtype = GenerateLoot(LOOT_TYPE_LOW);
-						itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
-						AddItemToContainer(gVehicleContainer[tmpid], itemid);
-
-						if(1 <= _:itemtype <= 46)
-							SetItemExtraData(itemid, WepData[_:itemtype][MagSize] * (random(2) + 1));
-
-						if(random(100) < 50)
-						{
-							itemtype = GenerateLoot(LOOT_TYPE_MEDIUM);
-							itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
-							AddItemToContainer(gVehicleContainer[tmpid], itemid);
-
-							if(1 <= _:itemtype <= 46)
-								SetItemExtraData(itemid, WepData[_:itemtype][MagSize] * (random(2) + 1));
-
-							if(random(100) < 50)
-							{
-								itemtype = GenerateLoot(LOOT_TYPE_HIGH);
-								itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
-								AddItemToContainer(gVehicleContainer[tmpid], itemid);
-
-								if(1 <= _:itemtype <= 46)
-									SetItemExtraData(itemid, WepData[_:itemtype][MagSize] * (random(2) + 1));
-							}
-						}
-					}
-				}
+				TotalVehicles++;
+				count++;
 			}
-
-			SetVehicleNumberPlate(tmpid, RandomNumberPlateString());
-
-			TotalVehicles++;
-			count++;
 		}
 		else if(sscanf(line, "'MODELGROUP:'d", gCurModelGroup) && strlen(line) > 3)print("LINE ERROR");
 	}

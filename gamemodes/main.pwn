@@ -1,14 +1,21 @@
 #include <a_samp>
 
-#define size (4)
 main()
 {
-	func("h3i");
+	new str[32];
+
+	str = "Hello ";
+
+	CallLocalFunction("set", "s", str);
+
+	print(str);
 }
 
-func(arr[size])
+forward set(s[]);
+public set(s[])
 {
-	print(arr);
+	format(s, 32, "nul");
+	return 1;
 }
 
 

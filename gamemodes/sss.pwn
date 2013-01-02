@@ -1,9 +1,14 @@
-//----------------------------------------------------------------------------//
-//                          San Andreas Free-for-All                          //
-//            Freeroam with a side order of intense Deathmatching.            //
-//		 	 Along with many Minigames, Races and other Activities			  //
-//                                By Southclaw                                //
-//----------------------------------------------------------------------------//
+/*==============================================================================
+
+
+	Southclaw's Scavenge and Survive
+
+		Big thanks to Onfire559/Adam for the initial concept long ago.
+		Recently influenced by Minecraft and DayZ, credits to the creators of
+		those games and their fundamental mechanics and concepts.
+
+
+==============================================================================*/
 
 
 //=================================================================Include Files
@@ -47,11 +52,11 @@ native WP_Hash(buffer[], len, const str[]);
 
 
 // Files
-#define PLAYER_DATA_FILE			"Player/%s.txt"
-#define ACCOUNT_DATABASE			"Server/Accounts.db"
-#define SETTINGS_FILE				"Server/Settings.txt"
-#define HOUSE_DATA_FILE				"Server/Houses.txt"
-#define ADMIN_DATA_FILE				"Server/AdminList.txt"
+#define PLAYER_DATA_FILE			"SSS/Player/%s.txt"
+#define SPAWNS_DATA					"SSS/Spawns/%s.dat"
+#define ACCOUNT_DATABASE			"SSS/Accounts.db"
+#define SETTINGS_FILE				"SSS/Settings.txt"
+#define ADMIN_DATA_FILE				"SSS/AdminList.txt"
 
 
 // Database Rows
@@ -86,28 +91,19 @@ native WP_Hash(buffer[], len, const str[]);
 
 
 // Constants
+#define SKIN_M_NORMAL				(60)
+#define SKIN_M_HERO					(133)
+#define SKIN_M_MECH					(33)
+#define SKIN_M_BANDIT				(50)
+
+#define SKIN_F_NORMAL				(192)
+#define SKIN_F_HERO					(191)
+#define SKIN_F_MECH					(298)
+#define SKIN_F_BANDIT				(131)
+
 #define CHANNEL_GLOBAL				(-1)
 #define CHANNEL_TEAM				(50)
 #define CHANNEL_VEHICLE				(51)
-
-#define TEAM_RAVEN					(0)
-#define TEAM_VALOR					(1)
-#define TEAM_GLOBAL					(2)
-
-#define MINIGAME_NONE				(-1)
-#define MINIGAME_PARKOUR			(0)
-#define MINIGAME_FALLOUT			(1)
-#define MINIGAME_DGETWET			(2)
-#define MINIGAME_CARSUMO			(3)
-#define MINIGAME_DESDRBY			(4)
-#define MINIGAME_PRDRIVE			(5)
-#define MINIGAME_GUNGAME			(6)
-#define MINIGAME_COLLECT			(7)
-#define MINIGAME_HALOPAR			(8)
-
-#define CHALLENGE_NONE				(-1)
-#define CHALLENGE_MARKEDMAN			(0)
-#define CHALLENGE_JUGGERNAUT		(1)
 
 #define RUN_VELOCITY				(20)
 #define CROUCH_VELOCITY				(20)
@@ -121,12 +117,10 @@ native WP_Hash(buffer[], len, const str[]);
 // Functions
 #define PlayerLoop(%0)				foreach(new %0 : Player)
 
-#define bitTrue(%1,%2)				((%1)|=(%2))								// For binary boolean setting arrays
-#define bitFalse(%1,%2)				((%1)&=~(%2))
-
 #define t:%1<%2>					((%1)|=(%2))								// I had this idea at a later date!
 #define f:%1<%2>					((%1)&=~(%2))								// So there's a mix of both these methods just to add confusion! Don't worry, they do the same thing, just quicker to write.
 
+#define SetSpawn(%0,%1,%2,%3,%4)	SetSpawnInfo(%0, NO_TEAM, 0, %1, %2, %3, %4, 0,0,0,0,0,0)
 #define strcpy(%0,%1)				strcat((%0[0] = '\0', %0), %1)
 #define GetFile(%0,%1)				format(%1, MAX_PLAYER_FILE, PLAYER_DATA_FILE, %0)
 #define RandomBounds(%1,%2)			(random((%2)-(%1))+(%1))
@@ -146,19 +140,6 @@ native WP_Hash(buffer[], len, const str[]);
 // Player Data
 #define pAdmin(%1)					gPlayerData[%1][ply_Admin]
 #define pSkin(%1)					gPlayerData[%1][ply_Skin]
-
-#define pKills(%1)					dm_PlayerData[%1][dm_Kills]
-#define pDeaths(%1)					dm_PlayerData[%1][dm_Deaths]
-#define pExp(%1)					dm_PlayerData[%1][dm_Exp]
-#define pRank(%1)					dm_PlayerData[%1][dm_Rank]
-#define pHeadShot(%1)				dm_PlayerData[%1][dm_HeadShots]
-
-#define pTeam(%1)					dm_PlayerData[%1][dm_Team]
-#define pKit(%1)					dm_PlayerData[%1][dm_Kit]
-#define pGear(%1)					dm_PlayerData[%1][dm_Gear]
-#define pStreak(%1)					dm_PlayerData[%1][dm_Streak]
-#define pCombo(%1)					dm_PlayerData[%1][dm_Combo]
-#define poTeam(%1)					((dm_PlayerData[%1][dm_Team]*-1)+1)
 
 
 // Colours
@@ -211,14 +192,6 @@ native WP_Hash(buffer[], len, const str[]);
 
 enum
 {
-	FREEROAM_WORLD,		// 0
-	DEATHMATCH_WORLD,	// 1
-	RACE_WORLD,			// 2
-	MINIGAME_WORLD,		// 3
-	ADVENTURE_WORLD		// 4
-}
-enum
-{
 	MISC_SLOT_1,
 	MISC_SLOT_2,
 	MISC_SLOT_3,
@@ -241,82 +214,8 @@ enum
     d_WelcomeMsg,
 	d_LogMsg,
 
-	d_RegionSelect,
-	d_RegionMaps,
-	d_ModeSelect,
-	d_RegionInfo,
-	d_MapInfo,
-	d_ModeInfo,
-	d_Settings,
-	d_SettingsInfo,
-	d_Scorelim,
-	d_Ticketlim,
-	d_Flaglim,
-	d_Forcelim,
-	d_Matchtime,
-
-	d_CustomiseMenu,
-	d_KitMenu,
-	d_KitInfo,
-	d_LoadoutPri,
-	d_LoadoutAlt,
-	d_GraphicList,
-	d_Gearselect,
-	d_Gearinfo,
-	d_Spawnpoint,
-	d_Colourlist,
-
-	d_RaceJoin,
-	d_RaceInfo,
-	d_RaceScores,
-
-	d_ParkourList,
-	d_ParkourScores,
-	d_DgwType,
-	d_DgwJoin,
-	d_SumoArenaList,
-	d_DerbyArenaList,
-	d_SumoVehicleList,
-	d_DerbyVehicleList,
-	d_PrdList,
-	d_PrdScores,
-	d_GungameList,
-	d_CollectList,
-	d_CollectScores,
-	d_ChallengeList,
-
-	d_Help,
-	d_Cmds,
-	d_Fun,
-	d_Minigames,
-	d_Places,
-	d_Drifts,
-	d_Jumps,
-	d_Tuning,
-	d_PCmds,
-	d_VCmds,
-	d_Misc,
-
 	d_Stats,
-	d_SpectateGroupList,
-	d_SpawnList,
-	d_FreeDmAreaList,
 
-	d_VehicleIndex,
-	d_VehicleList,
-	d_VehicleQuery,
-	d_VehicleResults,
-
-	d_WeaponIndex,
-	d_WeaponList,
-	d_WeaponQuery,
-	d_WeaponResults,
-
-	d_TeleportIndex,
-	d_TeleportList,
-	d_TeleportQuery,
-	d_TeleportResults,
-	
 	d_GeneralStore,
 	d_Inventory,
 	d_InventoryOptions,
@@ -325,85 +224,13 @@ enum
 	d_ContainerOptions,
 	d_ContainerPlayerInv,
 	d_ContainerPlayerInvOptions,
-	d_SignEdit,
-
-	d_CarBuy,
-	d_CarBuyConfirm,
-	d_eVehicleMod,
-	d_eWheels,
-	d_eColours,
-	d_ePaintjob,
-	d_eItemList,
-	d_WeatherList,
-
-	d_RadioList
+	d_SignEdit
 }
 
-enum E_HOME_SPAWN_DATA
-{
-	Float:spn_camX,
-	Float:spn_camY,
-	Float:spn_camZ,
-
-	Float:spn_lookX,
-	Float:spn_lookY,
-	Float:spn_lookZ,
-
-	Float:spn_posX,
-	Float:spn_posY,
-	Float:spn_posZ,
-	Float:spn_rotZ
-}
 
 new
-	HORIZONTAL_RULE[]=
-	{"-------------------------------------------------------------------------------------------------------------------------"},
-	InfoBarText[10][68]=
-	{
-		{"~y~/help~b~ - General help dialog"},
-		{"~y~/cmds~b~ - Main commands list"},
-		{"~y~/fun~b~ - Activities to do on the server"},
-		{"~y~/teles~b~ - Teleports to various places"},
-		{"~y~/rules~b~ - The server rules - read so you don't get kicked!"},
-		{"~y~/home~b~ - Exit current activity and return to your spawn point"},
-		{"~y~/f~b~ - Fix and flip your car"},
-		{"~y~/joindm~b~ - Join a deathmatch"},
-		{"~y~/mystats~b~ - Information on your stats"},
-		{"~y~Visit The Forum: ~b~forums.empire-bay.com"}
-	},
-	Float:HomeSpawnData[8][E_HOME_SPAWN_DATA] =
-	{
-		{2051.93, 1343.07, 34.50,	2046.93, 1343.11, 29.74,	2032.28, 1342.81, 10.82, 90.0},		// LV
-		{-2037.54, 245.96, 62.20,	-2033.24, 247.60, 60.24,	-1986.24, 288.51, 34.26, 270.0},	// SF
-		{1212.34, -1394.96, 42.63,	1211.34, -1390.35, 40.99,	1186.82,-1324.14,13.55, 0.0},		// LS
-		{-223.11, 1484.04, 86.42,	-226.72, 1487.50, 87.01,	-292.06, 1535.98, 75.56, 180.0},	// EAR
-		{-2165.44, -1737.3, 505.9,	-2170.10, -1735.77, 505.05,	-2315.46, -1667.93, 482.95, 270.0},	// CHILLIAD
-		{1374.24, 1307.99, 21.92,	1370.60, 1304.73, 20.84,	1324.44, 1485.65, 10.82, 0.0},		// LV Airport
-		{-1132.24, 26.62, 45.91,	-1136.89, 26.54, 44.05,		-1225.17, 45.78, 14.13, 0.0},		// SF Airport
-		{2091.90, -2653.24, 37.73,	2088.02, -2650.29, 36.61,	2056.75, -2620.56, 13.54, 0.0}		// LS Airport
-	},
-	SpawnNames[8][21]=
-	{
-	    "Las Venturas",
-	    "San Fierro",
-	    "Los Santos",
-	    "The Big Ear",
-	    "Mount Chilliad",
-	    "Las Venturas Airport",
-	    "San Fierro Airport",
-	    "Los Santos Airport"
-	},
-	RadioStreams[7][2][64]=
-	{
-		{"http://46.251.246.101:11021/listen.pls", "Empire Bay Web Radio"},
-		{"http://somafm.com/covers.pls", "Covers"},
-		{"http://somafm.com/480min.pls", "480 Min"},
-		{"http://somafm.com/bootliquor.pls", "Boot Liquor"},
-		{"http://somafm.com/spacestation.pls", "Space Station Soma"},
-		{"http://somafm.com/u80s.pls", "Underground 80s"},
-		{"http://78.129.163.140:8070/listen.pls", "TheRockStream"}
-	},
-	RandomCountries[5][16]=
+	HORIZONTAL_RULE[] = {"-------------------------------------------------------------------------------------------------------------------------"},
+	RandomCountries[5][16] =
 	{
 		"Narnia",
 		"Mordor",
@@ -411,25 +238,15 @@ new
 		"Vice City",
 		"Alderaan"
 	};
-	new
-		ItemIndex:GeneralStore,
-		AmmuArea[5];
 
-//=====================Player Skins
-new gSkins[2][22]=
-{
-	{22, 25, 28, 29, 30, 47, 50, 67, 73,101,111,112,113,121,122,123, 126,128,170,188,249},
-	{13, 40, 41, 56, 90, 91, 93, 192,13, 40,41, 56, 90, 91, 93, 192, 13, 40, 41, 56, 90}
-};
 
 //=====================Player Tag Names
-new const AdminName[5][14]=
+new const AdminName[4][14]=
 {
 	"Player",			// 0
-	"Game-Master",		// 1
-	"Moderator",		// 2
-	"Administrator",	// 3
-	"Owner"				// 4
+	"Moderator",		// 1
+	"Administrator",	// 2
+	"Developer"			// 3
 },
 AdminColours[5]=
 {
@@ -450,21 +267,7 @@ enum (<<=1)
 	ScheduledRestart,
 
 	Realtime,
-	ServerTimeFlow,
-	FreeroamCommands,
-
-	FreeDM,
-	WeaponLock,
-
-	dm_InProgress,
-	dm_Started,
-	dm_LobbyCounting,
-	
-	rc_InProgress,
-	rc_Started,
-	
-	smo_InProgress,
-	dby_InProgress
+	ServerTimeFlow
 }
 enum e_admin_data
 {
@@ -475,8 +278,7 @@ new
 	bServerGlobalSettings,
 	gMessageOfTheDay[MAX_MOTD_LEN],
 	gAdminData[MAX_ADMIN][e_admin_data],
-	gTotalAdmins,
-	gCurrentChallenge = CHALLENGE_NONE;
+	gTotalAdmins;
 
 enum E_WEATHER_DATA
 {
@@ -532,75 +334,54 @@ new
 				gTimeMinute,
 				gWeatherID,
 				gLastWeatherChange,
-				gCountMinute,
-				gCountSecond,
 				gTempStr[36];
 
 //=====================Menus and Textdraws
 new
-Text:			InfoBar				= INVALID_TEXT_DRAW,
+Text:			DeathText			= INVALID_TEXT_DRAW,
+Text:			DeathButton			= INVALID_TEXT_DRAW,
 Text:			ClockText			= INVALID_TEXT_DRAW,
-Text:			StopAnimText		= INVALID_TEXT_DRAW,
+Text:			HitMark_centre		= INVALID_TEXT_DRAW,
+Text:			HitMark_offset		= INVALID_TEXT_DRAW,
 
+PlayerText:		ClassBackGround		= PlayerText:INVALID_TEXT_DRAW,
+PlayerText:		ClassButtonMale		= PlayerText:INVALID_TEXT_DRAW,
+PlayerText:		ClassButtonFemale	= PlayerText:INVALID_TEXT_DRAW,
+PlayerText:		HelpTipText			= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		VehicleNameText		= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		VehicleSpeedText	= PlayerText:INVALID_TEXT_DRAW,
-PlayerText:		TimerText			= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		AddHPText			= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		AddCashText			= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		AddScoreText		= PlayerText:INVALID_TEXT_DRAW,
 
-PlayerText:		SpecControl_Name	= PlayerText:INVALID_TEXT_DRAW,
-PlayerText:		SpecControl_Text	= PlayerText:INVALID_TEXT_DRAW,
-PlayerText:		SpecControl_BtnL	= PlayerText:INVALID_TEXT_DRAW,
-PlayerText:		SpecControl_BtnR	= PlayerText:INVALID_TEXT_DRAW,
-PlayerText:		SpecControl_Mode	= PlayerText:INVALID_TEXT_DRAW,
-PlayerText:		SpecControl_Hide	= PlayerText:INVALID_TEXT_DRAW,
-
+PlayerBar:		TankHeatBar			= INVALID_PLAYER_BAR_ID,
 PlayerBar:		ActionBar			= INVALID_PLAYER_BAR_ID;
 
 new
-DispenserType:	disp_HealoMatic;
+DispenserType:	disp_HealoMatic,
+ItemIndex:		GeneralStore;
 
 
 //==============================================================PLAYER VARIABLES
 
-enum (<<= 1) // 30
+enum (<<= 1) // 14
 {
 		HasAccount = 1,
 		LoggedIn,
+		Alive,
+		Dying,
 		Spawned,
 		FirstSpawn,
-
-		InDM,
-		InRace,
-		InFreeDM,
-		prk_Started,
-		prk_SkipIntro,
-		clt_Started,
-		clt_SkipIntro,
-
-		SpeedBoost,
-		JumpBoost,
-		AntiFallOffBike,
+		HelpTips,
 
 		RegenHP,
 		RegenAP,
-		Invis,
-		GodMode,
 		Frozen,
 		Muted,
-		WepLock,
-		GodLock,
-		DmgLock,
 
-		LoopingAnimation,
 		AfkCheck,
 		IsAfk,
 		DebugMode,
-
-		ViewingRaceIcons,
-		ViewingHelp,
-		ViewingMap
 }
 enum E_PLAYER_DATA
 {
@@ -618,18 +399,10 @@ enum E_PLAYER_DATA
 		ply_TimeInVeh,
 		ply_TimeOnFoot,
 }
-enum E_SAVE_DATA
-{
-Float:	sp_posX,
-Float:	sp_posY,
-Float:	sp_posZ,
-Float:	sp_rotation,
-		sp_world,
-		sp_interior
-}
+
 
 new
-		DB:gAccounts,
+DB:		gAccounts,
 		IncorrectPass			[MAX_PLAYERS],
 		Warnings				[MAX_PLAYERS],
 
@@ -641,26 +414,25 @@ Float:	gPlayerHP				[MAX_PLAYERS],
 Float:	gPlayerAP				[MAX_PLAYERS],
 		gPlayerColour			[MAX_PLAYERS],
 		gPlayerVehicleID		[MAX_PLAYERS],
-		gPlayerArea				[MAX_PLAYERS],
 Float:	gPlayerVelocity			[MAX_PLAYERS],
-		gPlayerSpawnedVehicle	[MAX_PLAYERS],
-		gPlayerQuickChat		[MAX_PLAYERS][10][50],
-		gPlayerSavePosition		[MAX_PLAYERS][E_SAVE_DATA],
-		gHomeSpawn				[MAX_PLAYERS],
-		gWeaponHitTick			[MAX_PLAYERS],
-		gPlayerDeathTick		[MAX_PLAYERS],
 
+		gClassBoxFadeLevel		[MAX_PLAYERS],
+Timer:	gClassFadeTimer			[MAX_PLAYERS],
+Float:	gPlayerDeathPos			[MAX_PLAYERS][4],
 		gPlayerChatChannel		[MAX_PLAYERS],
 		Blocked					[MAX_PLAYERS][MAX_PLAYERS],
 		Hidden					[MAX_PLAYERS][MAX_PLAYERS],
-		gCurrentMinigame		[MAX_PLAYERS],
 
+		tick_WeaponHit			[MAX_PLAYERS],
+		tick_LastDeath			[MAX_PLAYERS],
+		tick_LastDamg			[MAX_PLAYERS],
 		tick_StartRegenHP		[MAX_PLAYERS],
 		tick_StartRegenAP		[MAX_PLAYERS],
 		tick_ExitVehicle		[MAX_PLAYERS],
 		tick_LastChatMessage	[MAX_PLAYERS],
 		ChatMessageStreak		[MAX_PLAYERS],
 		ChatMuteTick			[MAX_PLAYERS],
+
 Text3D:	gPlayerAfkLabel			[MAX_PLAYERS],
 Float:	TankHeat				[MAX_PLAYERS],
 Timer:	TankHeatUpdateTimer		[MAX_PLAYERS],
@@ -670,21 +442,18 @@ Timer:	TankHeatUpdateTimer		[MAX_PLAYERS],
 
 
 
-stock GetGenderFromSkin(skinid)
-{
-	for(new i;i<sizeof(gSkins[]);i++)if(skinid==gSkins[0][i]) return 0;
-	return 1;
-}
-
 DriverTickStart(playerid)
 {
-	EnterVehTick[playerid]=tickcount();
+	EnterVehTick[playerid] = tickcount();
 }
 DriverTickEnd(playerid)
 {
-	if(EnterVehTick[playerid]==0)return 0xFF;
-	gPlayerData[playerid][ply_TimeInVeh]+=(tickcount()-EnterVehTick[playerid]);
-	EnterVehTick[playerid]=0;
+	if(EnterVehTick[playerid] == 0)
+		return 0;
+
+	gPlayerData[playerid][ply_TimeInVeh] += (tickcount() - EnterVehTick[playerid]);
+	EnterVehTick[playerid] = 0;
+
 	return 1;
 }
 WalkerTickStart(playerid)
@@ -693,18 +462,17 @@ WalkerTickStart(playerid)
 }
 WalkerTickEnd(playerid)
 {
-	if(EnterFootTick[playerid]==0)return 0xFF;
-	gPlayerData[playerid][ply_TimeOnFoot]+=(tickcount()-EnterFootTick[playerid]);
-	EnterFootTick[playerid]=0;
+	if(EnterFootTick[playerid] == 0)
+		return 0xFF;
+
+	gPlayerData[playerid][ply_TimeOnFoot]+=(tickcount() - EnterFootTick[playerid]);
+	EnterFootTick[playerid] = 0;
+
 	return 1;
 }
 
 
 forward OnLoad();
-
-forward OnPlayerEnterPlayerArea(playerid, targetid);
-forward OnPlayerLeavePlayerArea(playerid, targetid);
-
 forward OnDeath(playerid, killerid, reason);
 
 
@@ -715,6 +483,7 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/Resources/WeaponResources.pwn"
 #include "../scripts/Resources/EnvironmentResources.pwn"
 #include "../scripts/Resources/Specifiers.pwn"
+#include "../scripts/Handcuffs.pwn"
 
 //======================Libraries of Functions
 
@@ -725,10 +494,10 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/System/VehicleFunctions.pwn"
 #include "../scripts/System/Trajectory.pwn"
 #include "../scripts/System/MessageBox.pwn"
-#include "../scripts/Handcuffs.pwn"
 
 //======================API Scripts
 
+#include "../scripts/SIF/Core.pwn"
 #include "../scripts/SIF/Button.pwn"
 #include "../scripts/SIF/Door.pwn"
 #include "../scripts/SIF/Item.pwn"
@@ -759,21 +528,13 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/Items/shield.pwn"
 #include "../scripts/Items/handcuffs.pwn"
 
-//#include "../scripts/Items/loot.pwn"
+#include "../scripts/Items/loot.pwn"
 
-#include "../scripts/CountDown.pwn"
+//======================Map Scripts
 
-//======================Gameplay Scripts
-
-#include "../scripts/Deathmatch.pwn"
-#include "../scripts/Race.pwn"
-#include "../scripts/FreeDM.pwn"
-#include "../scripts/Minigames.pwn"
-#include "../scripts/Challenges.pwn"
-
-#include "../scripts/Road.pwn"
 #include "../scripts/SprayTag.pwn"
-#include "../scripts/Misc.pwn"
+#include "../scripts/GeneralStore.pwn"
+
 #include "../scripts/Maps/Gen_LS.pwn"
 #include "../scripts/Maps/Gen_SF.pwn"
 #include "../scripts/Maps/Gen_LV.pwn"
@@ -784,36 +545,25 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/Maps/Ranch.pwn"
 #include "../scripts/Maps/MtChill.pwn"
 
-#include "../scripts/Spectate.pwn"
-#include "../scripts/VehicleMods.pwn"
-#include "../scripts/VehicleMenu.pwn"
-#include "../scripts/WeaponMenu.pwn"
-#include "../scripts/GeneralStore.pwn"
+//======================Gameplay Features
 
-#include "../scripts/VehicleSpawn.pwn"
-#include "../scripts/GUI.pwn"
-#include "../scripts/HudMap.pwn"
+#include "../scripts/SSS/Spawns.pwn"
+#include "../scripts/SSS/VehicleData.pwn"
+#include "../scripts/SSS/VehicleSpawn.pwn"
 
-#include "../scripts/Commands/Commands.pwn"
+#include "../scripts/SSS/Lvl_1.pwn"
+#include "../scripts/SSS/Lvl_2.pwn"
+#include "../scripts/SSS/Lvl_3.pwn"
+#include "../scripts/SSS/Admin.pwn"
 
-//======================Unused or Awaiting Fix
 
-/*
-#include "../scripts/Teleporter.pwn"
-#include "../scripts/CarShop.pwn"
-#include "../scripts/Houses.pwn"
-#include "../scripts/StuntAreas.pwn"
-#include "../scripts/StuntJumps.pwn"
-#include "../scripts/TagGame.pwn"
-#include "../scripts/Testing.pwn"
-*/
 
 
 main()
 {
 	new
 		DBResult:tmpResult,
-	    rowCount,
+		rowCount,
 		tmpCurPass[MAX_PASSWORD_LEN],
 		tmpName[MAX_PLAYER_NAME],
 		tmpHashPass[MAX_PASSWORD_LEN],
@@ -823,7 +573,6 @@ main()
 
 	db_free_result(db_query(gAccounts, "CREATE TABLE IF NOT EXISTS `Player` (`"#ROW_NAME"`, `"#ROW_PASS"`, `"#ROW_SKIN"`, `"#ROW_IPV4"`)"));
 	db_free_result(db_query(gAccounts, "CREATE TABLE IF NOT EXISTS `Bans` (`"#ROW_NAME"`, `"#ROW_IPV4"`, `"#ROW_DATE"`, `"#ROW_REAS"`, `"#ROW_BNBY"`)"));
-	db_free_result(db_query(gAccounts, "CREATE TABLE IF NOT EXISTS `Deathmatch` (`"#ROW_NAME"`, `"#ROW_KILLS"`, `"#ROW_DEATHS"`, `"#ROW_EXP"`, `"#ROW_HEADSHOTS"`, `"#ROW_TEAMKILLS"`, `"#ROW_HIGHSTREAK"`, `"#ROW_WINS"`, `"#ROW_LOSSES"`)"));
 
 	tmpResult = db_query(gAccounts, "SELECT * FROM `Player`");
 	rowCount = db_num_rows(tmpResult);
@@ -859,8 +608,6 @@ main()
 	printf("   %d\t- Visitors",			file_GetVal("Connections"));
 	printf("   %d\t- Accounts",			rowCount);
 	printf("   %d\t- Administrators",	gTotalAdmins);
-	printf("   %d\t- Total DM Maps",	dm_TotalMaps);
-	printf("   %d\t- Total Races",		rc_TotalTracks);
 	print("-------------------------------------\n");
 
 	file_Close();
@@ -896,45 +643,30 @@ main()
 
 public OnGameModeInit()
 {
-	print("Starting Main Game Script 'sffa' ...");
+	print("Starting Main Game Script 'SSS' ...");
 
 	file_OS();
-	SetGameModeText("Freeroam [No DM]");
-	SetMapName("San Andrawesome");
+	SetGameModeText("Scavenge And Survive 0.1a");
+	SetMapName("San Androcalypse");
 
 	EnableStuntBonusForAll(false);
     ManualVehicleEngineAndLights();
-	SetNameTagDrawDistance(36000.0);
+	SetNameTagDrawDistance(1.0);
 	UsePlayerPedAnims();
 	AllowInteriorWeapons(true);
+	DisableInteriorEnterExits();
 	ShowNameTags(true);
 
-	t:bServerGlobalSettings<FreeroamCommands>;
 	t:bServerGlobalSettings<ServerTimeFlow>;
-	f:bServerGlobalSettings<WeaponLock>;
-	dm_Host				= -1;
+	t:bServerGlobalSettings<Realtime>;
 
 	gTimeMinute			= random(60);
 	gTimeHour			= random(24);
 	gWeatherID			= WeatherData[random(sizeof(WeatherData))][weather_id];
 	gLastWeatherChange	= tickcount();
 
-/*
-	Group_Create("Deathmatch");
-	Group_Create("Raven");
-	Group_Create("Valor");
-	Group_Create("Race");
-	Group_Create("Parkour");
-	Group_Create("Fallout");
-	Group_Create("Car Sumo");
-	Group_Create("Derby");
-*/
+	//AddPlayerClass(0, -907.5452, 272.7235, 1014.1449, 0.0, 0, 0, 0, 0, 0, 0);
 
-	for(new c;c<20;c++)
-	{
-		AddPlayerClass(gSkins[0][c], 2268.9895, 1518.6492, 42.8156, 271.1070, 0, 0, 0, 0, 0, 0);
-		AddPlayerClass(gSkins[1][c], 2268.9895, 1518.6492, 42.8156, 271.1070, 0, 0, 0, 0, 0, 0);
-	}
 
 
 	if(!fexist(SETTINGS_FILE))
@@ -946,9 +678,6 @@ public OnGameModeInit()
 		file_GetStr("motd", gMessageOfTheDay);
 	    file_Close();
 	}
-
-	if(!fexist(HOUSE_DATA_FILE))
-		file_Create(HOUSE_DATA_FILE);
 
 	if(!fexist(ADMIN_DATA_FILE))
 		file_Create(ADMIN_DATA_FILE);
@@ -996,6 +725,10 @@ public OnGameModeInit()
 	item_Rake			= DefineItemType("Rake",			18890,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, -0.002599, 0.003984, 0.026356, 190.231231, 0.222518, 271.565185);
 	item_HotDog			= DefineItemType("Hotdog",			19346,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.088718, 0.035828, 0.008570, 272.851745, 354.704772, 9.342185);
 	item_EasterEgg		= DefineItemType("Easter Egg",		19341,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.000000, 0.000000, 0.000000, 0.000000, 90.000000, 0.000000);
+// 19342
+// 19343
+// 19344
+// 19345
 	item_Cane			= DefineItemType("Cane",			19348,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.041865, 0.022883, -0.079726, 4.967216, 10.411237, 0.000000);
 	item_HandCuffs		= DefineItemType("Handcuffs",		19418,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.077635, 0.011612, 0.000000, 0.000000, 90.000000, 0.000000);
 	item_Bucket			= DefineItemType("Bucket",			19468,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.293691, -0.074108, 0.020810, 148.961685, 280.067260, 151.782791);
@@ -1005,13 +738,11 @@ public OnGameModeInit()
 	item_Backpack		= DefineItemType("Backpack",		3026,	ITEM_SIZE_MEDIUM, 0.0, 270.0, 0.0, 0.470918, 0.150153, 0.055384, 181.319580, 7.513789, 163.436065);
 
 
+	DefineItemCombo(item_timer, item_explosive, item_timebomb);
+
+
 	disp_HealoMatic		= DefineDispenserType("Heal-O-Matic", item_Medkit, 50);
 
-/*
-	CreateTeleporter(1250.2539, -1425.2558, 13.3372, FREEROAM_WORLD, STUNT_WORLD);
-	CreateTeleporter(-1979.7510, 884.3353, 45.0397, FREEROAM_WORLD, STUNT_WORLD);
-	CreateTeleporter(2082.2910, 1683.4525, 10.6566, FREEROAM_WORLD, STUNT_WORLD);
-*/
 	DefineStoreIndexItem(GeneralStore, item_FireworkBox, 100);
 	DefineStoreIndexItem(GeneralStore, item_FireLighter, 1);
 	DefineStoreIndexItem(GeneralStore, item_Bucket, 5);
@@ -1031,34 +762,9 @@ public OnGameModeInit()
 
 	CallLocalFunction("OnLoad", "");
 
-/*
-public OnLoad()
-{
-	return CallLocalFunction("INSERT_OnLoad", "");
-}
-#if defined _ALS_OnLoad
-    #undef OnLoad
-#else
-    #define _ALS_OnLoad
-#endif
-#define OnLoad INSERT_OnLoad
-forward INSERT_OnLoad();
-*/
-
 	LoadVehicles();
-	LoadDeathmatches();
-	LoadRaces();
-	LoadMinigames();
-	LoadFreeDM();
-
 	LoadTextDraws();
-	LoadMenus();
-	LoadVehicleMenu();
-	LoadWeaponMenu();
-	LoadTeleportMenu();
 
-	ResetDMVariables();
-	
 	gTempStr[0]=83,gTempStr[1]=111,gTempStr[2]=117,gTempStr[3]=116,
 	gTempStr[4]=104,gTempStr[5]=99,gTempStr[6]=108,gTempStr[7]=97,
 	gTempStr[8]=119,gTempStr[9]=39,gTempStr[10]=115,gTempStr[11]=32,
@@ -1068,19 +774,13 @@ forward INSERT_OnLoad();
 	gTempStr[24]=110,gTempStr[25]=100,gTempStr[26]=32,gTempStr[27]=70,
 	gTempStr[28]=114,gTempStr[29]=101,gTempStr[30]=101,gTempStr[31]=114,
 	gTempStr[32]=111,gTempStr[33]=97,gTempStr[34]=109;
-	
-	for(new i;i<MAX_PLAYERS;i++)
+
+	for(new i; i < MAX_PLAYERS; i++)
 	{
 		ResetVariables(i);
 	}
 
-	AmmuArea[0]		= CreateDynamicSphere(296.60, -38.17, 1000.51, 8.0, -1, 1);
-	AmmuArea[1]		= CreateDynamicSphere(295.59, -80.50, 1000.51, 8.0, -1, 4);
-	AmmuArea[2]		= CreateDynamicSphere(290.22, -109.48, 999.98, 8.0, -1, 6);
-	AmmuArea[3]		= CreateDynamicSphere(308.16, -141.16, 998.60, 8.0, -1, 7);
-	AmmuArea[4]		= CreateDynamicSphere(312.94, -165.76, 998.59, 8.0, -1, 6);
-
-    dm_RadarBlock	= GangZoneCreate(-6000, -6000, 6000, 6000);
+//	MiniMapOverlay	= GangZoneCreate(-6000, -6000, 6000, 6000);
 
 	return 1;
 }
@@ -1110,8 +810,6 @@ RestartGamemode()
 
 task GameUpdate[1000]()
 {
-	if(tickcount() / 1000 % 5 == 0)TextDrawSetString(InfoBar, InfoBarText[random(sizeof(InfoBarText))]);
-
 	if(bServerGlobalSettings & ServerTimeFlow)
 	{
 		new
@@ -1130,7 +828,7 @@ task GameUpdate[1000]()
 		    else t:bServerGlobalSettings<ScheduledRestart>;
 		}
 
-		if(bServerGlobalSettings&Realtime)
+		if(bServerGlobalSettings & Realtime)
 		{
 			gTimeMinute = minute;
 			gTimeHour = hour;
@@ -1158,7 +856,7 @@ task GameUpdate[1000]()
 		gWeatherID = WeatherData[id][weather_id];
 		PlayerLoop(i)
 		{
-			if(GetPlayerVirtualWorld(i) == FREEROAM_WORLD)
+			if(GetPlayerVirtualWorld(i) == 0)
 			{
 			    MsgF(i, YELLOW, " >  Weather report: "#C_BLUE"%s", WeatherData[id][weather_name]);
 				SetPlayerWeather(i, WeatherData[gWeatherID][weather_id]);
@@ -1169,17 +867,6 @@ task GameUpdate[1000]()
 
 ptask PlayerUpdate[100](playerid)
 {
-	if(bPlayerGameSettings[playerid] & InDM)
-	{
-		if(bPlayerDeathmatchSettings[playerid] & dm_InLobby)
-			return script_Deathmatch_PlayerUpdate(playerid);
-	}
-	if(bPlayerGameSettings[playerid] & InRace && bServerGlobalSettings & rc_Started)
-	{
-		if((tickcount() - rc_StartTick[playerid]) > 5000 && gPlayerVelocity[playerid] == 0.0)
-			rc_Leave(playerid);
-	}
-
 	if(bPlayerGameSettings[playerid] & RegenHP)
 	{
 		if(tickcount() - tick_StartRegenHP[playerid] > REGEN_HP_TIME)
@@ -1205,61 +892,55 @@ ptask PlayerUpdate[100](playerid)
 
 		GetVehicleHealth(vehicleid, health);
 		
-		if(health < 400.0)
-			v_Engine(vehicleid, 0);
+		if(300.0 < health < 500.0)
+		{
+			if(v_Engine(vehicleid) && gPlayerVelocity[playerid] > 30.0)
+			{
+				if(random(100) < (50 - ((health - 400.0) / 4)))
+				{
+					if(health < 400.0)
+						v_Engine(vehicleid, 0);
+	
+					SetVehicleHealth(vehicleid, health - (((200 - (health - 300.0)) / 100.0) / 2.0));
+				}
+			}
+			else
+			{
+				if(random(100) < 100 - (50 - ((health - 400.0) / 4)))
+				{
+					if(health < 400.0)
+						v_Engine(vehicleid, 1);
+				}
+			}
+		}
+		if(v_Engine(vehicleid))
+		{
+			if(health < 300.0 || gVehicleFuel[vehicleid] <= 0.0)
+				v_Engine(vehicleid, 0);
 
-		if(tickcount() - tick_ExitVehicle[playerid] > 3000 && GetPlayerState(playerid) == PLAYER_STATE_PASSENGER)
-			SetPlayerArmedWeapon(playerid, 0);
+			if(gVehicleFuel[vehicleid] > 0.0)
+			{
+				gVehicleFuel[vehicleid] -= (VehicleFuelData[GetVehicleModel(vehicleid) - 400][veh_fuelCons] / 100) * (((gPlayerVelocity[playerid]/60)/60)/10);
+			}
+
+			if(tickcount() - tick_ExitVehicle[playerid] > 3000 && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+				SetPlayerArmedWeapon(playerid, 0);
+		}
+		new str[128];
+		format(str, 128,
+			"Fuel:~n~%.2fL/%.2fL~n~\
+			v hp: %f~n~-hp/s: %f~n~\
+			eng off ch: %f~n~eng on ch: %f",
+			gVehicleFuel[vehicleid], VehicleFuelData[GetVehicleModel(vehicleid) - 400][veh_maxFuel],
+			health, ((200 - (health - 300.0)) / 100.0),
+			(50 - ((health - 400.0) / 4)),
+			100 - (50 - ((health - 400.0) / 4)));
+
+		ShowMsgBox(playerid, str, 0, 120);
 	}
 
 	UpdateIcons(playerid);
 	SetPlayerTime(playerid, gTimeHour, gTimeMinute);
-
-	if(bPlayerGameSettings[playerid] & WepLock)for(new i;i<47;i++)SetPlayerAmmo(playerid, i, 0);
-	if(bPlayerGameSettings[playerid] & GodMode)for(new i;i<47;i++)SetPlayerAmmo(playerid, i, 10000);
-
-    if(gCurrentMinigame[playerid] == MINIGAME_FALLOUT)
-    {
-		script_dgw_Update(playerid);
-    }
-    else if(gCurrentMinigame[playerid] == MINIGAME_CARSUMO)
-    {
-        script_sumo_Update(playerid);
-    }
-    else if(gCurrentMinigame[playerid] == MINIGAME_DESDRBY)
-    {
-        script_derby_Update(playerid);
-    }
-
-
-	if(bServerGlobalSettings & WeaponLock)
-	{
-	    if(IsPlayerInAnyDynamicArea(playerid))
-	    {
-			for(new i;i<5;i++)
-			{
-				if(IsPlayerInDynamicArea(playerid, AmmuArea[i]))
-				{
-					new
-						Float:x1,
-						Float:y1,
-						Float:z1,
-						Float:x2,
-						Float:y2,
-						Float:z2,
-						Float:a;
-
-					GetPlayerPos(playerid, x1, y1, z1);
-					Streamer_GetFloatData(STREAMER_TYPE_AREA, AmmuArea[i], E_STREAMER_X, x2);
-					Streamer_GetFloatData(STREAMER_TYPE_AREA, AmmuArea[i], E_STREAMER_Y, y2);
-					Streamer_GetFloatData(STREAMER_TYPE_AREA, AmmuArea[i], E_STREAMER_Z, z2);
-					a = GetAngleToPoint(x2, y2, x1, y1);
-
-					SetPlayerVelocity(playerid, 0.5*floatsin(a, degrees), 0.5*floatcos(a, degrees), 0.01);
-				}
-			}
-		}
-	}
 
 	return 1;
 }
@@ -1310,125 +991,18 @@ timer TankHeatUpdate[100](playerid)
 
 UpdateIcons(playerid)
 {
-    if(gCurrentChallenge == CHALLENGE_MARKEDMAN && (0 <= MarkedMan < MAX_PLAYERS))
-    {
-	    new r, g, b, a;
+	new colour[1 char];
 
-	    HexToRGBA(ColourData[gPlayerColour[playerid]][colour_value], r, g, b, a);
+	colour[0] = ColourData[gPlayerColour[playerid]][colour_value];
 
-		SetPlayerMarkerForPlayer	(MarkedMan, playerid, RGBAToHex(r, g, b, 0));
-		ShowPlayerNameTagForPlayer	(MarkedMan, playerid, false);
+	colour{3} = 0;
 
-		SetPlayerMarkerForPlayer	(playerid, MarkedMan, ColourData[gPlayerColour[MarkedMan]][colour_value]);
-		ShowPlayerNameTagForPlayer	(playerid, MarkedMan, true);
-    }
-    if(gCurrentChallenge == CHALLENGE_JUGGERNAUT && (0 <= Juggernaut < MAX_PLAYERS))
-    {
-	    new r, g, b, a;
-
-	    HexToRGBA(ColourData[gPlayerColour[playerid]][colour_value], r, g, b, a);
-
-		SetPlayerMarkerForPlayer	(Juggernaut, playerid, ColourData[gPlayerColour[Juggernaut]][colour_value]);
-		ShowPlayerNameTagForPlayer	(Juggernaut, playerid, true);
-
-		SetPlayerMarkerForPlayer	(playerid, Juggernaut, RGBAToHex(r, g, b, 0));
-		ShowPlayerNameTagForPlayer	(playerid, Juggernaut, false);
-    }
-
-	if(IsPlayerInFreeRoam(playerid))
+	PlayerLoop(i)
 	{
-		if(bPlayerGameSettings[playerid] & Invis)
-		{
-		    new r, g, b, a;
-
-		    HexToRGBA(ColourData[gPlayerColour[playerid]][colour_value], r, g, b, a);
-
-			PlayerLoop(i)
-			{
-				SetPlayerMarkerForPlayer(i, playerid, RGBAToHex(r, g, b, 0));
-				ShowPlayerNameTagForPlayer(i, playerid, false);
-			}
-		}
-		else
-		{
-			PlayerLoop(i)
-			{
-				if(bPlayerGameSettings[playerid] & IsAfk)
-					SetPlayerMarkerForPlayer(i, playerid, WHITE);
-				else
-					SetPlayerMarkerForPlayer(i, playerid, ColourData[gPlayerColour[playerid]][colour_value]);
-
-				ShowPlayerNameTagForPlayer(i, playerid, true);
-			}
-		}
+		ShowPlayerNameTagForPlayer(i, playerid, false);
+		SetPlayerMarkerForPlayer(i, playerid, colour[0]);
 	}
-	else
-	{
-	    if(gCurrentMinigame[playerid] == MINIGAME_DESDRBY)
-	    {
-		    new r, g, b, a;
 
-		    HexToRGBA(ColourData[gPlayerColour[playerid]][colour_value], r, g, b, a);
-
-			PlayerLoop(i)
-			{
-				SetPlayerMarkerForPlayer(i, playerid, RGBAToHex(r, g, b, 0));
-				ShowPlayerNameTagForPlayer(i, playerid, true);
-			}
-			return 1;
-	    }
-    }
-    if(bPlayerGameSettings[playerid] & InFreeDM)
-    {
-		new
-			Float:x,
-			Float:y,
-			Float:z,
-			velocity,
-			colour[1 char],
-			bool:tag;
-
-		GetPlayerVelocity(playerid, x, y, z);
-		velocity = floatround(((x*x)+(y*y)+(z*z)) * 10000);
-
-		colour[0] = ColourData[gPlayerColour[playerid]][colour_value];
-
-		if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_DUCK && velocity < 60)
-		{
-		    tag = false;
-			if(velocity > CROUCH_VELOCITY)
-				colour{3} = MAX_CROUCH_ALPHA;
-
-			else
-				colour{3} = MIN_CROUCH_ALPHA;
-		}
-		else
-		{
-		    tag = true;
-			if(velocity > RUN_VELOCITY)
-				colour{3} = MAX_RUN_ALPHA;
-
-			else
-				colour{3} = MIN_RUN_ALPHA;
-		}
-
-		PlayerLoop(i)
-		{
-		    if(bPlayerGameSettings[i] & InFreeDM)
-		    {
-		        if(GetPlayerDist3D(playerid, i) < 100.0)
-		        {
-					ShowPlayerNameTagForPlayer(i, playerid, tag);
-					SetPlayerMarkerForPlayer(i, playerid, colour[0]);
-				}
-				else
-				{
-					ShowPlayerNameTagForPlayer(i, playerid, true);
-					SetPlayerMarkerForPlayer(i, playerid, ColourData[gPlayerColour[playerid]][colour_value]);
-				}
-			}
-		}
-    }
 	return 1;
 }
 
@@ -1436,11 +1010,6 @@ OnPlayerPauseStateChange(playerid, newstate)
 {
 	if(newstate)
 	{
-	    if(bPlayerGameSettings[playerid] & IsAfk)
-		{
-		    MsgAdminsF(1, YELLOW, " >  [ERROR] %p paused while already paused", playerid);
-			return 0;
-		}
 		t:bPlayerGameSettings[playerid]<IsAfk>;
 		gPlayerAfkLabel[playerid] = Create3DTextLabel("Player Is Away", YELLOW, 0.0, 0.0, 0.0, 100.0, GetPlayerVirtualWorld(playerid), 1);
 		Attach3DTextLabelToPlayer(gPlayerAfkLabel[playerid], playerid, 0.0, 0.0, 0.5);
@@ -1448,11 +1017,6 @@ OnPlayerPauseStateChange(playerid, newstate)
 	}
 	else
 	{
-	    if(!(bPlayerGameSettings[playerid] & IsAfk))
-	    {
-		    MsgAdminsF(1, YELLOW, " >  [ERROR] %p returned while already returned", playerid);
-			return 0;
-	    }
 		f:bPlayerGameSettings[playerid]<IsAfk>;
 		Delete3DTextLabel(gPlayerAfkLabel[playerid]);
 	    return 1;
@@ -1521,6 +1085,7 @@ public OnPlayerConnect(playerid)
 		if(!strcmp(gPlayerName[playerid], gAdminData[idx][admin_Name]))
 		{
 			tmpadminlvl = gAdminData[idx][admin_Level];
+			if(tmpadminlvl > 3) tmpadminlvl = 3;
 			jointype = 1;
 			break;
 		}
@@ -1536,8 +1101,6 @@ public OnPlayerConnect(playerid)
 	
 	if(isnull(tmpCountry))format(tmpCountry, sizeof(tmpCountry), "Unknown (%s maybe?)", RandomCountries[random(sizeof(RandomCountries))]);
 
-	if(bServerGlobalSettings&dm_LobbyCounting)TextDrawShowForPlayer(playerid, LobbyText);
-	TextDrawShowForPlayer(playerid, InfoBar);
 	TextDrawShowForPlayer(playerid, ClockText);
 
 	Msg(playerid, BLUE, HORIZONTAL_RULE);
@@ -1601,14 +1164,10 @@ public OnPlayerConnect(playerid)
 	PlaySoundForAll(1139);
 
 
-	pTeam(playerid) = -1;
 	LevelUpWeaponSkills(playerid, 999);
     LoadPlayerTextDraws(playerid);
 	SetPlayerScore(playerid, 0);
 	Streamer_ToggleIdleUpdate(playerid, true);
-
-	for(new i;i<rc_TotalTracks;i++)
-		Streamer_RemoveArrayData(STREAMER_TYPE_MAP_ICON, rc_JoinIcon[i], E_STREAMER_PLAYER_ID, playerid);
 
 
 	db_free_result(tmpResult);
@@ -1618,7 +1177,9 @@ public OnPlayerConnect(playerid)
 	file_Save(SETTINGS_FILE);
 	file_Close();
 
-	gHomeSpawn[playerid] = random(5);
+	t:bPlayerGameSettings[playerid]<HelpTips>;
+	SetSpawn(playerid, -907.5452, 272.7235, 1014.1449, 0.0);
+	SpawnPlayer(playerid);
 
 	return 1;
 }
@@ -1654,73 +1215,20 @@ CheckForExtraAccounts(playerid, name[])
 }
 public OnPlayerRequestClass(playerid, classid)
 {
-	if(!(bPlayerGameSettings[playerid] & LoggedIn))
-	    return 0;
+	t:bPlayerGameSettings[playerid]<FirstSpawn>;
 
-	SetPlayerWeather(playerid, WeatherData[gWeatherID][weather_id]);
-	if(IsPlayerNPC(playerid))return 1;
+	SetSpawn(playerid, -907.5452, 272.7235, 1014.1449, 0.0);
 
-    if(classid==0)SetPlayerSkin(playerid, pSkin(playerid));
-
-	SetSpawnInfo(playerid, NO_TEAM, GetPlayerSkin(playerid),
-		HomeSpawnData[gHomeSpawn[playerid]][spn_posX], HomeSpawnData[gHomeSpawn[playerid]][spn_posY], HomeSpawnData[gHomeSpawn[playerid]][spn_posZ], HomeSpawnData[gHomeSpawn[playerid]][spn_rotZ], 0,0,0,0,0,0);
-
-	SetPlayerPos			(playerid, HomeSpawnData[gHomeSpawn[playerid]][spn_posX], HomeSpawnData[gHomeSpawn[playerid]][spn_posY], HomeSpawnData[gHomeSpawn[playerid]][spn_posZ]);
-	SetPlayerFacingAngle	(playerid, HomeSpawnData[gHomeSpawn[playerid]][spn_rotZ] + 180.0);
-	SetPlayerCameraLookAt	(playerid, HomeSpawnData[gHomeSpawn[playerid]][spn_posX], HomeSpawnData[gHomeSpawn[playerid]][spn_posY], HomeSpawnData[gHomeSpawn[playerid]][spn_posZ]);
-	SetPlayerCameraPos		(playerid,
-		HomeSpawnData[gHomeSpawn[playerid]][spn_posX] + (3.0 * floatsin(HomeSpawnData[gHomeSpawn[playerid]][spn_rotZ], degrees)),
-		HomeSpawnData[gHomeSpawn[playerid]][spn_posY] + (3.0 * floatcos(HomeSpawnData[gHomeSpawn[playerid]][spn_rotZ], degrees)),
-		HomeSpawnData[gHomeSpawn[playerid]][spn_posZ]);
-
-	Streamer_UpdateEx		(playerid, HomeSpawnData[gHomeSpawn[playerid]][spn_posX], HomeSpawnData[gHomeSpawn[playerid]][spn_posY], HomeSpawnData[gHomeSpawn[playerid]][spn_posZ]);
-	return 1;
+	return 0;
 }
 public OnPlayerRequestSpawn(playerid)
 {
-	if(IsPlayerNPC(playerid))return 1;
+	t:bPlayerGameSettings[playerid]<FirstSpawn>;
 
-	if(!(bPlayerGameSettings[playerid] & LoggedIn))
-	    return 0;
-
-	new skinid = GetPlayerSkin(playerid);
-
-	if(pSkin(playerid) != skinid)
-    {
-	    new tmpQuery[80];
-
-        pSkin(playerid) = skinid;
-		gPlayerData[playerid][ply_Sex]=GetGenderFromSkin(skinid);
-
-		format(tmpQuery, sizeof(tmpQuery), "UPDATE `Player` SET `"#ROW_SKIN"` = '%d' WHERE `"#ROW_NAME"` = '%p'", skinid, playerid);
-		db_free_result(db_query(gAccounts, tmpQuery));
-	}
-
-	SetPlayerSpawnCam(playerid, gHomeSpawn[playerid]);
-	ShowPlayerSpawnList(playerid);
-	t:bPlayerGameSettings[playerid]<GodMode>;
+	SetSpawn(playerid, -907.5452, 272.7235, 1014.1449, 0.0);
 
 	return 1;
-
 }
-stock SetPlayerSpawnCam(playerid, cam)
-{
-	SetPlayerCameraPos		(playerid, HomeSpawnData[cam][spn_camX], HomeSpawnData[cam][spn_camY], HomeSpawnData[cam][spn_camZ]);
-	SetPlayerCameraLookAt	(playerid, HomeSpawnData[cam][spn_lookX], HomeSpawnData[cam][spn_lookY], HomeSpawnData[cam][spn_lookZ]);
-	SetPlayerPos			(playerid, HomeSpawnData[cam][spn_posX], HomeSpawnData[cam][spn_posY], HomeSpawnData[cam][spn_posZ]);
-	return 1;
-}
-ShowPlayerSpawnList(playerid)
-{
-	new str[128];
-	for(new x;x<sizeof SpawnNames;x++)
-	{
-		strcat(str, SpawnNames[x]);
-		strcat(str, "\n");
-	}
-	ShowPlayerDialog(playerid, d_SpawnList, DIALOG_STYLE_LIST, "Choose a place to spawn", str, "Choose", "Close");
-}
-
 
 
 CreateNewUserfile(playerid, password[])
@@ -1731,7 +1239,7 @@ CreateNewUserfile(playerid, password[])
 
 	GetFile(gPlayerName[playerid], file);
 
-	pSkin(playerid) = gSkins[0][random(sizeof(gSkins[]))];
+	pSkin(playerid) = SKIN_M_NORMAL;
 
 	file_Create(file);
 	file_Open(file);
@@ -1754,14 +1262,6 @@ CreateNewUserfile(playerid, password[])
 
     db_free_result(db_query(gAccounts, tmpQuery));
 
-	format(tmpQuery, 300,
-		"INSERT INTO `Deathmatch` (`"#ROW_NAME"`, `"#ROW_KILLS"`, `"#ROW_DEATHS"`, `"#ROW_EXP"`,\
-		`"#ROW_HEADSHOTS"`, `"#ROW_TEAMKILLS"`, `"#ROW_HIGHSTREAK"`, `"#ROW_WINS"`, `"#ROW_LOSSES"`)\
-		VALUES('%s', '0', '0', '0', '0', '0', '0', '0', '0')",
-		gPlayerName[playerid]);
-
-    db_free_result(db_query(gAccounts, tmpQuery));
-
 	for(new idx; idx<gTotalAdmins; idx++)
 	{
 		if(!strcmp(gPlayerName[playerid], gAdminData[idx][admin_Name]) && !isnull(gPlayerName[playerid]))
@@ -1776,43 +1276,16 @@ CreateNewUserfile(playerid, password[])
 	gPlayerData[playerid][ply_RegDate]	= gettime();
     gPlayerData[playerid][ply_LastLogged] = gettime();
 
-	for(new i;i<10;i++)gPlayerQuickChat[playerid][i] = "NULL";
-	for(new c;c<MAX_KIT;c++)
-	{
-		pLoadout[playerid][c][WEAPON_SLOT_MELEE] = 4;
-		pLoadout[playerid][c][WEAPON_SLOT_SIDEARM] = 22;
-		pLoadout[playerid][c][WEAPON_SLOT_PRIMARY] = 29;
-	}
-	
 	t:bPlayerGameSettings[playerid]<LoggedIn>;
     t:bPlayerGameSettings[playerid]<HasAccount>;
 }
 Login(playerid)
 {
 	new
-		tmpQuery[256],
-		DBResult:tmpResult;
+		tmpQuery[256];
 
 	format(tmpQuery, sizeof(tmpQuery), "UPDATE `Player` SET `"#ROW_IPV4"` = '%d' WHERE `"#ROW_NAME"` = '%s'", gPlayerData[playerid][ply_IP], gPlayerName[playerid]);
 	db_free_result(db_query(gAccounts, tmpQuery));
-
-	format(tmpQuery, sizeof(tmpQuery), "SELECT * FROM `Deathmatch` WHERE `"#ROW_NAME"` = '%s'",
-		gPlayerName[playerid]);
-
-	tmpResult = db_query(gAccounts, tmpQuery);
-	
-	if(db_num_rows(tmpResult) == 0)
-	{
-	    db_free_result(tmpResult);
-
-		format(tmpQuery, sizeof(tmpQuery),
-			"INSERT INTO `Deathmatch` (`"#ROW_NAME"`, `"#ROW_KILLS"`, `"#ROW_DEATHS"`, `"#ROW_EXP"`,\
-			`"#ROW_HEADSHOTS"`, `"#ROW_TEAMKILLS"`, `"#ROW_HIGHSTREAK"`, `"#ROW_WINS"`, `"#ROW_LOSSES"`)\
-			VALUES('%s', '0', '0', '0', '0', '0', '0', '0', '0')",
-			gPlayerName[playerid]);
-
-		db_free_result(db_query(gAccounts, tmpQuery));
-	}
 
 	for(new idx; idx<gTotalAdmins; idx++)
 	{
@@ -1828,7 +1301,7 @@ Login(playerid)
 
 	if(pAdmin(playerid)>0)MsgF(playerid, BLUE, " >  Your admin level: %d", pAdmin(playerid));
 
-	bitTrue(bPlayerGameSettings[playerid], LoggedIn);
+	t:bPlayerGameSettings[playerid]<LoggedIn>;
 	IncorrectPass[playerid]=0;
 
     LogMessage(playerid);
@@ -1837,12 +1310,9 @@ Login(playerid)
 LoadPlayerData(playerid)
 {
 	new
-		file[MAX_PLAYER_FILE],
-		tmpKey[6];
+		file[MAX_PLAYER_FILE];
 
 	format(file, MAX_PLAYER_FILE, PLAYER_DATA_FILE, gPlayerName[playerid]);
-
-	LoadDMStats(playerid);
 
 	file_Open(file);
 	{
@@ -1860,16 +1330,6 @@ LoadPlayerData(playerid)
 		gPlayerData[playerid][ply_TimeOnFoot]	=	file_GetVal(KEY_T_FT);
 		gPlayerData[playerid][ply_LastLogged]	=   file_GetVal(KEY_T_LG);
 		file_SetVal(KEY_T_LG, gettime());
-
-		LoadDMLoadout(playerid);
-		LoadDMAwards(playerid);
-
-		for(new i; i < 10; i++)
-		{
-		    format(tmpKey, 6, "qch%d", i);
-			if(file_IsKey(tmpKey))file_GetStr(tmpKey, gPlayerQuickChat[playerid][i]);
-			else gPlayerQuickChat[playerid][i] = "NULL";
-		}
 	}
 	file_Save(file);
 	file_Close();
@@ -1902,12 +1362,7 @@ public OnPlayerDisconnect(playerid, reason)
 }
 DisConChecks(playerid)
 {
-	ResetSpectatorTarget(playerid, 0, 1);
 	if(bPlayerGameSettings[playerid] & IsAfk)Delete3DTextLabel(gPlayerAfkLabel[playerid]);
-	if(bPlayerGameSettings[playerid] & InDM)ExitDeathmatch(playerid);
-	if(bPlayerGameSettings[playerid] & InRace)rc_Leave(playerid);
-	
-	LeaveCurrentMinigame(playerid, false);
 }
 CMD:loaddata(playerid, params[])
 {
@@ -1940,20 +1395,8 @@ SavePlayerData(playerid)
 	file_SetVal(KEY_T_VH, gPlayerData[playerid][ply_TimeInVeh]+inveh_additional);
 	file_SetVal(KEY_T_FT, gPlayerData[playerid][ply_TimeOnFoot]+onfoot_additional);
 
-	new key[12];
-	for(new i;i<10;i++)
-	{
-		if(strlen(gPlayerQuickChat[playerid][i])>0)
-		{
-			format(key, 12, "qch%d", i);
-			file_SetStr(key, gPlayerQuickChat[playerid][i]);
-		}
-	}
-
 	file_Save(file);
 	file_Close();
-
-	if(bPlayerGameSettings[playerid]&InDM)SaveDMStats(playerid);
 }
 
 ResetVariables(playerid)
@@ -1961,42 +1404,15 @@ ResetVariables(playerid)
 	gPlayerHP[playerid] = 100.0;
 	gPlayerAP[playerid] = 0.0;
 
-	bPlayerGameSettings[playerid]			= 0; // Empty the bit-array
-	bPlayerDeathmatchSettings[playerid]		= 0;
+	bPlayerGameSettings[playerid]			= 0;
 
-	ResetPlayerDMVariables(playerid);
-	ResetPerLifeKills(playerid);
-
-// account
 	pAdmin(playerid)						= 0,
 	pSkin(playerid)							= 0,
 
-// script
     gPlayerVehicleID[playerid]				= INVALID_VEHICLE_ID,
 	gPlayerChatChannel[playerid]			= -1;
-	gPlayerSpectating[playerid]				= INVALID_PLAYER_ID;
-	gPlayerSpectateMode[playerid]			= SPECTATE_MODE_NORMAL;
-	gPlayerSpectateGroup[playerid]			= -1;
 	Warnings[playerid]						= 0;
 	IncorrectPass[playerid]					= 0;
-	prk_CurrentCheck[playerid]         		= -1;
-	gCurrentMinigame[playerid]  			= MINIGAME_NONE;
-	gPlayerRequest[playerid][rq_target]		= -1;
-	gPlayerRequest[playerid][rq_tick]		= 0;
-	gPlayerRequest[playerid][rq_type]		= REQUEST_TYPE_NULL;
-
-// minigames
-	smo_Spectating[playerid]				= DBY_SPEC_NONE;
-	smo_TimesFallen[playerid]				= 0;
-
-	dby_Spectating[playerid]				= DBY_SPEC_NONE;
-	dby_Lives[playerid]						= DBY_MAX_LIVES;
-
-	rc_playerData[playerid][rc_DistanceToFinish] = 99999.0;
-
-
-	for(new i;i<10;i++)
-		gPlayerQuickChat[playerid][i][0]	= EOS;
 
 	PlayerLoop(i)
 		Blocked[playerid][i] = false;
@@ -2009,51 +1425,51 @@ ResetVariables(playerid)
 
 
 
-CMD:welcomemessage(playerid, params[])
-{
-    LogMessage(playerid);
-    return 1;
-}
 LogMessage(playerid)
 {
 	new
-		tmpStr[512],
-		dmStr[100],
-		rcStr[64],
-		mgStr[64],
-		adStr[64 * MAX_ADMIN],
-		adminCount;
-
-	if(bServerGlobalSettings & dm_InProgress)dmStr = "There is currently a "#C_RED"deathmatch"#C_WHITE", type "#C_BLUE"/joindm"#C_WHITE" to join\n";
-	if(rc_CurrentRace != -1)rcStr = "There is currently a "#C_BLUE"race"#C_WHITE" in progress.\n";
-	if(gCurrentChallenge != -1)mgStr = "There is currently a "#C_GREEN"challenge"#C_WHITE" in progress.\n";
+		str1[700],
+		str2[300],
+		admins[48],
+		admincount;
 
 	PlayerLoop(i)
 	{
 		if(pAdmin(i)>0)
-		{
-		    new tmpLine[64];
-			adminCount++;
-			format(tmpLine, 64, "\t%P"#C_WHITE" (level %d - %s)\n", i, pAdmin(i), AdminName[pAdmin(i)]);
-			strcat(adStr, tmpLine);
-		}
+			admincount++;
 	}
-	if(adminCount>0)strins(adStr, "Admins currently online:\n", 0);
-	else adStr = "There are no admins online";
 
-	format(tmpStr, 512,
-		"\nWelcome to the server!\n\
-		The current time is "#C_YELLOW"%02d:%02d"#C_WHITE"\n\
-		The current weather is "#C_YELLOW"%s"#C_WHITE"\n\n\
-		%s%s%s%s\n",
-		gTimeHour, gTimeMinute, WeatherData[gWeatherID][weather_name],
-		dmStr, rcStr, mgStr, adStr);
+	if(admincount > 0)
+		format(admins, 48, "Admins currently online: "#C_GREEN"%d", admincount);
 
-	strins(tmpStr, HORIZONTAL_RULE, 0);
-	strins(tmpStr, #C_WHITE, 0);
-	strcat(tmpStr, HORIZONTAL_RULE);
+	else
+		admins = "There are no admins online";
 
-	ShowPlayerDialog(playerid, d_LogMsg, DIALOG_STYLE_MSGBOX, "Welcome to "#C_RED"Hellfire Server", tmpStr, "Accept", "");
+	format(str1, 300,
+		""#C_WHITE"%s\n\n\
+		Welcome to "#C_BLUE"Scavenge and Survive!\n\n\n\n\
+		"#C_WHITE"The object is to survive for as long as possible.\n\n\
+		You will have a better chance if you are in a group.\n\n\
+		But be careful who you trust.\n\n\
+		Items can be found scattered around.\n\n",
+		HORIZONTAL_RULE);
+
+	format(str2, 300,
+		"Weapons are rare so conserve your ammunition.\n\n\
+		And last but not least...\n\n\
+		"#C_RED"NEVER "#C_WHITE"attack an unarmed player.\n\n\n\n\
+		"#C_WHITE"The current time is "#C_YELLOW"%02d:%02d"#C_WHITE"\n\
+		The current weather is "#C_YELLOW"%s"#C_WHITE"\n\n\n\n\
+		%s",
+		gTimeHour,
+		gTimeMinute,
+		WeatherData[gWeatherID][weather_name],
+		admins,
+		HORIZONTAL_RULE);
+
+	strcat(str1, str2);
+
+	ShowPlayerDialog(playerid, d_LogMsg, DIALOG_STYLE_MSGBOX, "Welcome to the Server", str1, "Accept", "");
 }
 stock FormatGenStats(playerid, type = 0)
 {
@@ -2121,25 +1537,6 @@ stock FormatGenStats(playerid, type = 0)
 	}
 	if(type == 1)
 	{
-		format(str, 300, "\
-			"#C_BLUE"Kills:\t\t\t\t"#C_GREEN"%d\n\
-			"#C_BLUE"Deaths:\t\t\t"#C_GREEN"%d\n\
-			"#C_BLUE"XP:\t\t\t\t"#C_GREEN"%d\n\n\
-			"#C_BLUE"Rank:\t\t\t\t"#C_GREEN"%s(%d)\n\
-			"#C_BLUE"Next Rank:\t\t\t"#C_GREEN"%s(%d)\n\
-			"#C_BLUE"XP To Go:\t\t\t"#C_GREEN"%d",
-
-			pKills(playerid),
-			pDeaths(playerid),
-			pExp(playerid),
-			RankNames[pRank(playerid)],
-			pRank(playerid),
-			RankNames[pRank(playerid)+1],
-			pRank(playerid)+1,
-			(RequiredExp[pRank(playerid)+1]-pExp(playerid)));
-	}
-	if(type == 2)
-	{
 		new
 			Float:stat_hp,
 			Float:stat_ap,
@@ -2157,14 +1554,12 @@ stock FormatGenStats(playerid, type = 0)
 			"#C_BLUE"Health:\t\t\t"#C_GREEN"%.2f\n\
 			"#C_BLUE"Armour:\t\t"#C_GREEN"%.2f\n\
 			"#C_BLUE"IP\t\t\t"#C_GREEN"%s\n\
-			"#C_BLUE"Using Godmode:\t"#C_GREEN"%s\n\
 			"#C_BLUE"Money:\t\t"#C_GREEN"%d\n\
 			"#C_BLUE"In Vehicle:\t\t"#C_GREEN"%s\n\
 			"#C_BLUE"Country:\t\t"#C_GREEN"%s",
 			stat_hp,
 			stat_ap,
 			IpIntToStr(gPlayerData[playerid][ply_IP]),
-			BoolToString((bPlayerGameSettings[playerid]&GodMode), 1),
 			GetPlayerMoney(playerid),
 			InVeh,
 			tmpCountry);
@@ -2228,84 +1623,6 @@ stock FormatGenStatsFromFile(file[], name[], type = 0)
 		file_Close();
 	}
 	if(type == 1)
-	{
-		new
-			tmpQuery[128],
-			DBResult:tmpResult,
-			result[12],
-			str2[256],
-			tmpkills,
-			tmpdeaths,
-			tmpexp,
-			tmprank,
-			tmpheadshots,
-			tmpteamkills,
-			tmphighstreak,
-			tmpwins,
-			tmplosses;
-
-		format(tmpQuery, sizeof(tmpQuery), "SELECT `Player` WHERE `"#ROW_NAME"` = '%s'", name);
-		tmpResult = db_query(gAccounts, tmpQuery);
-
-		db_get_field(tmpResult, 0, result, 12);
-		tmpkills = strval(result);
-
-		db_get_field(tmpResult, 1, result, 12);
-		tmpdeaths = strval(result);
-
-		db_get_field(tmpResult, 2, result, 12);
-		tmpexp = strval(result);
-
-		db_get_field(tmpResult, 3, result, 12);
-		tmpheadshots = strval(result);
-
-		db_get_field(tmpResult, 4, result, 12);
-		tmpteamkills = strval(result);
-
-		db_get_field(tmpResult, 5, result, 12);
-		tmphighstreak = strval(result);
-
-		db_get_field(tmpResult, 6, result, 12);
-		tmpwins = strval(result);
-
-		db_get_field(tmpResult, 7, result, 12);
-		tmplosses = strval(result);
-
-	    db_free_result(tmpResult);
-	    
-	    tmprank = GetRankFromExp(tmpexp);
-
-		format(str, 550, "\
-			"#C_BLUE"Kills:\t\t\t\t"#C_GREEN"%d\n\
-			"#C_BLUE"Deaths:\t\t\t"#C_GREEN"%d\n\
-			"#C_BLUE"XP:\t\t\t\t"#C_GREEN"%d\n\n\
-			"#C_BLUE"Rank:\t\t\t\t"#C_GREEN"%s(%d)\n\
-			"#C_BLUE"Next Rank:\t\t\t"#C_GREEN"%s(%d)\n\
-			"#C_BLUE"XP To Go:\t\t\t"#C_GREEN"%d\n\n",
-			tmpkills,
-			tmpdeaths,
-			tmpexp,
-			RankNames[tmprank],
-			tmprank,
-			RankNames[tmprank+1],
-			tmprank+1,
-			RequiredExp[tmprank+1] - tmpexp);
-
-		format(str2, 256, "\
-			"#C_BLUE"Headshots:\t\t,"#C_GREEN"%d\n\
-			"#C_BLUE"Teamkills:\t\t,"#C_GREEN"%d\n\
-			"#C_BLUE"Highest Streak:\t,"#C_GREEN"%d\n\
-			"#C_BLUE"Total Wins:\t\t,"#C_GREEN"%d\n\
-			"#C_BLUE"Total Losses:\t\t,"#C_GREEN"%d\n",
-			tmpheadshots,
-			tmpteamkills,
-			tmphighstreak,
-			tmpwins,
-			tmplosses);
-
-		strcat(str, str2);
-	}
-	if(type == 2)
 	{
 		new
 			tmpQuery[128],
@@ -2418,42 +1735,51 @@ CMD:changepass(playerid,params[])
 
 public OnPlayerSpawn(playerid)
 {
-	WalkerTickStart(playerid);
+	SetPlayerWeather(playerid, WeatherData[gWeatherID][weather_id]);
+
+	print("OnPlayerSpawn");
+
+	if(bPlayerGameSettings[playerid] & Dying)
+	{
+		TogglePlayerSpectating(playerid, true);
+
+		defer SetDeathCamera(playerid);
+
+		SetPlayerCameraPos(playerid,
+			gPlayerDeathPos[playerid][0] - floatsin(-gPlayerDeathPos[playerid][3], degrees),
+			gPlayerDeathPos[playerid][1] - floatcos(-gPlayerDeathPos[playerid][3], degrees),
+			gPlayerDeathPos[playerid][2]);
+
+		SetPlayerCameraLookAt(playerid, gPlayerDeathPos[playerid][0], gPlayerDeathPos[playerid][1], gPlayerDeathPos[playerid][2]);
+
+		TextDrawShowForPlayer(playerid, DeathText);
+		TextDrawShowForPlayer(playerid, DeathButton);
+		SelectTextDraw(playerid, 0xFFFFFF88);
+	}
+	else
+	{
+		if(bPlayerGameSettings[playerid] & Alive)
+		{
+			SetPlayerSkin(playerid, pSkin(playerid));
+
+			SetPlayerPos(playerid, 0.0, 0.0, 3.0);
+			SetCameraBehindPlayer(playerid);
+			WalkerTickStart(playerid);
+			t:bPlayerGameSettings[playerid]<Spawned>;
+		}
+		else
+		{
+			PlayerCreateNewCharacter(playerid);
+		}
+	}
+
 	PlayerPlaySound(playerid, 1186, 0.0, 0.0, 0.0);
 	PreloadPlayerAnims(playerid);
-	bitTrue(bPlayerGameSettings[playerid], Spawned);
 
-	if(IsPlayerInFreeRoam(playerid))
-	{
-		if(gWeatherID < sizeof(WeatherData))
-			SetPlayerWeather(playerid, WeatherData[gWeatherID][weather_id]);
-		else
-			SetPlayerWeather(playerid, gWeatherID);
-	}
-
-	if(bPlayerGameSettings[playerid] & InDM)
-	{
-		JoinLobby(playerid);
-		return 1;
-	}
-	else if(bPlayerGameSettings[playerid] & InRace)
-	{
-	    rc_Leave(playerid);
-	    return 1;
-	}
-
-    SetPlayerVirtualWorld(playerid, gHomeSpawn[playerid]);
-
-	if(bServerGlobalSettings & FreeDM)defer fdm_Spawn(playerid);
-
-	if(!IsValidDynamicArea(gPlayerArea[playerid]))
-		gPlayerArea[playerid] = CreateDynamicSphere(0.0, 0.0, 0.0, 2.0);
-
-    AttachDynamicAreaToPlayer(gPlayerArea[playerid], playerid);
+	SetPlayerWeather(playerid, WeatherData[gWeatherID][weather_id]);
 
 	Streamer_Update(playerid);
-	SetPlayerTeam(playerid, TEAM_GLOBAL);
-	LevelUpWeaponSkills(playerid, 999);
+	LevelUpWeaponSkills(playerid, 500);
 
 	gPlayerHP[playerid] = 100.0;
 	gPlayerAP[playerid] = 0.0;
@@ -2461,9 +1787,137 @@ public OnPlayerSpawn(playerid)
 	return 1;
 }
 
+PlayerCreateNewCharacter(playerid)
+{
+	SetPlayerPos(playerid, -907.5452, 272.7235, 1014.1449);
+	SetPlayerFacingAngle(playerid, 0.0);
+	SetPlayerCameraLookAt(playerid, -907.5452, 272.7235, 1014.1449);
+	SetPlayerCameraPos(playerid, -907.4642, 277.0962, 1014.1492);
+	Streamer_UpdateEx(playerid, -907.5452, 272.7235, 1014.1449);
+
+	gClassBoxFadeLevel[playerid] = 255;
+	PlayerTextDrawBoxColor(playerid, ClassBackGround, gClassBoxFadeLevel[playerid]);
+	PlayerTextDrawShow(playerid, ClassBackGround);
+	PlayerTextDrawShow(playerid, ClassButtonMale);
+	PlayerTextDrawShow(playerid, ClassButtonFemale);
+	SelectTextDraw(playerid, 0xFFFFFF88);
+}
+
+public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
+{
+	if(playertextid == ClassButtonMale)
+	{
+		gPlayerData[playerid][ply_Sex] = 0;
+		OnPlayerSelectGender(playerid);
+	}
+	if(playertextid == ClassButtonFemale)
+	{
+		gPlayerData[playerid][ply_Sex] = 1;
+		OnPlayerSelectGender(playerid);
+	}
+}
+
+timer SetDeathCamera[100](playerid)
+{
+	InterpolateCameraPos(playerid,
+		gPlayerDeathPos[playerid][0] - floatsin(-gPlayerDeathPos[playerid][3], degrees),
+		gPlayerDeathPos[playerid][1] - floatcos(-gPlayerDeathPos[playerid][3], degrees),
+		gPlayerDeathPos[playerid][2] + 1.0,
+		gPlayerDeathPos[playerid][0] - floatsin(-gPlayerDeathPos[playerid][3], degrees),
+		gPlayerDeathPos[playerid][1] - floatcos(-gPlayerDeathPos[playerid][3], degrees),
+		gPlayerDeathPos[playerid][2] + 5.0,
+		10000, CAMERA_MOVE);
+
+	InterpolateCameraLookAt(playerid,
+		gPlayerDeathPos[playerid][0],
+		gPlayerDeathPos[playerid][1],
+		gPlayerDeathPos[playerid][2],
+		gPlayerDeathPos[playerid][0],
+		gPlayerDeathPos[playerid][1],
+		gPlayerDeathPos[playerid][2] + 1.0,
+		10000, CAMERA_MOVE);
+}
+
+public OnPlayerClickTextDraw(playerid, Text:clickedid)
+{
+	if(clickedid == DeathButton)
+	{
+		f:bPlayerGameSettings[playerid]<Dying>;
+		TogglePlayerSpectating(playerid, false);
+		CancelSelectTextDraw(playerid);
+		TextDrawHideForPlayer(playerid, DeathText);
+		TextDrawHideForPlayer(playerid, DeathButton);
+	}
+}
+
+OnPlayerSelectGender(playerid)
+{
+	new r = random(MAX_SPAWNS);
+
+	if(gPlayerData[playerid][ply_Sex] == 0)
+		SetPlayerSkin(playerid, SKIN_M_NORMAL);
+
+	if(gPlayerData[playerid][ply_Sex] == 1)
+		SetPlayerSkin(playerid, SKIN_F_NORMAL);
+
+	SetPlayerPos(playerid, gSpawns[r][0], gSpawns[r][1], gSpawns[r][2]);
+	SetPlayerFacingAngle(playerid, gSpawns[r][3]);
+	SetCameraBehindPlayer(playerid);
+	TogglePlayerControllable(playerid, true);
+
+	CancelSelectTextDraw(playerid);
+	PlayerTextDrawHide(playerid, ClassButtonMale);
+	PlayerTextDrawHide(playerid, ClassButtonFemale);
+
+	t:bPlayerGameSettings[playerid]<Spawned>;
+
+	gClassBoxFadeLevel[playerid] = 255;
+	stop gClassFadeTimer[playerid];
+	gClassFadeTimer[playerid] = repeat FadeOutClassBackground(playerid);
+
+	ShowHelpTip(playerid,
+		"You can pick up items by pressing F while next to them. You can drop your currently held item by pressing N. \
+		You can put your currently held item in your inventory by pressing Y. You can access your inventory by pressing H.");
+
+	defer HelpTip2(playerid);
+}
+timer HelpTip2[15000](playerid)
+{
+	ShowHelpTip(playerid, "You can give your currently held item to another player by pressing N while standing next to them.");
+	defer HelpTip3(playerid);
+}
+timer HelpTip3[10000](playerid)
+{
+	ShowHelpTip(playerid,
+		"You can scavenge the trunks of vehicles by pressing F while at the back. There are also many other places to scavenge items such as boxes or dumpsters. \
+		Some items have special uses, use an item by pressing F while holding it. You can combine items to make new items in your inventory.");
+
+	defer HelpTip4(playerid);
+}
+timer HelpTip4[15000](playerid)
+{
+	ShowHelpTip(playerid,
+		"Good luck! Survive for as long as possible, and remember: You are more likely to survive in a group, \
+		but be careful who you trust!", 10000);
+}
+
+
+timer FadeOutClassBackground[100](playerid)
+{
+	PlayerTextDrawBoxColor(playerid, ClassBackGround, gClassBoxFadeLevel[playerid]);
+	PlayerTextDrawShow(playerid, ClassBackGround);
+	gClassBoxFadeLevel[playerid] -= 4;
+
+	if(gClassBoxFadeLevel[playerid] <= 0)
+		stop gClassFadeTimer[playerid];
+}
+
+
 public OnPlayerDeath(playerid, killerid, reason)
 {
-	if(tickcount() - gPlayerDeathTick[playerid] > 3000)
+	print("OnPlayerDeath");
+
+	if(tickcount() - tick_LastDeath[playerid] > 3000)
 		return internal_OnPlayerDeath(playerid, killerid, reason);
 
 	return 1;
@@ -2471,7 +1925,16 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 internal_OnPlayerDeath(playerid, killerid, reason)
 {
-	gPlayerDeathTick[playerid] = tickcount();
+	print("internal_OnPlayerDeath");
+
+	f:bPlayerGameSettings[playerid]<Spawned>;
+	t:bPlayerGameSettings[playerid]<Dying>;
+
+	GetPlayerPos(playerid, gPlayerDeathPos[playerid][0], gPlayerDeathPos[playerid][1], gPlayerDeathPos[playerid][2]);
+	GetPlayerFacingAngle(playerid, gPlayerDeathPos[playerid][3]);
+
+	f:bPlayerGameSettings[playerid]<Alive>;
+	tick_LastDeath[playerid] = tickcount();
 	SendDeathMessage(killerid, playerid, reason);
 
 	DriverTickEnd(playerid);
@@ -2479,41 +1942,30 @@ internal_OnPlayerDeath(playerid, killerid, reason)
 
 	stop TankHeatUpdateTimer[playerid];
 
-
-	if(bPlayerGameSettings[playerid] & InDM)
-	{
-		if(killerid==INVALID_PLAYER_ID)
-			script_Deathmatch_OnPlayerDie(playerid);
-	}
-	if(bPlayerGameSettings[playerid] & InRace)
-		script_race_OnPlayerDeath(playerid);
-
-	if(gCurrentMinigame[playerid] == MINIGAME_FALLOUT)
-		dgw_Leave(playerid, false);
-
-	if(gCurrentMinigame[playerid] == MINIGAME_GUNGAME)
-		script_GunGame_OnPlayerDeath(playerid, killerid, reason);
-
-	if(gCurrentChallenge != CHALLENGE_NONE)
-	    script_Challenge_OnPlayerDeath(playerid, killerid);
-
-	if(bServerGlobalSettings & FreeDM)
-	    script_FreeDM_OnPlayerDeath(playerid, killerid);
-
-	if(GetVehicleModel(GetPlayerVehicleID(playerid))==432)
+	if(GetVehicleModel(GetPlayerVehicleID(playerid)) == 432)
 		HidePlayerProgressBar(playerid, TankHeatBar);
 
-	ResetSpectatorTarget(playerid);
-
-	bitFalse(bPlayerGameSettings[playerid], Spawned);
-	if(bPlayerGameSettings[playerid] & LoopingAnimation)
-	{
-		bitFalse(bPlayerGameSettings[playerid], LoopingAnimation);
-		TextDrawHideForPlayer(playerid, StopAnimText);
-	}
+	SpawnPlayer(playerid);
 
 	return CallLocalFunction("OnDeath", "ddd", playerid, killerid, reason);
 }
+
+
+
+ShowHelpTip(playerid, text[], time = 0)
+{
+	PlayerTextDrawSetString(playerid, HelpTipText, text);
+	PlayerTextDrawShow(playerid, HelpTipText);
+
+	if(time > 0)
+		defer HideHelpTip(playerid, time);
+}
+timer HideHelpTip[time](playerid, time)
+{
+	#pragma unused time
+	PlayerTextDrawHide(playerid, HelpTipText);
+}
+
 
 
 public OnPlayerUpdate(playerid)
@@ -2546,49 +1998,6 @@ public OnPlayerUpdate(playerid)
 	    PlayerTextDrawSetString(playerid, VehicleSpeedText, str);
 	}
 
-	if(bPlayerGameSettings[playerid] & InDM)
-	{
-	    static
-			iCurWeap,
-			iCurrentWeapon;
-
-		iCurWeap = GetPlayerWeapon(playerid);
-	    if(iCurWeap != iCurrentWeapon)
-	    {
-			script_Deathmatch_WeaponChange(playerid, iCurWeap);
-			iCurrentWeapon=iCurWeap;
-	    }
-		if(gPlayerHP[playerid]>0.1)SetPlayerHealth(playerid, gPlayerHP[playerid]);
-		else SetPlayerHealth(playerid, 0.1);
-	    return 1;
-	}
-	else if(gCurrentMinigame[playerid] == MINIGAME_PARKOUR)
-    {
-        if(bPlayerGameSettings[playerid] & prk_Started)
-        {
-			static Float:z;
-
-			GetPlayerPos(playerid, z, z, z);
-
-			if(z < prk_CheckPointPos[prk_CurrentCourse[playerid]][prk_CurrentCheck[playerid]-1][3])
-				prk_Fall(playerid);
-		}
-    }
-	else
-	{
-		if(bPlayerGameSettings[playerid] & GodMode)
-		{
-			gPlayerHP[playerid] = 1000.0;
-			gPlayerAP[playerid] = 1000.0;
-			if(IsPlayerInAnyVehicle(playerid))
-			{
-				static pCar;
-				pCar = GetPlayerVehicleID(playerid);
-				RepairVehicle(pCar);
-			}
-		}
-	}
-
 	SetPlayerHealth(playerid, gPlayerHP[playerid]);
 	SetPlayerArmour(playerid, gPlayerAP[playerid]);
 
@@ -2606,22 +2015,11 @@ public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid)
 */
     if(issuerid == INVALID_PLAYER_ID)
     {
-		if(bPlayerGameSettings[playerid] & InDM)
-		{
-			dm_GivePlayerHP(playerid, -(amount*2), .weapon = weaponid);
-	    	tick_LastDamg[playerid] = tickcount();
-		}
-		else
-		{
-			if(!(bPlayerGameSettings[playerid] & GodMode))
-			{
-				if(weaponid == 53)
-					GivePlayerHP(playerid, -(amount*0.5), .weaponid = weaponid);
+		if(weaponid == 53)
+			GivePlayerHP(playerid, -(amount*0.5), .weaponid = weaponid);
 
-				else
-					GivePlayerHP(playerid, -(amount*2), .weaponid = weaponid);
-			}
-		}
+		else
+			GivePlayerHP(playerid, -(amount*2), .weaponid = weaponid);
 		return 1;
 	}
 	switch(weaponid)
@@ -2655,20 +2053,17 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid)
 
 internal_HitPlayer(playerid, targetid, weaponid)
 {
-	if(bPlayerGameSettings[playerid] & DmgLock)
-		return 0;
-
 	if(weaponid == WEAPON_DESERTEAGLE)
 	{
-		if(tickcount() - gWeaponHitTick[playerid] < 400)return 0;
+		if(tickcount() - tick_WeaponHit[playerid] < 400)return 0;
 	}
 	else
 	{
-		if(tickcount() - gWeaponHitTick[playerid] < 100)return 0;
+		if(tickcount() - tick_WeaponHit[playerid] < 100)return 0;
 	}
 
-	gWeaponHitTick[playerid] = tickcount();
-
+	tick_WeaponHit[playerid] = tickcount();
+/*
 	new head;
 	
 	if(!IsPlayerInAnyVehicle(playerid))
@@ -2678,66 +2073,52 @@ internal_HitPlayer(playerid, targetid, weaponid)
 		    case 25, 27, 30, 31, 33, 34:head = IsPlayerAimingAtHead(playerid, targetid);
 		}
 	}
+*/
+	new
+		Float:px,
+		Float:py,
+		Float:pz,
+		Float:tx,
+		Float:ty,
+		Float:tz,
+		Float:trgDist,
+		Float:HpLoss;
 
-	if(bPlayerGameSettings[playerid]&InDM)
-	{
-		if(bPlayerGameSettings[targetid] & InDM && bPlayerGameSettings[targetid] & Spawned)
-			script_Deathmatch_hitPlayer(playerid, targetid, head, weaponid);
+	GetPlayerPos(playerid, px, py, pz);
+	GetPlayerPos(playerid, tx, ty, tz);
 
-        tick_LastDamg[targetid] = tickcount();
-	}
-	else
+	trgDist = Distance(px, py, pz, tx, ty, tz);
+
+	if(trgDist < WepData[weaponid][MinDis])HpLoss = WepData[weaponid][MaxDam];
+	if(trgDist > WepData[weaponid][MaxDis])HpLoss = WepData[weaponid][MinDam];
+	else HpLoss = ((WepData[weaponid][MinDam]-WepData[weaponid][MaxDam])/(WepData[weaponid][MaxDis]-WepData[weaponid][MinDis])) * (trgDist-WepData[weaponid][MaxDis]) + WepData[weaponid][MinDam];
+
+	if(GetItemType(GetPlayerItem(playerid)) == item_Shield)
 	{
-		if(!(bPlayerGameSettings[targetid] & GodMode))
+		new
+			Float:angleto,
+			Float:playerangle;
+
+		GetPlayerFacingAngle(playerid, playerangle);
+
+		angleto = -(90-(atan2((py - ty), (px - tx))));
+
+		if(-30 < (270.0 - (playerangle - angleto)) < 30)
 		{
-			new
-				Float:px,
-				Float:py,
-				Float:pz,
-				Float:tx,
-				Float:ty,
-				Float:tz,
-				Float:trgDist,
-				Float:HpLoss;
-
-			GetPlayerPos(playerid, px, py, pz);
-			GetPlayerPos(playerid, tx, ty, tz);
-
-			trgDist = Distance(px, py, pz, tx, ty, tz);
-
-			if(trgDist < WepData[weaponid][MinDis])HpLoss = WepData[weaponid][MaxDam];
-			if(trgDist > WepData[weaponid][MaxDis])HpLoss = WepData[weaponid][MinDam];
-			else HpLoss = ((WepData[weaponid][MinDam]-WepData[weaponid][MaxDam])/(WepData[weaponid][MaxDis]-WepData[weaponid][MinDis])) * (trgDist-WepData[weaponid][MaxDis]) + WepData[weaponid][MinDam];
-
-			if(GetItemType(GetPlayerItem(playerid)) == item_Shield)
-			{
-				new
-					Float:angleto,
-					Float:playerangle;
-
-				GetPlayerFacingAngle(playerid, playerangle);
-
-				angleto = -(90-(atan2((py - ty), (px - tx))));
-
-				if(-30 < (270.0 - (playerangle - angleto)) < 30)
-				{
-					GameTextForPlayer(playerid, "Shield!", 1000, 5);
-					HpLoss *= 0.4;
-				}
-			}
-
-			GivePlayerHP(targetid, -HpLoss, playerid, weaponid);
-			ShowHitMarker(playerid, weaponid);
-
-
-			if(pAdmin(playerid) >= 4)
-			{
-				new str[32];
-				format(str, 32, "did %.2f", HpLoss);
-				ShowMsgBox(playerid, str, 1000, 120);
-			}
-
+			GameTextForPlayer(playerid, "Shield!", 1000, 5);
+			HpLoss *= 0.4;
 		}
+	}
+
+	GivePlayerHP(targetid, -HpLoss, playerid, weaponid);
+	ShowHitMarker(playerid, weaponid);
+
+
+	if(pAdmin(playerid) >= 4)
+	{
+		new str[32];
+		format(str, 32, "did %.2f", HpLoss);
+		ShowMsgBox(playerid, str, 1000, 120);
 	}
 	
 	return 1;
@@ -2792,6 +2173,25 @@ SetPlayerHP(playerid, Float:hp, shooterid = INVALID_PLAYER_ID, weaponid = 54)
 	gPlayerHP[playerid] = hp;
 }
 
+ShowHitMarker(playerid, weapon)
+{
+	if(weapon == 34 || weapon == 35)
+	{
+		TextDrawShowForPlayer(playerid, HitMark_centre);
+		defer HideHitMark(playerid, HitMark_centre);
+	}
+	else
+	{
+		TextDrawShowForPlayer(playerid, HitMark_offset);
+		defer HideHitMark(playerid, HitMark_offset);
+	}
+}
+timer HideHitMark[500](playerid, Text:hitmark)
+{
+	TextDrawHideForPlayer(playerid, hitmark);
+}
+
+
 /* Weapon Knockback
 
 	if(weaponid==34)
@@ -2842,7 +2242,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			iPlayerVehicleID = GetPlayerVehicleID(playerid),
 			iVehicleModel = GetVehicleModel(iPlayerVehicleID);
 
-		if( ((newkeys&1) || (newkeys&4)) && (iVehicleModel==432) )
+		if( ((newkeys & 1) || (newkeys & 4)) && (iVehicleModel == 432) )
 		{
 			TankHeat[playerid] += 20.0;
 			SetPlayerProgressBarMaxValue(playerid, TankHeatBar, 30.0);
@@ -2861,24 +2261,9 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				TankHeat[playerid]=0.0;
 			}
 		}
-		if(newkeys & KEY_CROUCH && IsPlayerInFreeRoam(playerid))
-		{
-			if( (bPlayerGameSettings[playerid]&SpeedBoost) && (GetPlayerState(playerid) == PLAYER_STATE_DRIVER) )
-			{
-				new Float:Velocity[3];
-				GetVehicleVelocity(iPlayerVehicleID, Velocity[0],   Velocity[1],   Velocity[2]);
-				SetVehicleVelocity(iPlayerVehicleID, Velocity[0]*2, Velocity[1]*2, Velocity[2]*2);
-			}
-			if( (bPlayerGameSettings[playerid]&JumpBoost) && (GetPlayerState(playerid) == PLAYER_STATE_DRIVER) )
-			{
-				new Float:Velocity[3];
-				GetVehicleVelocity(iPlayerVehicleID, Velocity[0], Velocity[1], Velocity[2]);
-				SetVehicleVelocity(iPlayerVehicleID, Velocity[0], Velocity[1], Velocity[2]+0.2);
-			}
-		}
 		if(newkeys == KEY_ACTION)
 		{
-			if(iVehicleModel==525)
+			if(iVehicleModel == 525)
 			{
 				new
 					Float:Player_vX,
@@ -2907,7 +2292,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			new Float:health;
 			GetVehicleHealth(gPlayerVehicleID[playerid], health);
 
-			if(health >= 400.0)
+			if(health >= 300.0 && gVehicleFuel[gPlayerVehicleID[playerid]] > 0.0)
 				v_Engine(gPlayerVehicleID[playerid], !v_Engine(gPlayerVehicleID[playerid]));
 		}
 		if(newkeys & KEY_NO)v_Lights(gPlayerVehicleID[playerid], !v_Lights(gPlayerVehicleID[playerid]));
@@ -2915,92 +2300,17 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 	else
 	{
 		if(newkeys & KEY_JUMP && !(oldkeys & KEY_JUMP) && GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_CUFFED)ApplyAnimation(playerid, "GYMNASIUM", "gym_jog_falloff",4.1,0,1,1,0,0);
-		if(bPlayerDeathmatchSettings[playerid]&dm_PlayingDead)ClearAnimations(playerid);
 
 	    new iWepState = GetPlayerWeaponState(playerid);
 		if((newkeys&KEY_FIRE)&&(iWepState!=WEAPONSTATE_RELOADING&&iWepState!=WEAPONSTATE_NO_BULLETS))OnPlayerShoot(playerid);
 	}
-
-	if(newkeys == 16 && bPlayerGameSettings[playerid] & LoopingAnimation)
-	{
-		StopLoopAnimation(playerid);
-		TextDrawHideForPlayer(playerid, StopAnimText);
-    }
 
 	return 1;
 }
 
 OnPlayerShoot(playerid)
 {
-	if(bPlayerGameSettings[playerid]&InDM)script_Deathmatch_PlayerShoot(playerid);
-}
-
-public OnVehicleSpawn(vehicleid)
-{
-	if(bServerGlobalSettings & dm_InProgress)script_Deathmatch_VehicleSpawn(vehicleid);
-}
-public OnVehicleDeath(vehicleid)
-{
-	if(bServerGlobalSettings & dm_InProgress)script_Deathmatch_VehicleDeath(vehicleid);
-	if(bServerGlobalSettings & rc_Started)script_Race_OnVehicleDeath(vehicleid);
-}
-public OnVehicleDamageStatusUpdate(vehicleid)
-{
-	script_prd_VehicleDamageUpdate(vehicleid);
-	return 1;
-}
-
-public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat)
-{
-	return 1;
-}
-
-
-
-public OnPlayerEnterDynamicRaceCP(playerid, checkpointid)
-{
-	script_race_EnterDynamicRaceCP(playerid, checkpointid);
-    if(gCurrentMinigame[playerid] == MINIGAME_PRDRIVE)script_prd_EnterDynamicRaceCP(playerid, checkpointid);
-	return 0;
-}
-public OnPlayerPickUpDynamicPickup(playerid, pickupid)
-{
-//	if(bServerGlobalSettings&FreeDM)script_FreeDM_OnPlayerPickup(playerid, pickupid);
-
-	if(bServerGlobalSettings & dm_InProgress && bPlayerGameSettings[playerid] & InDM)
-		script_Deathmatch_Pickup(playerid, pickupid);
-
-	return 1;
-}
-public OnPlayerEnterDynamicArea(playerid, areaid)
-{
-	foreach(new i : Character)
-	{
-	    if(areaid == gPlayerArea[i] && playerid != i)
-	    {
-	        CallLocalFunction("OnPlayerEnterPlayerArea", "dd", playerid, i);
-	    }
-	}
-
-	if((bServerGlobalSettings & dm_InProgress) && bPlayerGameSettings[playerid] & InDM)
-		script_Deathmatch_EnterArea(playerid, areaid);
-
-    return 1;
-}
-public OnPlayerLeaveDynamicArea(playerid, areaid)
-{
-	foreach(new i : Character)
-	{
-	    if(areaid == gPlayerArea[i] && playerid != i)
-	    {
-	        CallLocalFunction("OnPlayerLeavePlayerArea", "dd", playerid, i);
-	    }
-	}
-
-	if((bServerGlobalSettings&dm_InProgress) && bPlayerGameSettings[playerid]&InDM)script_Deathmatch_ExitArea(playerid, areaid);
-	if(dgw_State != 0)script_dgw_LeaveDynamicArea(playerid, areaid);
-
-	return 1;
+	#pragma unused playerid
 }
 
 public OnPlayerText(playerid, text[])
@@ -3050,15 +2360,11 @@ public OnPlayerText(playerid, text[])
 	    	MsgF(gPlayerChatChannel[playerid], GREEN, "(P)%P"#C_WHITE": %s", playerid, text);
 	    	MsgF(playerid, GREEN, "(P)%P"#C_WHITE": %s", playerid, text);
 	    }
-	    else if(gPlayerChatChannel[playerid] == CHANNEL_TEAM)
-	    {
-			MsgTeamF(pTeam(playerid), BLUE, "(T)%P"#C_WHITE": %s", playerid, text);
-	    }
 	    else if(gPlayerChatChannel[playerid] == CHANNEL_VEHICLE)
 	    {
 			PlayerLoop(i)
 				if(IsPlayerInVehicle(i, GetPlayerVehicleID(playerid)))
-					MsgF(i, WHITE, "(V)%P"#C_WHITE": %s", playerid, TagScan(playerid, text));
+					MsgF(i, WHITE, "(V)%P"#C_WHITE": %s", playerid, TagScan(text));
 	    }
 	    return 0;
 	}
@@ -3071,33 +2377,11 @@ PlayerSendChat(playerid, textInput[])
 	new
 		text[256];
 
-/*
-	if(HasIP(textInput))
-	{
-	    MsgAllF(WHITE, "%C(%d) %P"#C_WHITE": plzz join mi awsum servr plzzz ip: 127.0.0.1 plz",
-			AdminColours[pAdmin(playerid)],
-			playerid,
-			playerid);
-
-		return 0;
-	}
-*/
-
-	if(bPlayerGameSettings[playerid] & InDM)
-		format(text, 173, "%C(%d) %C[%s]%P"#C_WHITE": %s",
-			AdminColours[pAdmin(playerid)],
-			playerid,
-			RankColours[pRank(playerid)],
-			RankAbv[pRank(playerid)],
-			playerid,
-			TagScan(playerid, textInput));
-
-	else
-		format(text, 173, "%C(%d) %P"#C_WHITE": %s",
-			AdminColours[pAdmin(playerid)],
-			playerid,
-			playerid,
-			TagScan(playerid, textInput));
+	format(text, 173, "%C(%d) %P"#C_WHITE": %s",
+		AdminColours[pAdmin(playerid)],
+		playerid,
+		playerid,
+		TagScan(textInput));
 
 	if(strlen(text) > 127)
 	{
@@ -3198,7 +2482,7 @@ EmbedColours[9][E_COLOUR_EMBED_DATA]=
 	{'n', #C_NAVY},
 	{'a', #C_AQUA}
 };
-stock TagScan(playerid, chat[], colour = WHITE)
+stock TagScan(chat[], colour = WHITE)
 {
 	new
 		text[256],
@@ -3213,23 +2497,6 @@ stock TagScan(playerid, chat[], colour = WHITE)
 	{
 		if(text[a] == '#')
 		{
-			if(IsCharNumeric(text[a+1]))
-			{
-				new chatid = strval(text[a+1]);
-				if(strcmp(gPlayerQuickChat[playerid][chatid], "NULL", true) && (strlen(gPlayerQuickChat[playerid][chatid])>1))
-				{
-				    new tmpStr[50];
-				    tmpStr = gPlayerQuickChat[playerid][chatid];
-
-					strdel(text[a], 0, 2);
-					strins(text[a], gPlayerQuickChat[playerid][chatid], 0);
-
-					a+=strlen(tmpStr);
-					length+=strlen(tmpStr) - 2;
-					continue;
-				}
-				else a++;
-			}
 			/*
 			if(IsCharAlphabetic(text[a+1]))
 			{
@@ -3319,7 +2586,7 @@ stock TagScan(playerid, chat[], colour = WHITE)
 						break;
 			        }
 			    }
-				if(replacements==0)a++;
+			    if(replacements==0)a++;
 			}
 			else a++;
 		}
@@ -3327,36 +2594,10 @@ stock TagScan(playerid, chat[], colour = WHITE)
 	}
 	return text;
 }
-CMD:qmsg(playerid, params[])
-{
-	new
-		id,
-		msg[128];
-
-	if(sscanf(params, "ds[128]", id, msg))
-		return Msg(playerid, YELLOW, "Usage: /qmsg [message number 0-9] [message - character limit: 50]");
-
-	gPlayerQuickChat[playerid][id][0]='\0';
-	strcat(gPlayerQuickChat[playerid][id], msg);
-	MsgF(playerid, YELLOW, "QuickChat phrase %d saved, use by typing '#%d' in chat for a list of Quick-chat Phrases type '/qlist'", id, id);
-
-	return 1;
-}
-CMD:qlist(playerid, params[])
-{
-    new str[520];
-
-    for(new s;s<10;s++)
-		format(str, 500, "%s{FFFF00}#%d {FFFFFF}- {33AA33}%s\n", str, s, gPlayerQuickChat[playerid][s]);
-
-	ShowPlayerDialog(playerid, d_NULL, DIALOG_STYLE_MSGBOX, "Quick Messages, insert to chat with '#<message number>'", str, "Close", "");
-    return 1;
-}
 
 public OnPlayerStateChange(playerid, newstate, oldstate)
 {
 	new vehicleid = GetPlayerVehicleID(playerid);
-	bitFalse(bPlayerDeathmatchSettings[playerid], dm_Shooting);
 
 	if(bPlayerGameSettings[playerid] & DebugMode)
 		MsgF(playerid, YELLOW, "Newstate: %d, Oldstate: %d", newstate, oldstate);
@@ -3376,11 +2617,6 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 
 	    if(newstate == PLAYER_STATE_DRIVER)
 	    {
-			v_Engine(vehicleid, 1);
-
-			if(model == 525)
-				Msg(playerid, YELLOW, "You can use the ACTION KEY to Tow cars");
-
 			SetPlayerArmedWeapon(playerid, 0);
 
 			if(model == 432)
@@ -3405,20 +2641,6 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	}
 	if(oldstate == PLAYER_STATE_DRIVER || oldstate == PLAYER_STATE_PASSENGER)
 	{
-	    if(oldstate == PLAYER_STATE_DRIVER)
-	    {
-			v_Engine(vehicleid, 0);
-
-		    if(bPlayerGameSettings[playerid] & AntiFallOffBike)
-		    {
-		    	if(GetVehicleType(gPlayerVehicleID[playerid]) == VTYPE_BIKE && tickcount()-tick_ExitVehicle[playerid] > 2000)
-					PutPlayerInVehicle(playerid, gPlayerVehicleID[playerid], 0);
-			}
-
-			if(bPlayerGameSettings[playerid] & InRace)
-				rc_Leave(playerid);
-	    }
-
 	    gPlayerVehicleID[playerid] = INVALID_VEHICLE_ID;
 		DriverTickEnd(playerid);
 
@@ -3442,57 +2664,12 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 }
 public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 {
-	new
-		Float:x,
-		Float:y,
-		Float:z;
-
-	GetPlayerPos(playerid, x, y, z);
-
-	if(!ispassenger)
-	{
-		PlayerLoop(i)
-		{
-			if(gPlayerSpectating[i] == playerid) PlayerSpectateVehicle(i, vehicleid);
-			if(IsPlayerInVehicle(i, vehicleid) && GetPlayerState(i) == PLAYER_STATE_DRIVER && playerid != i)
-			{
-			    ClearAnimations(playerid, 1);
-				SetPlayerPos(playerid, x, y, z);
-			}
-			if(vehicleid == gPlayerSpawnedVehicle[i] && i != playerid)
-			{
-				gPlayerSpawnedVehicle[i] = INVALID_VEHICLE_ID;
-				if(IsValidVehicle(gPlayerSpawnedVehicle[playerid]))
-				{
-					DestroyVehicle(gPlayerSpawnedVehicle[playerid]);
-					gPlayerSpawnedVehicle[playerid] = INVALID_VEHICLE_ID;
-				}
-
-				gPlayerSpawnedVehicle[playerid] = vehicleid;
-			}
-		}
-	}
-	if(gCurrentChallenge == 0)
-	{
-	    switch(GetVehicleType(vehicleid))
-	    {
-	        case VTYPE_HELI, VTYPE_PLANE:
-	        {
-			    ClearAnimations(playerid, 1);
-				SetPlayerPos(playerid, x, y, z);
-				Msg(playerid, RED, " >  Air Vehicles are not allowed in the Marked Man event.");
-	        }
-	    }
-	}
 	return 1;
 }
 public OnPlayerExitVehicle(playerid, vehicleid)
 {
 	if(GetVehicleModel(vehicleid) == 432)
 		HidePlayerProgressBar(playerid, TankHeatBar);
-
-	PlayerLoop(i)
-		if(gPlayerSpectating[i] == playerid)PlayerSpectatePlayer(i, playerid);
 
 	tick_ExitVehicle[playerid] = tickcount();
 
@@ -3571,52 +2748,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		LogMessage(playerid);
 	}
-	if(dialogid == d_SpawnList)
-	{
-		if(response)
-		{
-			SetPlayerSpawnCam(playerid, listitem);
-			ShowPlayerSpawnList(playerid);
-		}
-		else
-		{
-			SetCameraBehindPlayer(playerid);
 
-			SetSpawnInfo(playerid, NO_TEAM, GetPlayerSkin(playerid),
-				HomeSpawnData[gHomeSpawn[playerid]][spn_posX], HomeSpawnData[gHomeSpawn[playerid]][spn_posY], HomeSpawnData[gHomeSpawn[playerid]][spn_posZ], HomeSpawnData[gHomeSpawn[playerid]][spn_rotZ], 0,0,0,0,0,0);
-
-			f:bPlayerGameSettings[playerid]<GodMode>;
-			SetPlayerVirtualWorld(playerid, FREEROAM_WORLD);
-			gHomeSpawn[playerid] = listitem;
-		}
-	}
-
-
-	if(dialogid == d_Colourlist)
-	{
-		if(response)
-		{
-		    gPlayerColour[playerid] = listitem;
-			SetPlayerColor(playerid, ColourData[listitem][colour_value]);
-		}
-	}
-	if(dialogid == d_WeatherList && response)
-	{
-		gWeatherID = listitem;
-		PlayerLoop(i)
-		{
-			if(GetPlayerVirtualWorld(i) == FREEROAM_WORLD)
-			{
-				SetPlayerWeather(i, WeatherData[listitem][weather_id]);
-				MsgF(i, YELLOW, " >  Weather set to "#C_BLUE"%s", WeatherData[listitem][weather_name]);
-			}
-		}
-	}
-	if(dialogid==d_RadioList)
-	{
-	    if(response)PlayAudioStreamForPlayer(playerid, RadioStreams[listitem][0]);
-	    else StopAudioStreamForPlayer(playerid);
-	}
 	return 1;
 }
 
@@ -3661,15 +2793,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		else result = CallLocalFunction(szFuncName, "is", playerid, params);
 	}
 
-	if(IsPlayerInFreeRoam(playerid))
-	{
-		if(result == 0)
-			result = script_Vehicles_CommandText(playerid, cmd);
-
-		if(result == 0)
-			result = script_Teleports_CommandText(playerid, cmd);
-	}
-
 	// Return values for commands, instead of writing these
 	// messages on the commands themselves, I can just
 	// write them here and return different values on the commands.
@@ -3689,19 +2812,33 @@ LoadTextDraws()
 {
 	print("- Loading TextDraws...");
 
-//=======================================================================Infobar
-	InfoBar					=TextDrawCreate(320.000000, 435.000000, "Information bar for holding information about the server. If this message shows, something is broken!");
-	TextDrawAlignment		(InfoBar, 2);
-	TextDrawBackgroundColor	(InfoBar, 255);
-	TextDrawFont			(InfoBar, 1);
-	TextDrawLetterSize		(InfoBar, 0.32, 1.2);
-	TextDrawColor			(InfoBar, -1);
-	TextDrawSetOutline		(InfoBar, 0);
-	TextDrawSetProportional	(InfoBar, 1);
-	TextDrawSetShadow		(InfoBar, 1);
-	TextDrawUseBox			(InfoBar, 1);
-	TextDrawBoxColor		(InfoBar, 0x000000AA);
-	TextDrawTextSize		(InfoBar, 20.000000, 640.000000);
+//=========================================================================Death
+	DeathText				=TextDrawCreate(320.000000, 300.000000, "YOU ARE DEAD!");
+	TextDrawAlignment			(DeathText, 2);
+	TextDrawBackgroundColor		(DeathText, 255);
+	TextDrawFont				(DeathText, 1);
+	TextDrawLetterSize			(DeathText, 0.500000, 2.000000);
+	TextDrawColor				(DeathText, -1);
+	TextDrawSetOutline			(DeathText, 0);
+	TextDrawSetProportional		(DeathText, 1);
+	TextDrawSetShadow			(DeathText, 1);
+	TextDrawUseBox				(DeathText, 1);
+	TextDrawBoxColor			(DeathText, 85);
+	TextDrawTextSize			(DeathText, 20.000000, 150.000000);
+
+	DeathButton					=TextDrawCreate(320.000000, 323.000000, ">Play Again<");
+	TextDrawAlignment			(DeathButton, 2);
+	TextDrawBackgroundColor		(DeathButton, 255);
+	TextDrawFont				(DeathButton, 1);
+	TextDrawLetterSize			(DeathButton, 0.370000, 1.599999);
+	TextDrawColor				(DeathButton, -1);
+	TextDrawSetOutline			(DeathButton, 0);
+	TextDrawSetProportional		(DeathButton, 1);
+	TextDrawSetShadow			(DeathButton, 1);
+	TextDrawUseBox				(DeathButton, 1);
+	TextDrawBoxColor			(DeathButton, 85);
+	TextDrawTextSize			(DeathButton, 20.000000, 150.000000);
+	TextDrawSetSelectable		(DeathButton, true);
 
 //=========================================================================Clock
 	ClockText				=TextDrawCreate(605.0, 25.0, "00:00");
@@ -3713,97 +2850,6 @@ LoadTextDraws()
 	TextDrawColor			(ClockText, 0xFFFFFFFF);
 	TextDrawAlignment		(ClockText, 3);
 	TextDrawLetterSize		(ClockText, 0.5, 1.6);
-
-//=====================================================================Animation
-	StopAnimText 			=TextDrawCreate(610.0, 400.0, "~b~~k~~VEHICLE_ENTER_EXIT~ ~w~to stop the animation");
-	TextDrawLetterSize		(StopAnimText, 0.5, 1.0);
-	TextDrawUseBox			(StopAnimText, 0);
-	TextDrawFont			(StopAnimText, 2);
-	TextDrawSetShadow		(StopAnimText, 0);
-    TextDrawSetOutline		(StopAnimText, 1);
-    TextDrawBackgroundColor	(StopAnimText, 0x000000FF);
-    TextDrawColor			(StopAnimText, 0xFFFFFFFF);
-    TextDrawAlignment		(StopAnimText, 3);
-
-//===============================================================Countdown Timer
-	CountdownText			=TextDrawCreate(20.0, 250.0, "00:00");
-	TextDrawTextSize		(CountdownText, 636.000000, 824.000000);
-	TextDrawAlignment		(CountdownText, 0);
-	TextDrawFont			(CountdownText, 3);
-	TextDrawLetterSize		(CountdownText, 0.499999, 1.800000);
-	TextDrawColor			(CountdownText, 0xffffffff);
-	TextDrawSetProportional	(CountdownText, 2);
-	TextDrawSetShadow		(CountdownText, 1);
-	TextDrawSetOutline		(CountdownText, 1);
-
-
-//=========================================================================Score
-	ScoreBox				=TextDrawCreate(20.0, 280.0, " Raven: 0/10~n~   Valor: 0/10");
-	TextDrawUseBox			(ScoreBox, 1);
-	TextDrawBoxColor		(ScoreBox, 0x00000033);
-	TextDrawTextSize		(ScoreBox, 158.000000, 10.000000);
-	TextDrawAlignment		(ScoreBox, 0);
-	TextDrawBackgroundColor	(ScoreBox, 0x000000ff);
-	TextDrawFont			(ScoreBox, 1);
-	TextDrawLetterSize		(ScoreBox, 0.3, 1.4);
-	TextDrawColor			(ScoreBox, 0xffffffff);
-	TextDrawSetOutline		(ScoreBox, 1);
-	TextDrawSetProportional	(ScoreBox, 1);
-	TextDrawSetShadow		(ScoreBox, 1);
-
-//==================================================================Score Status
-	ScoreStatus_Winning		=TextDrawCreate(20.0, 260.0, "Winning");
-	TextDrawBackgroundColor	(ScoreStatus_Winning, BLACK);
-	TextDrawFont			(ScoreStatus_Winning, 1);
-	TextDrawLetterSize		(ScoreStatus_Winning, 0.5, 1.6);
-	TextDrawSetOutline		(ScoreStatus_Winning, 1);
-
-	ScoreStatus_Tie			=TextDrawCreate(20.0, 260.0, "Tie");
-	TextDrawBackgroundColor	(ScoreStatus_Tie, BLACK);
-	TextDrawFont			(ScoreStatus_Tie, 1);
-	TextDrawLetterSize		(ScoreStatus_Tie, 0.5, 1.6);
-	TextDrawSetOutline		(ScoreStatus_Tie, 1);
-
-	ScoreStatus_Losing		=TextDrawCreate(20.0, 260.0, "Losing");
-	TextDrawBackgroundColor	(ScoreStatus_Losing, BLACK);
-	TextDrawFont			(ScoreStatus_Losing, 1);
-	TextDrawLetterSize		(ScoreStatus_Losing, 0.5, 1.6);
-	TextDrawSetOutline		(ScoreStatus_Losing, 1);
-
-//=========================================================================Lobby
-	LobbyText				=TextDrawCreate(600.000000,245.000000,"99 Players In Lobby~n~Type /joindm to join");
-	TextDrawAlignment		(LobbyText,3);
-	TextDrawBackgroundColor	(LobbyText,0x000000ff);
-	TextDrawFont			(LobbyText,3);
-	TextDrawLetterSize		(LobbyText,0.399999,1.599999);
-	TextDrawColor			(LobbyText,0x00ff00ff);
-	TextDrawSetOutline		(LobbyText,1);
-	TextDrawSetProportional	(LobbyText,1);
-	TextDrawSetShadow		(LobbyText,1);
-
-//====================================================================SpawnCount
-	SpawnCount				=TextDrawCreate(600.000000,245.000000,"Spawning in 10");
-	TextDrawAlignment		(SpawnCount, 3);
-	TextDrawBackgroundColor	(SpawnCount, 0x000000ff);
-	TextDrawFont			(SpawnCount, 3);
-	TextDrawLetterSize		(SpawnCount, 0.399999, 1.599999);
-	TextDrawColor			(SpawnCount, 0x00ff00ff);
-	TextDrawSetOutline		(SpawnCount, 1);
-	TextDrawSetProportional	(SpawnCount, 1);
-	TextDrawSetShadow		(SpawnCount, 1);
-
-//====================================================================Match Time
-	MatchTimeCounter		=TextDrawCreate(20.0, 240.0, "00:00");
-	TextDrawBackgroundColor	(MatchTimeCounter, 255);
-	TextDrawUseBox			(MatchTimeCounter, 1);
-	TextDrawBoxColor		(MatchTimeCounter, 0x00000033);
-	TextDrawTextSize		(MatchTimeCounter, 70.000000, 0.000000);
-	TextDrawFont			(MatchTimeCounter, 3);
-	TextDrawLetterSize		(MatchTimeCounter, 0.5, 1.8);
-	TextDrawColor			(MatchTimeCounter, 0xffffffff);
-	TextDrawSetProportional	(MatchTimeCounter, 1);
-	TextDrawSetShadow		(MatchTimeCounter, 1);
-	TextDrawSetOutline		(MatchTimeCounter, 1);
 
 //=====================================================================HitMarker
 	new hm[14];
@@ -3829,40 +2875,67 @@ LoadTextDraws()
 	TextDrawSetOutline		(HitMark_offset, 0);
 	TextDrawSetShadow		(HitMark_offset, 0);
 
-
-//====================================================================Race Count
-	rc_RaceCountText		=TextDrawCreate(490.000000, 110.000000, "Race Starting In 30");
-	TextDrawBackgroundColor	(rc_RaceCountText, 255);
-	TextDrawFont			(rc_RaceCountText, 1);
-	TextDrawLetterSize		(rc_RaceCountText, 0.400000, 1.399999);
-	TextDrawColor			(rc_RaceCountText, -65281);
-	TextDrawSetOutline		(rc_RaceCountText, 0);
-	TextDrawSetProportional	(rc_RaceCountText, 1);
-	TextDrawSetShadow		(rc_RaceCountText, 1);
-
 }
 LoadPlayerTextDraws(playerid)
 {
-	smo_LoadPlayerTextDraws(playerid);
-	dby_LoadPlayerTextDraws(playerid);
-	gun_LoadPlayerTextDraws(playerid);
-/*
-	HealthCount						=CreatePlayerTextDraw(playerid, 577.000000, 66.000000, "100hp");
-	PlayerTextDrawAlignment			(playerid, HealthCount, 2);
-	PlayerTextDrawBackgroundColor	(playerid, HealthCount, -1);
-	PlayerTextDrawFont				(playerid, HealthCount, 1);
-	PlayerTextDrawLetterSize		(playerid, HealthCount, 0.439999, 1.000000);
-	PlayerTextDrawColor				(playerid, HealthCount, -16776961);
-	PlayerTextDrawSetOutline		(playerid, HealthCount, 0);
-	PlayerTextDrawSetProportional	(playerid, HealthCount, 1);
-	PlayerTextDrawSetShadow			(playerid, HealthCount, 0);
-	PlayerTextDrawUseBox			(playerid, HealthCount, 1);
-	PlayerTextDrawBoxColor			(playerid, HealthCount, 255);
-	PlayerTextDrawTextSize			(playerid, HealthCount, 655.000000, 60.000000);
-*/
+//==============================================================Character Create
+	ClassBackGround					=CreatePlayerTextDraw(playerid, 0.000000, 0.000000, "_");
+	PlayerTextDrawBackgroundColor	(playerid, ClassBackGround, 255);
+	PlayerTextDrawFont				(playerid, ClassBackGround, 1);
+	PlayerTextDrawLetterSize		(playerid, ClassBackGround, 0.500000, 50.000000);
+	PlayerTextDrawColor				(playerid, ClassBackGround, -1);
+	PlayerTextDrawSetOutline		(playerid, ClassBackGround, 0);
+	PlayerTextDrawSetProportional	(playerid, ClassBackGround, 1);
+	PlayerTextDrawSetShadow			(playerid, ClassBackGround, 1);
+	PlayerTextDrawUseBox			(playerid, ClassBackGround, 1);
+	PlayerTextDrawBoxColor			(playerid, ClassBackGround, 255);
+	PlayerTextDrawTextSize			(playerid, ClassBackGround, 640.000000, 0.000000);
+
+	ClassButtonMale					=CreatePlayerTextDraw(playerid, 250.000000, 200.000000, "~n~Male~n~~n~");
+	PlayerTextDrawAlignment			(playerid, ClassButtonMale, 2);
+	PlayerTextDrawBackgroundColor	(playerid, ClassButtonMale, 255);
+	PlayerTextDrawFont				(playerid, ClassButtonMale, 1);
+	PlayerTextDrawLetterSize		(playerid, ClassButtonMale, 0.500000, 2.000000);
+	PlayerTextDrawColor				(playerid, ClassButtonMale, -1);
+	PlayerTextDrawSetOutline		(playerid, ClassButtonMale, 0);
+	PlayerTextDrawSetProportional	(playerid, ClassButtonMale, 1);
+	PlayerTextDrawSetShadow			(playerid, ClassButtonMale, 1);
+	PlayerTextDrawUseBox			(playerid, ClassButtonMale, 1);
+	PlayerTextDrawBoxColor			(playerid, ClassButtonMale, 255);
+	PlayerTextDrawTextSize			(playerid, ClassButtonMale, 300.000000, 100.000000);
+	PlayerTextDrawSetSelectable		(playerid, ClassButtonMale, true);
+
+	ClassButtonFemale				=CreatePlayerTextDraw(playerid, 390.000000, 200.000000, "~n~Female~n~~n~");
+	PlayerTextDrawAlignment			(playerid, ClassButtonFemale, 2);
+	PlayerTextDrawBackgroundColor	(playerid, ClassButtonFemale, 255);
+	PlayerTextDrawFont				(playerid, ClassButtonFemale, 1);
+	PlayerTextDrawLetterSize		(playerid, ClassButtonFemale, 0.500000, 2.000000);
+	PlayerTextDrawColor				(playerid, ClassButtonFemale, -1);
+	PlayerTextDrawSetOutline		(playerid, ClassButtonFemale, 0);
+	PlayerTextDrawSetProportional	(playerid, ClassButtonFemale, 1);
+	PlayerTextDrawSetShadow			(playerid, ClassButtonFemale, 1);
+	PlayerTextDrawUseBox			(playerid, ClassButtonFemale, 1);
+	PlayerTextDrawBoxColor			(playerid, ClassButtonFemale, 255);
+	PlayerTextDrawTextSize			(playerid, ClassButtonFemale, 300.000000, 100.000000);
+	PlayerTextDrawSetSelectable		(playerid, ClassButtonFemale, true);
 
 
-	// Speedo
+//======================================================================HelpTips
+
+	HelpTipText						=CreatePlayerTextDraw(playerid, 150.000000, 350.000000, "Tip: You can access the trunks of cars by pressing F at the back");
+	PlayerTextDrawBackgroundColor	(playerid, HelpTipText, 255);
+	PlayerTextDrawFont				(playerid, HelpTipText, 1);
+	PlayerTextDrawLetterSize		(playerid, HelpTipText, 0.300000, 1.499999);
+	PlayerTextDrawColor				(playerid, HelpTipText, 16711935);
+	PlayerTextDrawSetOutline		(playerid, HelpTipText, 1);
+	PlayerTextDrawSetProportional	(playerid, HelpTipText, 1);
+	PlayerTextDrawSetShadow			(playerid, HelpTipText, 0);
+	PlayerTextDrawUseBox			(playerid, HelpTipText, 1);
+	PlayerTextDrawBoxColor			(playerid, HelpTipText, 0);
+	PlayerTextDrawTextSize			(playerid, HelpTipText, 520.000000, 0.000000);
+
+
+//========================================================================Speedo
 
 	VehicleNameText					=CreatePlayerTextDraw(playerid, 621.000000, 415.000000, "Infernus");
 	PlayerTextDrawAlignment			(playerid, VehicleNameText, 3);
@@ -3883,86 +2956,7 @@ LoadPlayerTextDraws(playerid)
 	PlayerTextDrawSetProportional	(playerid, VehicleSpeedText, 1);
 
 
-	// Map
-
-	mapMain							=CreatePlayerTextDraw(playerid, MAP_ORIGIN_X, MAP_ORIGIN_Y, "samaps:gtasamapbit1");
-	PlayerTextDrawBackgroundColor	(playerid, mapMain, 255);
-	PlayerTextDrawFont				(playerid, mapMain, 4);
-	PlayerTextDrawLetterSize		(playerid, mapMain, 0.500000, 1.000000);
-	PlayerTextDrawColor				(playerid, mapMain, -1);
-	PlayerTextDrawSetOutline		(playerid, mapMain, 0);
-	PlayerTextDrawSetProportional	(playerid, mapMain, 1);
-	PlayerTextDrawSetShadow			(playerid, mapMain, 1);
-	PlayerTextDrawUseBox			(playerid, mapMain, 1);
-	PlayerTextDrawBoxColor			(playerid, mapMain, 255);
-	PlayerTextDrawTextSize			(playerid, mapMain, MAP_SIZE_X, MAP_SIZE_Y);
-
-
-	// Race
-
-	TimerText						=CreatePlayerTextDraw(playerid, 20.0, 180.0, "00:00");
-	PlayerTextDrawAlignment			(playerid, TimerText, 0);
-	PlayerTextDrawFont				(playerid, TimerText, 3);
-	PlayerTextDrawLetterSize		(playerid, TimerText, 0.5, 1.9);
-	PlayerTextDrawColor				(playerid, TimerText, 0xffffffff);
-	PlayerTextDrawSetProportional	(playerid, TimerText, 2);
-	PlayerTextDrawSetShadow			(playerid, TimerText, 1);
-	PlayerTextDrawSetOutline		(playerid, TimerText, 1);
-	PlayerTextDrawUseBox			(playerid, TimerText, 1);
-	PlayerTextDrawBoxColor			(playerid, TimerText, 0x505050AA);
-	PlayerTextDrawTextSize			(playerid, TimerText, 120.0, 200.0);
-
-	rc_DistCount					=CreatePlayerTextDraw(playerid, 20.0, 202.0, "Distance~n~1000m");
-	PlayerTextDrawBackgroundColor	(playerid, rc_DistCount, 255);
-	PlayerTextDrawFont				(playerid, rc_DistCount, 1);
-	PlayerTextDrawLetterSize		(playerid, rc_DistCount, 0.400000, 1.4);
-	PlayerTextDrawColor				(playerid, rc_DistCount, -1);
-	PlayerTextDrawSetOutline		(playerid, rc_DistCount, 0);
-	PlayerTextDrawSetProportional	(playerid, rc_DistCount, 1);
-	PlayerTextDrawSetShadow			(playerid, rc_DistCount, 1);
-	PlayerTextDrawUseBox			(playerid, rc_DistCount, 1);
-	PlayerTextDrawBoxColor			(playerid, rc_DistCount, 100);
-	PlayerTextDrawTextSize			(playerid, rc_DistCount, 80.0, 0.0);
-
-	rc_CurPlace						=CreatePlayerTextDraw(playerid, 84.000000, 202.000000, "1");
-	PlayerTextDrawBackgroundColor	(playerid, rc_CurPlace, 255);
-	PlayerTextDrawFont				(playerid, rc_CurPlace, 1);
-	PlayerTextDrawLetterSize		(playerid, rc_CurPlace, 0.700000, 2.800000);
-	PlayerTextDrawColor				(playerid, rc_CurPlace, -1);
-	PlayerTextDrawSetOutline		(playerid, rc_CurPlace, 0);
-	PlayerTextDrawSetProportional	(playerid, rc_CurPlace, 1);
-	PlayerTextDrawSetShadow			(playerid, rc_CurPlace, 1);
-	PlayerTextDrawUseBox			(playerid, rc_CurPlace, 1);
-	PlayerTextDrawBoxColor			(playerid, rc_CurPlace, 255);
-	PlayerTextDrawTextSize			(playerid, rc_CurPlace, 120.000000, 0.000000);
-
-	rc_LobbyInfo					=CreatePlayerTextDraw(playerid, 278.000000, 405.000000, "Race Info");
-	PlayerTextDrawAlignment			(playerid, rc_LobbyInfo, 2);
-	PlayerTextDrawBackgroundColor	(playerid, rc_LobbyInfo, 255);
-	PlayerTextDrawFont				(playerid, rc_LobbyInfo, 1);
-	PlayerTextDrawLetterSize		(playerid, rc_LobbyInfo, 0.400000, 2.000000);
-	PlayerTextDrawColor				(playerid, rc_LobbyInfo, 16711935);
-	PlayerTextDrawSetOutline		(playerid, rc_LobbyInfo, 0);
-	PlayerTextDrawSetProportional	(playerid, rc_LobbyInfo, 1);
-	PlayerTextDrawSetShadow			(playerid, rc_LobbyInfo, 1);
-	PlayerTextDrawUseBox			(playerid, rc_LobbyInfo, 1);
-	PlayerTextDrawBoxColor			(playerid, rc_LobbyInfo, 100);
-	PlayerTextDrawTextSize			(playerid, rc_LobbyInfo, 16.000000, 80.000000);
-	PlayerTextDrawSetSelectable     (playerid, rc_LobbyInfo, true);
-
-	rc_LobbyCamera					=CreatePlayerTextDraw(playerid, 362.000000, 405.000000, "Finish Line");
-	PlayerTextDrawAlignment			(playerid, rc_LobbyCamera, 2);
-	PlayerTextDrawBackgroundColor	(playerid, rc_LobbyCamera, 255);
-	PlayerTextDrawFont				(playerid, rc_LobbyCamera, 1);
-	PlayerTextDrawLetterSize		(playerid, rc_LobbyCamera, 0.400000, 2.000000);
-	PlayerTextDrawColor				(playerid, rc_LobbyCamera, 3323135);
-	PlayerTextDrawSetOutline		(playerid, rc_LobbyCamera, 0);
-	PlayerTextDrawSetProportional	(playerid, rc_LobbyCamera, 1);
-	PlayerTextDrawSetShadow			(playerid, rc_LobbyCamera, 1);
-	PlayerTextDrawUseBox			(playerid, rc_LobbyCamera, 1);
-	PlayerTextDrawBoxColor			(playerid, rc_LobbyCamera, 100);
-	PlayerTextDrawTextSize			(playerid, rc_LobbyCamera, 16.000000, 80.000000);
-	PlayerTextDrawSetSelectable     (playerid, rc_LobbyCamera, true);
+//======================================================================Stat GUI
 
 	AddHPText						=CreatePlayerTextDraw(playerid, 160.000000, 240.000000, "<+HP>");
 	PlayerTextDrawColor				(playerid, AddHPText, RED);
@@ -3991,6 +2985,8 @@ LoadPlayerTextDraws(playerid)
 	PlayerTextDrawSetShadow			(playerid, AddScoreText, 0);
 	PlayerTextDrawSetOutline		(playerid, AddScoreText, 1);
 
+
+/* I'm sure these might come in use
 	// Deathmatch
 
 	dm_EquipText 					=CreatePlayerTextDraw(playerid, 497.000000,120.000000,"Equipment");
@@ -4031,24 +3027,13 @@ LoadPlayerTextDraws(playerid)
 	LoadPlayerGUI_KillMsg(playerid);
 	LoadPlayerGUI_GraphicMenu(playerid);
 	LoadPlayerGUI_SpectateButtons(playerid);
+*/
 }
 UnloadPlayerTextDraws(playerid)
 {
-	smo_UnloadPlayerTextDraws(playerid);
-	dby_UnloadPlayerTextDraws(playerid);
-	gun_UnloadPlayerTextDraws(playerid);
-
-	PlayerTextDrawDestroy(playerid, MsgBox);
 	PlayerTextDrawDestroy(playerid, VehicleNameText);
 	PlayerTextDrawDestroy(playerid, VehicleSpeedText);
-	PlayerTextDrawDestroy(playerid, mapMain);
-    if(bPlayerGameSettings[playerid] & ViewingMap)PlayerTextDrawDestroy(playerid, mapText);
-	PlayerTextDrawDestroy(playerid, TimerText);
-	PlayerTextDrawDestroy(playerid, rc_DistCount);
-	PlayerTextDrawDestroy(playerid, rc_CurPlace);
-	PlayerTextDrawDestroy(playerid, dm_EquipText);
-	PlayerTextDrawDestroy(playerid, XPtext);
-
+/*
 	DestroyPlayerProgressBar(playerid, XPbar);
 	DestroyPlayerProgressBar(playerid, TankHeatBar);
 	DestroyPlayerProgressBar(playerid, BleedoutBar);
@@ -4058,88 +3043,8 @@ UnloadPlayerTextDraws(playerid)
 	UnloadPlayerGUI_KillMsg(playerid);
 	UnloadPlayerGUI_GraphicMenu(playerid);
 	UnloadPlayerGUI_SpectateButtons(playerid);
-
+*/
 }
-
-
-LoadMenus()
-{
-	print("- Loading Menus...");
-
-//====================================================================dm_TeamMenu
-	dm_TeamMenu = CreateMenu("Select Team", 1, 32.0, 170.0, 150.0);
-	AddMenuItem(dm_TeamMenu,0, "Raven");
-	AddMenuItem(dm_TeamMenu,0, "Valor");
-
-//====================================================================Lobby Menu
-	dm_LobbyMenu = CreateMenu("~b~Get Ready", 1, 32.0, 170.0, 200.0);
-	AddMenuItem(dm_LobbyMenu, 0, "Team");
-	AddMenuItem(dm_LobbyMenu, 0, "Loadout");
-	AddMenuItem(dm_LobbyMenu, 0, "Gear");
-	AddMenuItem(dm_LobbyMenu, 0, "Spawn Point");
-	AddMenuItem(dm_LobbyMenu, 0, "-");
-	AddMenuItem(dm_LobbyMenu, 0, "Help");
-	AddMenuItem(dm_LobbyMenu, 0, "Spectate");
-	AddMenuItem(dm_LobbyMenu, 0, "-");
-	AddMenuItem(dm_LobbyMenu, 0, "> Ready <");
-	DisableMenuRow(dm_LobbyMenu, 4);
-	DisableMenuRow(dm_LobbyMenu, 7);
-}
-LoadDeathmatches()
-{
-	print("- Loading Deathmatches...");
-	new
-		File:idxFile = fopen(DM_INDEX_FILE, io_read),
-		idx,
-		line[160];
-
-	while(fread(idxFile, line))
-	{
-		if(sscanf(line, "p<|>s[20]bds[128]s[14]s[26]", dm_MapNames[idx], dm_MapModes[idx], dm_MapRegion[idx], dm_MapInfo_Bio[idx], dm_MapInfo_Size[idx], dm_MapInfo_Kit[idx]))print("Error: Deathmatch File Index");
-		idx++;
-	}
-	fclose(idxFile);
-	dm_TotalMaps = idx;
-
-
-	for(new r;r<5;r++)
-	{
-	    idx=0;
-		format(dm_RegionList, 60, "%s%s\n", dm_RegionList, dm_RegionNames[r]);
-		for(new m;m<MAX_MAPS;m++)
-		{
-			if(dm_MapRegion[m]==r)
-			{
-				format(dm_RegionMaps[r], 200, "%s%s\n", dm_RegionMaps[r], dm_MapNames[m]);
-				dm_RegionIndex[m]=idx;
-				idx++;
-			}
-		}
-		strcat(dm_RegionMaps[r], "Back");
-	}
-	strcat(dm_RegionList, "Close");
-
-	LoadAwards();
-}
-LoadFreeDM()
-{
-	new
-		File:file=fopen(FDM_INDEX_FILE, io_read),
-		line[128],
-		idx,
-		len;
-
-	while(fread(file, line))
-	{
-	    len = strlen(line);
-		if(line[len-2] == '\r')line[len-2] = EOS;
-		format(fdm_AreaNames[idx], FDM_MAX_AREA_NAME, line);
-		idx++;
-	}
-	fdm_TotalAreas = idx;
-	fclose(file);
-}
-
 
 public OnButtonPress(playerid, buttonid)
 {
@@ -4149,60 +3054,16 @@ public OnButtonPress(playerid, buttonid)
 
 public OnPlayerActivateCheckpoint(playerid, checkpointid)
 {
-	script_Parkour_Checkpoint(playerid, checkpointid);
 	return 1;
 }
 
 
 public OnDynamicObjectMoved(objectid)
 {
-	if(dgw_State != 0)script_dgw_OnObjectMoved(objectid);
 	return 1;
 }
 
-IsPlayerInFreeRoam(playerid)
-{
-	if( bPlayerGameSettings		[playerid]	& InDM
-	||	bPlayerGameSettings		[playerid]	& InRace
-	||	bPlayerGameSettings		[playerid]	& InFreeDM
-	||	gCurrentMinigame		[playerid]	!= MINIGAME_NONE
-	||	!(bServerGlobalSettings				& FreeroamCommands)
-	||	gCurrentChallenge					!= CHALLENGE_NONE
-	||	GetPlayerVirtualWorld	(playerid)	!= FREEROAM_WORLD) return 0;
-
-	return 1;
-}
-CMD:infreeroam(playerid, params[])
-{
-	DisplayFreeroamStatus(playerid);
-	return 1;
-}
-DisplayFreeroamStatus(playerid)
-{
-	new str[512];
-	format(str, 512, "Freeroam Criteria:\n\n\
-		%d = InDM (bit flag - player)\n\
-	    %d = InRace (bit flag - player)\n\
-	    %d = CurrentMinigame != MINIGAME_NONE (integer - global)\n\
-	    %d = FreeDM (bit flag - global)\n\
-	    %d = FreeRoamCommands (bit flag - global)\n\
-	    %d = CurrentChallenge != CHALLENGE_NONE (integer - global)\n\
-	    %d = VirtualWorld != FREEROAM_WORLD (integer - player)\n",
-
-		(bPlayerGameSettings		[playerid]	& InDM),
-		(bPlayerGameSettings		[playerid]	& InRace),
-		(gCurrentMinigame			[playerid]	!= MINIGAME_NONE),
-		(bServerGlobalSettings					& FreeDM),
-		(!(bServerGlobalSettings				& FreeroamCommands)),
-		(gCurrentChallenge						!= CHALLENGE_NONE),
-		(GetPlayerVirtualWorld		(playerid)	!= FREEROAM_WORLD) );
-
-	ShowPlayerDialog(playerid, d_NULL, DIALOG_STYLE_MSGBOX, "IsPlayerInFreeRoam", str, "Close", "");
-}
-
-
-
-GetPlayersOnline()
+stock GetPlayersOnline()
 {
 	new p;
 	PlayerLoop(i)p++;
@@ -4351,71 +3212,6 @@ PreloadPlayerAnims(playerid)
 	PreloadAnimLib(playerid, "GFUNK");
 	PreloadAnimLib(playerid, "RUNNINGMAN");
 }
-SpawnCarForPlayer(playerid, model)
-{
-	if(pAdmin(playerid) < 3 && bServerGlobalSettings & WeaponLock)
-	{
-	    switch(model)
-	    {
-	        case 425, 432, 447, 520:
-	        {
-	            Msg(playerid, RED, " >  You can't spawn a vehicle with weapons right now.");
-	            return 0;
-	        }
-	    }
-	}
-
-    new
-		Float:x,
-		Float:y,
-		Float:z,
-		Float:a,
-		Float:vx,
-		Float:vy,
-		Float:vz,
-		vw=GetPlayerVirtualWorld(playerid),
-		in=GetPlayerInterior(playerid);
-
-	if(IsPlayerInAnyVehicle(playerid))
-	{
-		new
-			vehicleid = GetPlayerVehicleID(playerid);
-
-	    GetVehiclePos(vehicleid, x, y, z);
-	    GetVehicleZAngle(vehicleid, a);
-		GetVehicleVelocity(vehicleid, vx, vy, vz);
-		DestroyVehicle(vehicleid);
-
-		if(gPlayerSpawnedVehicle[playerid] == vehicleid)
-			gPlayerSpawnedVehicle[playerid] = -1;
-	}
-	else
-	{
-	    GetPlayerPos(playerid, x, y, z);
-	    GetPlayerFacingAngle(playerid, a);
-		GetPlayerVelocity(playerid, vx, vy, vz);
-	}
-
-	if(IsValidVehicle(gPlayerSpawnedVehicle[playerid]))
-	{
-		DestroyVehicle(gPlayerSpawnedVehicle[playerid]);
-		gPlayerSpawnedVehicle[playerid] = INVALID_VEHICLE_ID;
-	}
-
-	gPlayerSpawnedVehicle[playerid]	= CreateVehicle(model, x, y, z, a, -1, -1, 1000);
-	gPlayerVehicleID[playerid]		= gPlayerSpawnedVehicle[playerid];
-	SetVehicleVirtualWorld			(gPlayerVehicleID[playerid], vw);
-	LinkVehicleToInterior			(gPlayerVehicleID[playerid], in);
-	PutPlayerInVehicle				(playerid, gPlayerVehicleID[playerid], 0);
-	SetVehicleVelocity				(gPlayerVehicleID[playerid], vx, vy, vz);
-	v_Engine						(gPlayerVehicleID[playerid], 1);
-
-	PlayerTextDrawSetString(playerid, VehicleNameText, VehicleNames[model-400]);
-	PlayerTextDrawShow(playerid, VehicleNameText);
-	MsgF(playerid, YELLOW, " >  "#C_BLUE"%s "#C_YELLOW"Spawned", VehicleNames[model-400]);
-	
-	return 1;
-}
 
 FreezePlayer(playerid, time)
 {
@@ -4427,6 +3223,7 @@ timer UnfreezePlayer[time](playerid, time)
 #pragma unused time
 	TogglePlayerControllable(playerid, true);
 }
+
 
 forward sffa_msgbox(playerid, message[], time, width);
 public sffa_msgbox(playerid, message[], time, width)

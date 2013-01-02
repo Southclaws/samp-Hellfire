@@ -1,9 +1,3 @@
-CMD:cuffs(playerid, params[])
-{
-    SetPlayerSpecialAction(playerid, SPECIAL_ACTION_CUFFED);
-    SetPlayerAttachedObject(playerid, 9, 19418, 6, -0.011000, 0.028000, -0.022000, -15.600012, -33.699977, -81.700035, 0.891999, 1.000000, 1.168000);
-    return 1;
-}
 	CMD:carjacked1(playerid, params[])
 	{
 		LoopAnimation(playerid, "PED", "CAR_jackedLHS", 4.0, 0, 1, 1, 1, 0);

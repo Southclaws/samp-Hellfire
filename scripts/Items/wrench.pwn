@@ -15,7 +15,7 @@ hook OnPlayerConnect(playerid)
 
 hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
-	if(GetPlayerItemType(playerid) == item_Wrench)
+	if(GetItemType(GetPlayerItem(playerid)) == item_Wrench)
 	{
 		if(newkeys == 16)
 		{

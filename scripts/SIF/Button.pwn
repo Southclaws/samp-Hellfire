@@ -48,7 +48,7 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 		The functions that control the core features of this script.
 
 		native -
-		native - SIF/Button/Core Functions
+		native - SIF/Button/Core
 		native -
 
 		native CreateButton(Float:x, Float:y, Float:z, text[], world = 0, interior = 0, Float:areasize = 1.0, label = 0, labeltext[] = "", labelcolour = 0xFFFF00FF, Float:streamdist = 10.0)
@@ -240,7 +240,7 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 		the data directly. These include automatic ID validation checks.
 
 		native -
-		native - SIF/Button/Interface Functions
+		native - SIF/Button/Interface
 		native -
 
 		native IsValidButtonID(buttonid)
@@ -483,7 +483,7 @@ Float:		btn_attachAngleRange,
 }
 
 
-new
+static
 			btn_Data[MAX_BUTTON][E_BTN_DATA],
 Iterator:	btn_Index<MAX_BUTTON>,
 			btn_Pressing[MAX_PLAYERS];
@@ -547,9 +547,10 @@ stock CreateButton(Float:x, Float:y, Float:z, text[/*MAX_BUTTON_TEXT*/], world =
 	btn_Data[id][btn_link]				= INVALID_BUTTON_ID;
 
 	if(label)
-	{
 		btn_Data[id][btn_label] = CreateDynamic3DTextLabel(labeltext, labelcolour, x, y, z, streamdist, _, _, 1, world, interior, _, streamdist);
-	}
+
+	else
+		btn_Data[id][btn_label] = Text3D:INVALID_3DTEXT_ID;
 
 	Iter_Add(btn_Index, id);
 	return id;
@@ -558,22 +559,21 @@ stock DestroyButton(buttonid)
 {
 	if(!Iter_Contains(btn_Index, buttonid))return 0;
 
-	if(IsValidDynamicArea(btn_Data[buttonid][btn_area]))
-		DestroyDynamicArea(btn_Data[buttonid][btn_area]);
+	DestroyDynamicArea(btn_Data[buttonid][btn_area]);
 
 	if(IsValidDynamic3DTextLabel(btn_Data[buttonid][btn_label]))
 		DestroyDynamic3DTextLabel(btn_Data[buttonid][btn_label]);
 
-	btn_Data[buttonid][btn_area] = -1;
-	btn_Data[buttonid][btn_label] = Text3D:INVALID_3DTEXT_ID;
+	btn_Data[buttonid][btn_area]		= -1;
+	btn_Data[buttonid][btn_label]		= Text3D:INVALID_3DTEXT_ID;
 
-	btn_Data[buttonid][btn_posX]				= 0.0;
-	btn_Data[buttonid][btn_posY]				= 0.0;
-	btn_Data[buttonid][btn_posZ]				= 0.0;
-	btn_Data[buttonid][btn_world]				= 0;
-	btn_Data[buttonid][btn_interior]			= 0;
-	btn_Data[buttonid][btn_link]				= INVALID_BUTTON_ID;
-	btn_Data[buttonid][btn_text][0]			= EOS;
+	btn_Data[buttonid][btn_posX]		= 0.0;
+	btn_Data[buttonid][btn_posY]		= 0.0;
+	btn_Data[buttonid][btn_posZ]		= 0.0;
+	btn_Data[buttonid][btn_world]		= 0;
+	btn_Data[buttonid][btn_interior]	= 0;
+	btn_Data[buttonid][btn_link]		= INVALID_BUTTON_ID;
+	btn_Data[buttonid][btn_text][0]		= EOS;
 
 	foreach(new i : Player)
 		if(IsPlayerViewingMsgBox(i))
@@ -661,6 +661,7 @@ stock DetatchButtonFromVehicle(buttonid)
 
 	return 1;
 }
+
 
 /*==============================================================================
 
@@ -783,6 +784,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 			break;
 		}
 	}
+
 	return CallLocalFunction("btn_OnPlayerEnterDynamicArea", "dd", playerid, areaid);
 }
 #if defined _ALS_OnPlayerEnterDynamicArea
@@ -805,6 +807,7 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 			break;
 		}
 	}
+
 	return CallLocalFunction("btn_OnPlayerLeaveDynamicArea", "dd", playerid, areaid);
 }
 #if defined _ALS_OnPlayerLeaveDynamicArea

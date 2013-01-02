@@ -1,5 +1,6 @@
 #define ADD_LOOT(%0,%1);	LootTable[%0][loot_index[%0]++] = %1;
 
+#define LOOT_TYPE_NONE		(-1)
 #define LOOT_TYPE_LOW		(0)
 #define LOOT_TYPE_MEDIUM	(1)
 #define LOOT_TYPE_HIGH		(2)
@@ -22,30 +23,27 @@ public OnLoad()
 	ADD_LOOT(LOOT_TYPE_LOW, item_Crowbar);
 	ADD_LOOT(LOOT_TYPE_LOW, item_Hammer);
 	ADD_LOOT(LOOT_TYPE_LOW, item_Flashlight);
-	ADD_LOOT(LOOT_TYPE_LOW, item_Taser);
 	ADD_LOOT(LOOT_TYPE_LOW, item_LaserPoint);
 	ADD_LOOT(LOOT_TYPE_LOW, item_Screwdriver);
 	ADD_LOOT(LOOT_TYPE_LOW, item_MobilePhone);
 	ADD_LOOT(LOOT_TYPE_LOW, item_Pager);
 	ADD_LOOT(LOOT_TYPE_LOW, item_Rake);
 	ADD_LOOT(LOOT_TYPE_LOW, item_HotDog);
-	ADD_LOOT(LOOT_TYPE_LOW, item_EasterEgg1);
-	ADD_LOOT(LOOT_TYPE_LOW, item_EasterEgg2);
-	ADD_LOOT(LOOT_TYPE_LOW, item_EasterEgg3);
-	ADD_LOOT(LOOT_TYPE_LOW, item_EasterEgg4);
-	ADD_LOOT(LOOT_TYPE_LOW, item_EasterEgg5);
+	ADD_LOOT(LOOT_TYPE_LOW, item_EasterEgg);
 	ADD_LOOT(LOOT_TYPE_LOW, item_Cane);
-	ADD_LOOT(LOOT_TYPE_LOW, item_HandCuffs);
 	ADD_LOOT(LOOT_TYPE_LOW, item_Bucket);
-	ADD_LOOT(LOOT_TYPE_LOW, item_GasMask);
 
+	ADD_LOOT(LOOT_TYPE_MEDIUM, item_Taser);
+	ADD_LOOT(LOOT_TYPE_MEDIUM, item_GasMask);
 	ADD_LOOT(LOOT_TYPE_MEDIUM, item_Medkit);
 	ADD_LOOT(LOOT_TYPE_MEDIUM, item_timer);
-	ADD_LOOT(LOOT_TYPE_MEDIUM, item_explosive);
 	ADD_LOOT(LOOT_TYPE_MEDIUM, item_battery);
 	ADD_LOOT(LOOT_TYPE_MEDIUM, item_HealthRegen);
-	ADD_LOOT(LOOT_TYPE_MEDIUM, item_ArmourRegen);
-	ADD_LOOT(LOOT_TYPE_MEDIUM, item_Shield);
+
+	ADD_LOOT(LOOT_TYPE_HIGH, item_explosive);
+	ADD_LOOT(LOOT_TYPE_HIGH, item_ArmourRegen);
+	ADD_LOOT(LOOT_TYPE_HIGH, item_Shield);
+	ADD_LOOT(LOOT_TYPE_HIGH, item_HandCuffs);
 
 	// Weapons
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_KNUCKLES);
@@ -57,10 +55,6 @@ public OnLoad()
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_POOLCUE);
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_KANTANA);
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_CHAINSAW);
-	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_DILDO1);
-	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_DILDO2);
-	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_DILDO3);
-	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_DILDO4);
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_FLOWERS);
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_CANE);
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_SPRAYCAN);
@@ -93,15 +87,15 @@ public OnLoad()
 	ADD_LOOT(LOOT_TYPE_HIGH, ItemType:WEAPON_NIGHTVISION);
 	ADD_LOOT(LOOT_TYPE_HIGH, ItemType:WEAPON_THERMALVISION);
 
-	return CallLocalFunction("misc_OnLoad", "");
+	return CallLocalFunction("loot_OnLoad", "");
 }
 #if defined _ALS_OnLoad
     #undef OnLoad
 #else
     #define _ALS_OnLoad
 #endif
-#define OnLoad misc_OnLoad
-forward misc_OnLoad();
+#define OnLoad loot_OnLoad
+forward loot_OnLoad();
 
 
 ItemType:GenerateLoot(type)

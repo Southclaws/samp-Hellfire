@@ -48,7 +48,7 @@ public OnPlayerUseItem(playerid, itemid)
 #define OnPlayerUseItem pack_OnPlayerUseItem
 forward pack_OnPlayerUseItem(playerid, itemid);
 
-public OnPlayerOpenInventory(playerid, list[])
+public OnPlayerOpenInventory(playerid)
 {
 	if(IsValidItem(gPlayerBackpack[playerid]))
 	{

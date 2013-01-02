@@ -12,9 +12,12 @@ ItemType:	cft_result
 }
 
 
-new 
+static 
 ItemType:	cft_Data[CFT_MAX_COMBO][E_CRAFT_COMBO_DATA],
 Iterator:	cft_Index<CFT_MAX_COMBO>;
+
+static
+			cft_SelectedInvSlot[MAX_PLAYERS];
 
 
 forward ItemType:GetItemComboResult(ItemType:item1, ItemType:item2);
@@ -35,31 +38,60 @@ DefineItemCombo(ItemType:item1, ItemType:item2, ItemType:result)
 	return id;
 }
 
+public OnPlayerViewInventoryOptions(playerid)
+{
+	AddInventoryOption("Combine");
+}
+public OnPlayerSelectInventoryOption(playerid, option)
+{
+	if(option == 0)
+	{
+		cft_SelectedInvSlot[playerid] = GetPlayerSelectedInventorySlot(playerid);
+
+		DisplayCombineInventory(playerid);
+	}
+}
+
+DisplayCombineInventory(playerid)
+{
+	new
+		list[INV_MAX_SLOTS * (MAX_ITEM_NAME + 1)],
+		tmp[MAX_ITEM_NAME];
+	
+	for(new i; i < INV_MAX_SLOTS; i++)
+	{
+		if(!IsValidItem(GetInventorySlotItem(playerid, i)))
+			strcat(list, "<Empty>\n");
+
+		else
+		{
+			GetItemTypeName(GetItemType(GetInventorySlotItem(playerid, i)), tmp);
+			strcat(list, tmp);
+			strcat(list, "\n");
+		}
+	}
+
+	ShowPlayerDialog(playerid, d_InventoryCombine, DIALOG_STYLE_LIST, "Inventory", list, "Combine", "Close");
+}
+
 hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
 	if(dialogid == d_InventoryCombine)
 	{
-		// If the player clicks the other button, "cancel".
-		if(!response)
-		{
-			DisplayPlayerInventory(playerid, d_Inventory, "Options");
-			return 1;
-		}
-
 		// If the player picks the same inventory item as the one he is trying to combine
 		// Or if he picks an empty slot, re-render the dialog.
 		// You can't combine something with itself or nothing, that's like dividing by zero!
 
-		if(listitem == inv_SelectedSlot[playerid] || !IsInventorySlotUsed(playerid, listitem))
+		if(listitem == GetPlayerSelectedInventorySlot(playerid) || !IsInventorySlotUsed(playerid, listitem))
 		{
-			DisplayPlayerInventory(playerid, d_InventoryCombine, "Combine");
+			DisplayCombineInventory(playerid);
 			return 1;
 		}
 
 		// Get the item combination result, AKA the item that the two items will create.
 
 		new ItemType:result = GetItemComboResult(
-			GetItemType(GetInventorySlotItem(playerid, inv_SelectedSlot[playerid])),
+			GetItemType(GetInventorySlotItem(playerid, GetPlayerSelectedInventorySlot(playerid))),
 			GetItemType(GetInventorySlotItem(playerid, listitem)) );
 
 		// The above function returns an invalid item if there is no combination
@@ -69,32 +101,33 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			new newitem = CreateItem(result, 0.0, 0.0, 0.0);
 
-			DestroyItem(GetInventorySlotItem(playerid, inv_SelectedSlot[playerid]));
+			DestroyItem(GetInventorySlotItem(playerid, GetPlayerSelectedInventorySlot(playerid)));
 			DestroyItem(GetInventorySlotItem(playerid, listitem));
 
 			// Remove from the highest slot first
 			// Because the remove code shifts other inventory items up by 1 slot.
 
-			if(inv_SelectedSlot[playerid] > listitem)
+			if(GetPlayerSelectedInventorySlot(playerid) > listitem)
 			{
-				RemoveItemFromInventory(playerid, inv_SelectedSlot[playerid]);
+				RemoveItemFromInventory(playerid, GetPlayerSelectedInventorySlot(playerid));
 				RemoveItemFromInventory(playerid, listitem);
 			}
 			else
 			{
 				RemoveItemFromInventory(playerid, listitem);
-				RemoveItemFromInventory(playerid, inv_SelectedSlot[playerid]);
+				RemoveItemFromInventory(playerid, GetPlayerSelectedInventorySlot(playerid));
 			}
 
 			AddItemToInventory(playerid, newitem);
 
-			DisplayPlayerInventory(playerid, d_Inventory, "Options");
+			DisplayPlayerInventory(playerid);
 		}
 
 		// If it's not valid, re-render the dialog.
 
-		else DisplayPlayerInventory(playerid, d_InventoryCombine, "Combine");
+		else DisplayCombineInventory(playerid);
 	}
+
 	return 1;
 }
 

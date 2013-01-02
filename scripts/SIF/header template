@@ -5,6 +5,9 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 
 	SIF/Overview
 	{
+		SIF is a collection of high-level include scripts to make the
+		development of interactive features easy for the developer while
+		maintaining quality front-end gameplay for players.
 	}
 
 	SIF/FILENAME/Description
@@ -13,8 +16,10 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 
 	SIF/FILENAME/Dependencies
 	{
-		Streamer Plugin					- Incognito
-		YSI\y_hooks						- Y_Less
+		SIF/Button
+		Streamer Plugin
+		YSI\y_hooks
+		YSI\y_timers
 	}
 
 	SIF/FILENAME/Credits
@@ -29,19 +34,64 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 	{
 		The functions that control the core features of this script.
 
+		native -
+		native - SIF/FILENAME/Core
+		native -
+
+		native Func(params)
+		{
+			Description:
+				-
+
+			Parameters:
+				-
+
+			Returns:
+				-
+		}
 	}
 
 	SIF/FILENAME/Events
 	{
 		Events called by player actions done by using features from this script.
 
+		native -
+		native - SIF/FILENAME/Callbacks
+		native -
+
+		native Func(params)
+		{
+			Called:
+				-
+
+			Parameters:
+				-
+
+			Returns:
+				-
+		}
 	}
 
 	SIF/FILENAME/Interface Functions
 	{
 		Functions to get or set data values in this script without editing
 		the data directly. These include automatic ID validation checks.
-	
+
+		native -
+		native - SIF/FILENAME/Interface
+		native -
+
+		native Func(params)
+		{
+			Description:
+				-
+
+			Parameters:
+				-
+
+			Returns:
+				-
+		}
 	}
 
 	SIF/FILENAME/Internal Functions
@@ -49,6 +99,11 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 		Internal events called by player actions done by using features from
 		this script.
 	
+		Func(params)
+		{
+			Description:
+				-
+		}
 	}
 
 	SIF/FILENAME/Hooks
@@ -56,6 +111,11 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 		Hooked functions or callbacks, either SA:MP natives or from other
 		scripts or plugins.
 
+		SAMP/OnPlayerSomething
+		{
+			Reason:
+				-
+		}
 	}
 
 ==============================================================================*/
@@ -66,3 +126,33 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 	Setup
 
 ==============================================================================*/
+
+
+/*==============================================================================
+
+	Zeroing
+
+==============================================================================*/
+
+
+/*==============================================================================
+
+	Core Functions
+
+==============================================================================*/
+
+
+/*==============================================================================
+
+	Internal Functions and Hooks
+
+==============================================================================*/
+
+
+/*==============================================================================
+
+	Interface
+
+==============================================================================*/
+
+

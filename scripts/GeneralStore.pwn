@@ -33,7 +33,8 @@ enum E_STORE_ITEM_DATA
 {
 bool:		item_used,
 ItemType:	item_type,
-			item_price
+			item_price,
+			item_extradata
 }
 
 
@@ -76,16 +77,17 @@ CreateShop(name[], ItemIndex:itemindex, Float:x, Float:y, Float:z, Float:itemx, 
 
 	return id;
 }
-DefineStoreIndexItem(ItemIndex:itemindex, ItemType:itemid, price)
+DefineStoreIndexItem(ItemIndex:itemindex, ItemType:itemid, price, extradata = 0)
 {
 	new id;
 	while(id < MAX_ITEM_INDEX_ITEMS && shp_ItemIndex[itemindex][id][item_used])id++;
 	if(id == MAX_ITEM_INDEX_ITEMS)
 		return -1;
 
-	shp_ItemIndex[itemindex][id][item_price] = price;
-	shp_ItemIndex[itemindex][id][item_type] = itemid;
 	shp_ItemIndex[itemindex][id][item_used] = true;
+	shp_ItemIndex[itemindex][id][item_type] = itemid;
+	shp_ItemIndex[itemindex][id][item_price] = price;
+	shp_ItemIndex[itemindex][id][item_extradata] = extradata;
 
 	shp_ItemIndexSize[itemindex]++;
 
@@ -134,6 +136,8 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				shp_Data[shp_CurrentShop[playerid]][shp_itemX],
 				shp_Data[shp_CurrentShop[playerid]][shp_itemY],
 				shp_Data[shp_CurrentShop[playerid]][shp_itemZ]);
+
+			SetItemExtraData(shp_Data[shp_CurrentShop[playerid]][shp_itemid], shp_ItemIndex[index][listitem][item_extradata]);
 
 			DestroyButton(shp_Data[shp_CurrentShop[playerid]][shp_button]);
 			shp_Data[shp_CurrentShop[playerid]][shp_button] = INVALID_BUTTON_ID;

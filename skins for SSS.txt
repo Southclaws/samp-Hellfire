@@ -1,0 +1,27 @@
+skins for SSS.txt
+
+
+male:
+	60 - Normal Male
+	133 - Hero Male
+	33 - Bandit Male
+	50 - Mechanic Male
+
+female
+	192 - Normal Female
+	191 - Hero Female
+	298 - Mechanic Female
+	131 - Bandit Female
+
+
+other
+	170
+	188
+	26 - traveller - go so far
+	29 - not ot be trusted
+	101 - normal?
+	206 - possible hero skin
+
+	65 - mech?
+	93 - normal female?
+	191 - normal?

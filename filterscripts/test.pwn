@@ -2,7 +2,7 @@
 #include <YSI\y_va>
 #include <formatex>
 #include "../scripts/System/PlayerFunctions.pwn"
-#include "../scripts/Releases/Camera Sequencer/CameraMover.inc"
+//#include "../scripts/API/Camera Sequencer/CameraMover.inc"
 #include <zcmd>
 #include <streamer>
 #include <colours>
@@ -10,11 +10,15 @@
 #undef MAX_PLAYERS
 #define MAX_PLAYERS 16
 
-new camid;
+
+main()
+{
+	print("FS");
+}
 
 public OnFilterScriptInit()
 {
-	camid = LoadCameraMover("test");
+	print("FS");
 	return 1;
 }
 public OnFilterScriptExit()
@@ -26,7 +30,6 @@ public OnPlayerConnect(playerid)
 
 CMD:cameratest(playerid, params[])
 {
-	PlayCameraMover(playerid, camid);
 	return 1;
 }
 
@@ -46,7 +49,7 @@ CMD:vcount(playerid, params[])
 {
 	new count;
 	for(new i;i<MAX_VEHICLES;i++)if(IsValidVehicle(i))count++;
-	msgF(playerid, -1, "Total Vehicles: %d", count);
+	MsgF(playerid, -1, "Total Vehicles: %d", count);
 	return 1;
 }
 CMD:vdel(playerid, params[])
@@ -75,7 +78,7 @@ CMD:gotov(playerid, p[])
 	GetVehiclePos(id, x, y, z);
 	SetPlayerPos(id, x, y, z+2.0);
 
-	msgF(playerid, -1, "Going to vehicle %d", id);
+	MsgF(playerid, -1, "Going to vehicle %d", id);
 	return 1;
 }
 
@@ -156,4 +159,11 @@ CMD:weplevel(playerid, params[])
 
 
 
+
+CMD:skin(playerid, params[])
+{
+	SetPlayerSkin(playerid, strval(params));
+
+	return 1;
+}
 

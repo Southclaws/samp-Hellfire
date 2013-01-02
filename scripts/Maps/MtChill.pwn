@@ -24,7 +24,7 @@ public OnLoad()
 	new buttons[1];
 
 
-	ch_gate = CreateButton(-2307.81, -1650.67, 484.36, "Press F to activate", FREEROAM_WORLD);
+	ch_gate = CreateButton(-2307.81, -1650.67, 484.36, "Press F to activate", 0);
 
 	buttons[0] = ch_gate;
 
@@ -34,7 +34,7 @@ public OnLoad()
 		.maxbuttons = 1, .movespeed = 1.0, .closedelay = -1);
 
 
-	ch_doorBtn = CreateButton(-2311.4900, -1647.7000, 484.3600, "Press F to use", FREEROAM_WORLD, 0);
+	ch_doorBtn = CreateButton(-2311.4900, -1647.7000, 484.3600, "Press F to use", 0, 0);
 
 	buttons[0] = ch_doorBtn;
 
@@ -54,6 +54,10 @@ public OnLoad()
 	#pragma unused ch_walton
 
 	ch_doorstate = false;
+
+	AddItemToContainer(
+		CreateContainer("Generator", 6, -2318.9067, -1636.5662, 483.7031),
+		CreateItem(item_Medkit, -2322.9257, -1639.8038, 483.7031));
 
 	return CallLocalFunction("mtchil_OnLoad", "");
 }

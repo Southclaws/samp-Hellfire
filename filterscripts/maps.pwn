@@ -162,11 +162,11 @@ LoadMap(mapfile[])
 		if(!sscanf(str, "p<(>{s[20]}p<,>dfffffp<)>f{s[4]}",
 			modelid, data[0], data[1], data[2], data[3], data[4], data[5]))
 		{
-			//For finding missing objects
 			/*
-		    */
-		    new Float:d=Distance(data[0], data[1], data[2], -260.7864, 1192.7984, 19.7559);
-		    if(d<=50)printf("obj found in '%s' id: %d", filename, modelid);
+			//For finding missing objects
+			new Float:d=Distance(data[0], data[1], data[2], -260.7864, 1192.7984, 19.7559);
+			if(d<=50)printf("obj found in '%s' id: %d", filename, modelid);
+			*/
 
 			tmpObjID = CreateDynamicObject(modelid, data[0], data[1], data[2], data[3], data[4], data[5], world, interior, _, streamdist);
 			obj_GlobalID++;
