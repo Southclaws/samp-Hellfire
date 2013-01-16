@@ -1,7 +1,8 @@
 #include <YSI\y_hooks>
 
+#if defined AddCashText
 
-GivePlayerMoneyEx(playerid, money)
+stock GivePlayerMoneyEx(playerid, money)
 {
 	new
 		tmpstr[16],
@@ -29,7 +30,11 @@ timer HideCashText[2000](playerid)
 }
 #define GivePlayerMoney GivePlayerMoneyEx
 
-GivePlayerScore(playerid, score)
+#endif
+
+#if defined AddScoreText
+
+stock GivePlayerScore(playerid, score)
 {
 	new
 		tmpstr[16],
@@ -56,14 +61,5 @@ timer HideScoreText[2000](playerid)
 	PlayerTextDrawHide(playerid, AddScoreText);
 }
 
+#endif
 
-CMD:givemoney(playerid, params[])
-{
-	GivePlayerMoney(playerid, strval(params));
-	return 1;
-}
-CMD:givescore(playerid, params[])
-{
-	GivePlayerScore(playerid, strval(params));
-	return 1;
-}

@@ -2,32 +2,19 @@
 
 #include <a_samp>
 #include <ZCMD>
-#include <YSI\y_timers>
 
 
-new
-	gPlayerFps[MAX_PLAYERS];
-
-public OnFilterScriptInit()
+CMD:fps(playerid, params[])
 {
-	for(new i;i<MAX_PLAYERS;i++)
-	{
-		if(IsPlayerConnected(i))
-		{
-		    repeat UpdateFps(i);
-		}
-	}
+	new id = CreateObject(19300, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	AttachObjectToPlayer(id, playerid, 0.0, 0.0, 0.75, 0.0, 0.0, 0.0);
+	AttachCameraToObject(playerid, id);
+
+	return 1;
 }
 
-timer UpdateFps[5000](playerid)
+CMD:recam(playerid, params[])
 {
-	gPlayerFps[playerid] = GetPlayerDrunkLevel(playerid);
-	SetPlayerDrunkLevel(playerid, 1000);
-	
-	new str[128];
-	format(str, 128, "~n~~n~~n~%d", gPlayerFps[playerid]);
-	GameTextForPlayer(playerid, str, 5500, 5);
+	SetCameraBehindPlayer(playerid);
+	return 1;
 }
-
-
-

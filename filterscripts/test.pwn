@@ -160,10 +160,19 @@ CMD:weplevel(playerid, params[])
 
 
 
-CMD:skin(playerid, params[])
+CMD:vhp(playerid, params[])
 {
-	SetPlayerSkin(playerid, strval(params));
+	SetVehicleHealth(GetPlayerVehicleID(playerid), strval(params));
 
 	return 1;
 }
 
+CMD:nos(playerid,params[])
+{
+	if(!IsPlayerInAnyVehicle(playerid))
+		SendClientMessage(playerid,-1,"You are not in a vehicle.");
+
+	AddVehicleComponent(GetPlayerVehicleID(playerid), 1010);
+
+	return 1;
+}

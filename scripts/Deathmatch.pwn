@@ -1961,7 +1961,7 @@ RankCheck(playerid)
 
 	if(result > currentrank)
 	{
-		LevelUpWeaponSkills(playerid, pRank(playerid)*100);
+		SetAllWeaponSkills(playerid, pRank(playerid)*100);
 		pRank(playerid) = result;
 	}
 	return 0;

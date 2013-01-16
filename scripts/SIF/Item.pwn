@@ -614,7 +614,7 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 				0
 					If the entered item ID handle is invalid.
 		}
-		native SetItemRotation(itemid, Float:rx, Float:ry, Float:rz)
+		native SetItemRot(itemid, Float:rx, Float:ry, Float:rz, bool:offsetfromdefaults)
 		{
 			Description:
 				Sets the rotation of a world item object regardless of the item
@@ -626,6 +626,10 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 
 				<rx>, <ry>, <rz> (float, euler angles)
 					The rotation values to set the object to.
+
+				<offsetfromdefaults> (boolean)
+					Set to true to turn the entered values into offsets from the
+					default rotation values of the item type.
 
 			Returns:
 				0
@@ -1241,8 +1245,11 @@ GiveWorldItemToPlayer(playerid, itemid, call)
 
 	if(call)
 	{
-		if(CallLocalFunction("OnPlayerPickUpItem", "dd", playerid, itemid))return 0;
-		if(!Iter_Contains(itm_Index, itemid))return 0;
+		if(CallLocalFunction("OnPlayerPickedUpItem", "dd", playerid, itemid))
+			return 0;
+
+		if(!Iter_Contains(itm_Index, itemid))
+			return 0;
 	}
 
 	itm_Data[itemid][itm_posX]		= 0.0;
@@ -1389,7 +1396,7 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				if(i == playerid || itm_Holding[i] != INVALID_ITEM_ID || itm_Interacting[i] != INVALID_ITEM_ID)
 					continue;
 
-				if(IsPlayerInDynamicArea(playerid, gPlayerArea[i]) && !IsPlayerInAnyVehicle(i))
+				if(IsPlayerInDynamicArea(playerid, gPlayerArea[i]))
 				{
 					PlayerGiveItem(playerid, i, 1);
 					return 1;
@@ -1446,8 +1453,6 @@ public OnPlayerLeavePlayerArea(playerid, targetid)
 #define OnPlayerLeavePlayerArea itm_OnPlayerLeavePlayerArea
 forward itm_OnPlayerLeavePlayerArea(playerid, targetid);
 
-
-
 internal_OnPlayerUseItem(playerid, itemid)
 {
 	new buttonid = GetPlayerButtonID(playerid);
@@ -1462,7 +1467,8 @@ internal_OnPlayerUseItem(playerid, itemid)
 public OnButtonPress(playerid, buttonid)
 {
 	print("OnButtonPress <Item Script>");
-	if(!IsPlayerInAnyVehicle(playerid) && itm_Interacting[playerid] == INVALID_ITEM_ID)
+
+	if(itm_Interacting[playerid] == INVALID_ITEM_ID)
 	{
 		new item = itm_Holding[playerid];
 
@@ -1699,11 +1705,23 @@ stock SetItemPos(itemid, Float:x, Float:y, Float:z)
 
 	return 1;
 }
-stock SetItemRotation(itemid, Float:rx, Float:ry, Float:rz)
+stock SetItemRot(itemid, Float:rx, Float:ry, Float:rz, bool:offsetfromdefaults = false)
 {
-	if(!Iter_Contains(itm_Index, itemid))return 0;
-	if(!Iter_Contains(itm_WorldIndex, itemid))return 0;
-	SetDynamicObjectRot(itm_Data[itemid][itm_objId], rx, ry, rz);
+	if(!Iter_Contains(itm_Index, itemid))
+		return 0;
+
+	if(!Iter_Contains(itm_WorldIndex, itemid))
+		return 0;
+
+	if(offsetfromdefaults)
+		SetDynamicObjectRot(itm_Data[itemid][itm_objId],
+			itm_TypeData[itm_Data[itemid][itm_type]][itm_rotX]+rx,
+			itm_TypeData[itm_Data[itemid][itm_type]][itm_rotY]+ry,
+			itm_TypeData[itm_Data[itemid][itm_type]][itm_rotZ]+rz);
+
+	else
+		SetDynamicObjectRot(itm_Data[itemid][itm_objId], rx, ry, rz);
+
 	return 1;	
 }
 

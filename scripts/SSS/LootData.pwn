@@ -6,7 +6,7 @@
 #define LOOT_TYPE_HIGH		(2)
 
 new
-	ItemType:LootTable[3][64],
+	ItemType:LootTable[3][128],
 	loot_index[3];
 
 
@@ -32,6 +32,8 @@ public OnLoad()
 	ADD_LOOT(LOOT_TYPE_LOW, item_EasterEgg);
 	ADD_LOOT(LOOT_TYPE_LOW, item_Cane);
 	ADD_LOOT(LOOT_TYPE_LOW, item_Bucket);
+	ADD_LOOT(LOOT_TYPE_LOW, item_Flag);
+	ADD_LOOT(LOOT_TYPE_LOW, item_Satchel);
 
 	ADD_LOOT(LOOT_TYPE_MEDIUM, item_Taser);
 	ADD_LOOT(LOOT_TYPE_MEDIUM, item_GasMask);
@@ -39,11 +41,21 @@ public OnLoad()
 	ADD_LOOT(LOOT_TYPE_MEDIUM, item_timer);
 	ADD_LOOT(LOOT_TYPE_MEDIUM, item_battery);
 	ADD_LOOT(LOOT_TYPE_MEDIUM, item_HealthRegen);
+	ADD_LOOT(LOOT_TYPE_MEDIUM, item_Wheel);
+	ADD_LOOT(LOOT_TYPE_MEDIUM, item_Canister1);
+	ADD_LOOT(LOOT_TYPE_MEDIUM, item_Canister2);
+	ADD_LOOT(LOOT_TYPE_MEDIUM, item_Canister3);
+	ADD_LOOT(LOOT_TYPE_MEDIUM, item_MotionSense);
 
 	ADD_LOOT(LOOT_TYPE_HIGH, item_explosive);
 	ADD_LOOT(LOOT_TYPE_HIGH, item_ArmourRegen);
 	ADD_LOOT(LOOT_TYPE_HIGH, item_Shield);
 	ADD_LOOT(LOOT_TYPE_HIGH, item_HandCuffs);
+	ADD_LOOT(LOOT_TYPE_HIGH, item_Backpack);
+	ADD_LOOT(LOOT_TYPE_HIGH, item_CapCase);
+	ADD_LOOT(LOOT_TYPE_HIGH, item_CapMineBad);
+	ADD_LOOT(LOOT_TYPE_HIGH, item_CapMine);
+
 
 	// Weapons
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_KNUCKLES);
@@ -52,9 +64,6 @@ public OnLoad()
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_KNIFE);
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_BASEBALLBAT);
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_SHOVEL);
-	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_POOLCUE);
-	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_KANTANA);
-	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_CHAINSAW);
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_FLOWERS);
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_CANE);
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_SPRAYCAN);
@@ -62,6 +71,8 @@ public OnLoad()
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_CAMERA);
 	ADD_LOOT(LOOT_TYPE_LOW, ItemType:WEAPON_PARACHUTE);
 
+	ADD_LOOT(LOOT_TYPE_MEDIUM, ItemType:WEAPON_KANTANA);
+	ADD_LOOT(LOOT_TYPE_MEDIUM, ItemType:WEAPON_CHAINSAW);
 	ADD_LOOT(LOOT_TYPE_MEDIUM, ItemType:WEAPON_COLT45);
 	ADD_LOOT(LOOT_TYPE_MEDIUM, ItemType:WEAPON_COLT45SD);
 	ADD_LOOT(LOOT_TYPE_MEDIUM, ItemType:WEAPON_DESERTEAGLE);
@@ -87,6 +98,10 @@ public OnLoad()
 	ADD_LOOT(LOOT_TYPE_HIGH, ItemType:WEAPON_NIGHTVISION);
 	ADD_LOOT(LOOT_TYPE_HIGH, ItemType:WEAPON_THERMALVISION);
 
+	printf("Loot Index LOW size: %d", loot_index[LOOT_TYPE_LOW]);
+	printf("Loot Index MED size: %d", loot_index[LOOT_TYPE_MEDIUM]);
+	printf("Loot Index HIG size: %d", loot_index[LOOT_TYPE_HIGH]);
+
 	return CallLocalFunction("loot_OnLoad", "");
 }
 #if defined _ALS_OnLoad
@@ -111,7 +126,7 @@ ItemType:GenerateLoot(type)
 
 	if(!IsValidItemType(id))
 	{
-		printf("INVALID ITEM IN LOOT TABLE! INDEX: %d ID: %d", index, _:id);
+		printf("ERROR: Invalid item type in loot table %d: cell: %d ID: %d", type, index, _:id);
 		return INVALID_ITEM_TYPE;		
 	}
 

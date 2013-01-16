@@ -88,10 +88,7 @@ stock abs(int)
 */
 stock Float:absoluteangle(Float:angle)
 {
-	while(!(0.0 <= angle <= 360.0))
-	{
-		if(angle < 0.0)angle += 360.0;
-		if(angle > 360.0)angle -= 360.0;
-	}
+	while(angle < 0.0)angle += 360.0;
+	while(angle > 360.0)angle -= 360.0;
 	return angle;
 }

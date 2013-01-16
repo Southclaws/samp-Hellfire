@@ -1,5 +1,4 @@
 #include <a_samp>
-#include <a_npc>
 
 #undef MAX_PLAYERS
 #define MAX_PLAYERS 16
@@ -16,6 +15,10 @@
 #include <streamer>
 #include <colours>
 #include <RNPC>
+
+
+#define SetSpawn(%0,%1,%2,%3,%4)	SetSpawnInfo(%0, NO_TEAM, 0, %1, %2, %3, %4, 0,0,0,0,0,0)
+
 
 new
 	Float:gNpcIdlePos[3][4]=
@@ -76,6 +79,10 @@ new
 
 public OnFilterScriptInit()
 {
+	defer load();
+}
+timer load[5000]()
+{
 	gNpcId[0] = ConnectRNPC(gNpcName[0]);
 	gNpcId[1] = ConnectRNPC(gNpcName[1]);
 	gNpcId[2] = ConnectRNPC(gNpcName[2]);
@@ -92,6 +99,20 @@ public OnFilterScriptExit()
 
 public OnPlayerConnect(playerid)
 {
+	return 1;
+}
+
+public OnPlayerRequestClass(playerid, classid)
+{
+	SetSpawn(playerid, -907.5452, 272.7235, 1014.1449, 0.0);
+
+	return 0;
+}
+public OnPlayerRequestSpawn(playerid)
+{
+	SetSpawn(playerid, -907.5452, 272.7235, 1014.1449, 0.0);
+
+	return 1;
 }
 
 public OnPlayerSpawn(playerid)

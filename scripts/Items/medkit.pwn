@@ -44,36 +44,17 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				}
 				ClearAnimations(playerid);
 			}
-			else
-			{
-				if(IsPlayerConnected(gPlayerMedkitTarget[playerid]) && gPlayerMedkitTarget[playerid] != playerid)
-					PlayerGiveItem(playerid, gPlayerMedkitTarget[playerid], 0);
-			}
 		}
 	}
     return 1;
 }
 
 
-public OnPlayerGiveItem(playerid, targetid, itemid)
-{
-	if(GetItemType(itemid) == item_Medkit)return 1;
-    return CallLocalFunction("med_OnPlayerGiveItem", "ddd", playerid, targetid, itemid);
-}
-#if defined _ALS_OnPlayerGiveItem
-    #undef OnPlayerGiveItem
-#else
-    #define _ALS_OnPlayerGiveItem
-#endif
-#define OnPlayerGiveItem med_OnPlayerGiveItem
-forward med_OnPlayerGiveItem(playerid, targetid, itemid);
-
-
 public OnPlayerEnterPlayerArea(playerid, targetid)
 {
 	if(GetItemType(GetPlayerItem(playerid)) == item_Medkit)
 	{
-		ShowMsgBox(playerid, "Tap F to give medkit~n~Hold F to heal");
+		ShowMsgBox(playerid, "Press N to give~n~Hold F to heal");
 	}
     return CallLocalFunction("med_OnPlayerEnterPlayerArea", "dd", playerid, targetid);
 }

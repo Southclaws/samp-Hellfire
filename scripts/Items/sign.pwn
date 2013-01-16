@@ -8,7 +8,7 @@ enum E_SIGN_DATA
 			sgn_object,
 			sgn_button,
 			sgn_text[MAX_SIGN_TEXT],
-			sgn_owner,
+			sgn_owner[MAX_PLAYER_NAME],
 Float:		sgn_posX,
 Float:		sgn_posY,
 Float:		sgn_posZ,
@@ -39,7 +39,7 @@ stock CreateSign(playerid, text[MAX_SIGN_TEXT], Float:x, Float:y, Float:z, Float
 	sgn_Data[id][sgn_button] = CreateButton(x, y, z, "Press F to edit");
 
 	sgn_Data[id][sgn_text] = text;
-	sgn_Data[id][sgn_owner] = playerid;
+	GetPlayerName(playerid, sgn_Data[id][sgn_owner], MAX_PLAYER_NAME);
 	sgn_Data[id][sgn_posX] = x;
 	sgn_Data[id][sgn_posY] = y;
 	sgn_Data[id][sgn_posZ] = z;
@@ -62,7 +62,7 @@ stock DestroySign(signid)
 	DestroyButton(sgn_Data[signid][sgn_button]);
 
 	sgn_Data[signid][sgn_text] = text;
-	sgn_Data[signid][sgn_owner] = playerid;
+	sgn_Data[signid][sgn_owner][0] = EOS;
 	sgn_Data[signid][sgn_posX] = x;
 	sgn_Data[signid][sgn_posY] = y;
 	sgn_Data[signid][sgn_posZ] = z;
@@ -82,8 +82,7 @@ SetSignText(signid, text[])
 	if(!Iter_Contains(sgn_Index, signid))
 		return 0;
 
-	sgn_Data[signid][sgn_text][0] = EOS;
-	strcat(sgn_Data[signid][sgn_text], text);
+	strcpy(sgn_Data[signid][sgn_text], text, MAX_SIGN_TEXT);
 
 	SetDynamicObjectMaterialText(sgn_Data[signid][sgn_object], 0, text, OBJECT_MATERIAL_SIZE_512x512, "Arial", 72, 1, -16777216, -1, 1);
 

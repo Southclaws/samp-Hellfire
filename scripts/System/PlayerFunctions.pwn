@@ -144,7 +144,7 @@ stock MsgDeathmatchF(colour, fmat[], va_args<>)
 //==============================================================================Player Functions
 
 
-stock LevelUpWeaponSkills(playerid, skill)
+stock SetAllWeaponSkills(playerid, skill)
 {
 	SetPlayerSkillLevel(playerid, WEAPONSKILL_PISTOL,			100);
 	SetPlayerSkillLevel(playerid, WEAPONSKILL_PISTOL_SILENCED,	skill);

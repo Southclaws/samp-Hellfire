@@ -23,7 +23,7 @@ new
 ShowMapForPlayer(playerid, text[], Float:x, Float:y)
 {
 	new
-		mapBit[21],
+		mapbit[21],
 		Float:mapX,
 		Float:mapY;
 
@@ -33,12 +33,12 @@ ShowMapForPlayer(playerid, text[], Float:x, Float:y)
 		if(y > 0.0)
 		{
 			mapY = (y / 3000) * MAP_SIZE_Y;
-			mapBit = MAP_BIT_NE;
+			mapbit = MAP_BIT_NE;
 		}
 		else
 		{
 			mapY = ((y+3000) / 3000) * MAP_SIZE_Y;
-			mapBit = MAP_BIT_SE;
+			mapbit = MAP_BIT_SE;
 		}
 	}
 	else
@@ -47,15 +47,15 @@ ShowMapForPlayer(playerid, text[], Float:x, Float:y)
 		if(y > 0.0)
 		{
 			mapY = (y / 3000) * MAP_SIZE_Y;
-			mapBit = MAP_BIT_NW;
+			mapbit = MAP_BIT_NW;
 		}
 		else
 		{
 			mapY = ((y+3000) / 3000) * MAP_SIZE_Y;
-			mapBit = MAP_BIT_SW;
+			mapbit = MAP_BIT_SW;
 		}
 	}
-	PlayerTextDrawSetString(playerid, mapMain, mapBit);
+	PlayerTextDrawSetString(playerid, mapMain, mapbit);
 
     if(bPlayerGameSettings[playerid] & ViewingMap)PlayerTextDrawDestroy(playerid, mapText);
 

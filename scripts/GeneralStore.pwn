@@ -52,9 +52,10 @@ CreateShop(name[], ItemIndex:itemindex, Float:x, Float:y, Float:z, Float:itemx, 
 {
 	new id = Iter_Free(shp_Index);
 
+	if(id == -1)
+		return INVALID_SHOP_ID;
 
-	shp_Data[id][shp_name][0] = EOS;
-	strcat(shp_Data[id][shp_name], name);
+	strcpy(shp_Data[id][shp_name], name, MAX_STORE_NAME);
 	shp_Data[id][shp_itemIndex] = itemindex;
 
 	shp_Data[id][shp_button] = CreateButton(x, y, z, name, world, interior, 1.0, 1, name);

@@ -206,6 +206,11 @@ native WP_Hash(buffer[], len, const str[]);
 #define C_SPECIAL					"{0025AA}"
 
 
+#define ATTACHSLOT_ITEM				(0)
+#define ATTACHSLOT_USE				(1)
+#define ATTACHSLOT_HOLSTER			(2)
+#define ATTACHSLOT_HOLD				(3)
+
 //==============================================================SERVER VARIABLES
 
 
@@ -641,7 +646,6 @@ Float:	gPlayerHP				[MAX_PLAYERS],
 Float:	gPlayerAP				[MAX_PLAYERS],
 		gPlayerColour			[MAX_PLAYERS],
 		gPlayerVehicleID		[MAX_PLAYERS],
-		gPlayerArea				[MAX_PLAYERS],
 Float:	gPlayerVelocity			[MAX_PLAYERS],
 		gPlayerSpawnedVehicle	[MAX_PLAYERS],
 		gPlayerQuickChat		[MAX_PLAYERS][10][50],
@@ -729,12 +733,17 @@ forward OnDeath(playerid, killerid, reason);
 
 //======================API Scripts
 
+#include "../scripts/SIF/Core.pwn"
 #include "../scripts/SIF/Button.pwn"
 #include "../scripts/SIF/Door.pwn"
 #include "../scripts/SIF/Item.pwn"
 #include "../scripts/SIF/Inventory.pwn"
-#include "../scripts/SIF/Craft.pwn"
 #include "../scripts/SIF/Container.pwn"
+
+#include "../scripts/SIF/Modules/WeaponItems.pwn"
+#include "../scripts/SIF/Modules/Craft.pwn"
+#include "../scripts/SIF/Modules/Dispenser.pwn"
+
 
 #include "../scripts/API/Balloon/Balloon.pwn"
 #include "../scripts/API/Checkpoint/Checkpoint.pwn"
@@ -742,24 +751,18 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/API/Zipline/Zipline.pwn"
 #include "../scripts/API/Ladder/Ladder.pwn"
 #include "../scripts/API/Turret/Turret.pwn"
+#include "../scripts/API/SprayTag/SprayTag.pwn"
 
 #include "../scripts/Items/misc.pwn"
-#include "../scripts/Items/weapons.pwn"
 #include "../scripts/Items/firework.pwn"
 #include "../scripts/Items/medkit.pwn"
 #include "../scripts/Items/beer.pwn"
-#include "../scripts/Items/dispenser.pwn"
 #include "../scripts/Items/timebomb.pwn"
 #include "../scripts/Items/Sign.pwn"
 #include "../scripts/Items/adrenaline.pwn"
 #include "../scripts/Items/electroap.pwn"
 #include "../scripts/Items/briefcase.pwn"
 #include "../scripts/Items/backpack.pwn"
-#include "../scripts/Items/wrench.pwn"
-#include "../scripts/Items/shield.pwn"
-#include "../scripts/Items/handcuffs.pwn"
-
-//#include "../scripts/Items/loot.pwn"
 
 #include "../scripts/CountDown.pwn"
 
@@ -772,7 +775,6 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/Challenges.pwn"
 
 #include "../scripts/Road.pwn"
-#include "../scripts/SprayTag.pwn"
 #include "../scripts/Misc.pwn"
 #include "../scripts/Maps/Gen_LS.pwn"
 #include "../scripts/Maps/Gen_SF.pwn"
@@ -982,27 +984,6 @@ public OnGameModeInit()
 	item_Sign			= DefineItemType("Sign",			19471,	ITEM_SIZE_LARGE, 0.0, 0.0, 270.0);
 	item_HealthRegen	= DefineItemType("Adrenaline",		1575,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.262021, 0.014938, 0.000000, 279.040191, 352.944946, 358.980987);
 	item_ArmourRegen	= DefineItemType("ElectroArmour",	19515,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.300333, -0.090105, 0.000000, 0.000000, 0.000000, 180.000000);
-	item_FishRod		= DefineItemType("Fishing Rod",		18632,	ITEM_SIZE_LARGE, 0.0, 0.0, 0.0, 0.091496, 0.019614, 0.000000, 185.619995, 354.958374, 0.000000);
-	item_Wrench			= DefineItemType("Wrench",			18633,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.084695, -0.009181, 0.152275, 98.865089, 270.085449, 0.000000);
-	item_Crowbar		= DefineItemType("Crowbar",			18634,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.066177, 0.011153, 0.038410, 97.289527, 270.962554, 1.114514);
-	item_Hammer			= DefineItemType("Hammer",			18635,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.000000, -0.008230, 0.000000, 6.428617, 0.000000, 0.000000);
-	item_Shield			= DefineItemType("Shield",			18637,	ITEM_SIZE_LARGE, 0.0, 0.0, 0.0, -0.262389, 0.016478, -0.151046, 103.597534, 6.474381, 38.321765);
-	item_Flashlight		= DefineItemType("Flashlight",		18641,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.061910, 0.022700, 0.039052, 190.938354, 0.000000, 0.000000);
-	item_Taser			= DefineItemType("Taser",			18642,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.079878, 0.014009, 0.029525, 180.000000, 0.000000, 0.000000);
-	item_LaserPoint		= DefineItemType("Laser Pointer",	18643,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.066244, 0.010838, -0.000024, 6.443027, 287.441467, 0.000000);
-	item_Screwdriver	= DefineItemType("Screwdriver",		18644,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.099341, 0.021018, 0.009145, 193.644195, 0.000000, 0.000000);
-	item_MobilePhone	= DefineItemType("Mobile Phone",	18865,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.103904, -0.003697, -0.015173, 94.655189, 184.031860, 0.000000);
-	item_Pager			= DefineItemType("Pager",			18875,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.097277, 0.027625, 0.013023, 90.819244, 191.427993, 0.000000);
-	item_Rake			= DefineItemType("Rake",			18890,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, -0.002599, 0.003984, 0.026356, 190.231231, 0.222518, 271.565185);
-	item_HotDog			= DefineItemType("Hotdog",			19346,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.088718, 0.035828, 0.008570, 272.851745, 354.704772, 9.342185);
-	item_EasterEgg		= DefineItemType("Easter Egg",		19341,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.000000, 0.000000, 0.000000, 0.000000, 90.000000, 0.000000);
-	item_Cane			= DefineItemType("Cane",			19348,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.041865, 0.022883, -0.079726, 4.967216, 10.411237, 0.000000);
-	item_HandCuffs		= DefineItemType("Handcuffs",		19418,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.077635, 0.011612, 0.000000, 0.000000, 90.000000, 0.000000);
-	item_Bucket			= DefineItemType("Bucket",			19468,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.293691, -0.074108, 0.020810, 148.961685, 280.067260, 151.782791);
-	item_GasMask		= DefineItemType("Gas Mask",		19472,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.062216, 0.055396, 0.001138, 90.000000, 0.000000, 180.000000);
-	item_Flag			= DefineItemType("Flag",			2993,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.045789, 0.026306, -0.078802, 8.777217, 0.272155, 0.000000);
-	item_Briefcase		= DefineItemType("Briefcase",		1210,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 90.0, 0.285915, 0.078406, -0.009429, 0.000000, 270.000000, 0.000000);
-	item_Backpack		= DefineItemType("Backpack",		3026,	ITEM_SIZE_MEDIUM, 0.0, 270.0, 0.0, 0.470918, 0.150153, 0.055384, 181.319580, 7.513789, 163.436065);
 
 
 	disp_HealoMatic		= DefineDispenserType("Heal-O-Matic", item_Medkit, 50);
@@ -1017,12 +998,9 @@ public OnGameModeInit()
 	DefineStoreIndexItem(GeneralStore, item_Bucket, 5);
 	DefineStoreIndexItem(GeneralStore, item_Rake, 8);
 	DefineStoreIndexItem(GeneralStore, item_FishRod, 15);
-	DefineStoreIndexItem(GeneralStore, item_Wrench, 5);
 	DefineStoreIndexItem(GeneralStore, item_Crowbar, 10);
-	DefineStoreIndexItem(GeneralStore, item_Hammer, 10);
 	DefineStoreIndexItem(GeneralStore, item_Flashlight, 10);
 	DefineStoreIndexItem(GeneralStore, item_LaserPoint, 10);
-	DefineStoreIndexItem(GeneralStore, item_Screwdriver, 3);
 	DefineStoreIndexItem(GeneralStore, item_MobilePhone, 50);
 	DefineStoreIndexItem(GeneralStore, item_Pager, 30);
 	DefineStoreIndexItem(GeneralStore, item_Flag, 5);
@@ -1602,7 +1580,7 @@ public OnPlayerConnect(playerid)
 
 
 	pTeam(playerid) = -1;
-	LevelUpWeaponSkills(playerid, 999);
+	SetAllWeaponSkills(playerid, 999);
     LoadPlayerTextDraws(playerid);
 	SetPlayerScore(playerid, 0);
 	Streamer_ToggleIdleUpdate(playerid, true);
@@ -2446,14 +2424,9 @@ public OnPlayerSpawn(playerid)
 
 	if(bServerGlobalSettings & FreeDM)defer fdm_Spawn(playerid);
 
-	if(!IsValidDynamicArea(gPlayerArea[playerid]))
-		gPlayerArea[playerid] = CreateDynamicSphere(0.0, 0.0, 0.0, 2.0);
-
-    AttachDynamicAreaToPlayer(gPlayerArea[playerid], playerid);
-
 	Streamer_Update(playerid);
 	SetPlayerTeam(playerid, TEAM_GLOBAL);
-	LevelUpWeaponSkills(playerid, 999);
+	SetAllWeaponSkills(playerid, 999);
 
 	gPlayerHP[playerid] = 100.0;
 	gPlayerAP[playerid] = 0.0;
@@ -2709,23 +2682,6 @@ internal_HitPlayer(playerid, targetid, weaponid)
 			if(trgDist > WepData[weaponid][MaxDis])HpLoss = WepData[weaponid][MinDam];
 			else HpLoss = ((WepData[weaponid][MinDam]-WepData[weaponid][MaxDam])/(WepData[weaponid][MaxDis]-WepData[weaponid][MinDis])) * (trgDist-WepData[weaponid][MaxDis]) + WepData[weaponid][MinDam];
 
-			if(GetItemType(GetPlayerItem(playerid)) == item_Shield)
-			{
-				new
-					Float:angleto,
-					Float:playerangle;
-
-				GetPlayerFacingAngle(playerid, playerangle);
-
-				angleto = -(90-(atan2((py - ty), (px - tx))));
-
-				if(-30 < (270.0 - (playerangle - angleto)) < 30)
-				{
-					GameTextForPlayer(playerid, "Shield!", 1000, 5);
-					HpLoss *= 0.4;
-				}
-			}
-
 			GivePlayerHP(targetid, -HpLoss, playerid, weaponid);
 			ShowHitMarker(playerid, weaponid);
 
@@ -2974,14 +2930,6 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 }
 public OnPlayerEnterDynamicArea(playerid, areaid)
 {
-	foreach(new i : Character)
-	{
-	    if(areaid == gPlayerArea[i] && playerid != i)
-	    {
-	        CallLocalFunction("OnPlayerEnterPlayerArea", "dd", playerid, i);
-	    }
-	}
-
 	if((bServerGlobalSettings & dm_InProgress) && bPlayerGameSettings[playerid] & InDM)
 		script_Deathmatch_EnterArea(playerid, areaid);
 
@@ -2989,14 +2937,6 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 }
 public OnPlayerLeaveDynamicArea(playerid, areaid)
 {
-	foreach(new i : Character)
-	{
-	    if(areaid == gPlayerArea[i] && playerid != i)
-	    {
-	        CallLocalFunction("OnPlayerLeavePlayerArea", "dd", playerid, i);
-	    }
-	}
-
 	if((bServerGlobalSettings&dm_InProgress) && bPlayerGameSettings[playerid]&InDM)script_Deathmatch_ExitArea(playerid, areaid);
 	if(dgw_State != 0)script_dgw_LeaveDynamicArea(playerid, areaid);
 
@@ -3399,9 +3339,6 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		PlayerTextDrawSetString(playerid, VehicleNameText, VehicleNames[model-400]);
 		PlayerTextDrawShow(playerid, VehicleNameText);
 		PlayerTextDrawShow(playerid, VehicleSpeedText);
-
-		Streamer_SetFloatData(STREAMER_TYPE_AREA, gPlayerArea[playerid], E_STREAMER_SIZE, 20.0);
-		AttachDynamicAreaToVehicle(gPlayerArea[playerid], vehicleid);
 	}
 	if(oldstate == PLAYER_STATE_DRIVER || oldstate == PLAYER_STATE_PASSENGER)
 	{
@@ -3434,9 +3371,6 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			gPlayerChatChannel[playerid] = CHANNEL_GLOBAL;
 			Msg(playerid, YELLOW, " >  You are now talking on the "#C_BLUE"global "#C_YELLOW"chat channel");
 		}
-
-		Streamer_SetFloatData(STREAMER_TYPE_AREA, gPlayerArea[playerid], E_STREAMER_SIZE, 1.4);
-		AttachDynamicAreaToPlayer(gPlayerArea[playerid], playerid);
 	}
 	return 1;
 }

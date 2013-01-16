@@ -1,21 +1,25 @@
 #include <a_samp>
 
+
 main()
 {
-	new str[32];
+	new i[32];
 
-	str = "Hello ";
+	i = "hello";
 
-	CallLocalFunction("set", "s", str);
 
-	print(str);
-}
+	switch(0)
+	{
+		case 6:
+		{
+			print("hi");
+		}
+		default:
+		{
+			print("nope");
+		}
+	}
 
-forward set(s[]);
-public set(s[])
-{
-	format(s, 32, "nul");
-	return 1;
 }
 
 

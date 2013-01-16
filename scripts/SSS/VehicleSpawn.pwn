@@ -1,5 +1,6 @@
 #include <YSI\y_hooks>
 
+#define MAX_SPAWNED_VEHICLES	(400)
 #define VEHICLE_INDEX_FILE		"vehicles/index.ini"
 #define VEHICLE_DATA_FILE		"vehicles/%s.dat"
 #define PERSONAL_VEHICLE_FILE	"vehicles/special/player.dat"
@@ -35,7 +36,7 @@ enum E_PVEHICLE_DATA
 }
 enum (<<=1)
 {
-	v_Used,
+	v_Used = 1,
 	v_Occupied
 }
 
@@ -44,6 +45,8 @@ new
 	TotalVehicles,
 	gCurModelGroup,
 	bVehicleSettings[MAX_VEHICLES],
+	Iterator:gVehicleIndex<MAX_SPAWNED_VEHICLES>,
+	gVehicleArea[MAX_VEHICLES],
 	gVehicleContainer[MAX_VEHICLES],
 	gCurrentContainerVehicle[MAX_PLAYERS];
 
@@ -216,7 +219,7 @@ LoadVehiclesFromFile(file[], bool:prints = true)
 	{
 		if(!sscanf(line, "p<,>ffffD(-1)", posX, posY, posZ, rotZ, model))
 		{
-		    if(random(100) < 50)continue;
+		    if(random(100) < 80)continue;
 
 			if(model == -1)
 				model = PickRandomVehicleFromGroup(gCurModelGroup);
@@ -233,56 +236,6 @@ LoadVehiclesFromFile(file[], bool:prints = true)
 
 			if(IsValidVehicle(tmpid))
 			{
-				new
-					chance = random(100),
-					Float:health;
-
-				if(chance < 70)
-					health=(250 + random(300));
-
-				else if(chance < 30)
-					health=(400 + random(300));
-
-				else if(chance < 5)
-					health=(700 + random(300));
-
-				SetVehicleHealth(tmpid, health);
-				ApplyRandomDamageToVehicle(tmpid);
-
-				if(VehicleFuelData[model-400][veh_lootType] != LOOT_TYPE_NONE)
-				{
-					new
-						itemid,
-						ItemType:itemtype,
-						Float:x,
-						Float:y,
-						Float:z;
-
-					GetVehicleModelInfo(model, VEHICLE_MODEL_INFO_SIZE, x, y, z);
-
-					gVehicleContainer[tmpid] = CreateContainer("Trunk", 12, .virtual = 1);
-
-					for(new i = 1; i <= 4; i++)
-					{
-						new loottype = LOOT_TYPE_LOW;
-
-						if(i > 2) loottype = VehicleFuelData[model-400][veh_lootType];
-
-						if(random(100) < 100 / i )
-						{
-							itemtype = GenerateLoot(loottype);
-							itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
-							AddItemToContainer(gVehicleContainer[tmpid], itemid);
-
-							if(1 <= _:itemtype <= 46)
-								SetItemExtraData(itemid, WepData[_:itemtype][MagSize] * (random(2) + 1));
-						}
-					}
-				}
-				gVehicleFuel[tmpid] = random(floatround(VehicleFuelData[model-400][veh_maxFuel], floatround_floor));
-
-				SetVehicleNumberPlate(tmpid, RandomNumberPlateString());
-
 				TotalVehicles++;
 				count++;
 			}
@@ -303,30 +256,80 @@ PickRandomVehicleFromGroup(group)
 	return gModelGroup[group][random(idx)];
 }
 
-ApplyRandomDamageToVehicle(vehicleid)
+public OnVehicleSpawn(vehicleid)
 {
-	if(random(100) < 20)
-	{
-		UpdateVehicleDamageStatus(vehicleid,
-			encode_tires(random(1), random(1), random(1), random(1)),
-			encode_panels(random(4), random(4), random(4), random(4), random(4), random(4), random(4)),
-			encode_doors(random(5), random(5), random(5), random(5), random(5), random(5)),
-			encode_lights(random(1), random(1), random(1), random(1)));
-	}
-	else
-	{
-		UpdateVehicleDamageStatus(vehicleid,
-			encode_tires(random(1), random(1), random(1), random(1)),
-			encode_panels(1+random(3), 1+random(3), 1+random(3), 1+random(3), 1+random(3), 1+random(3), 1+random(3)),
-			encode_doors(1+random(4), 1+random(4), 1+random(4), 1+random(4), 1+random(4), 1+random(4)),
-			encode_lights(random(1), random(1), random(1), random(1)));
-	}
-}
+	new
+		chance = random(100),
+		model = GetVehicleModel(vehicleid),
+		Float:sx,
+		Float:sy,
+		Float:sz;
 
-CMD:rdam(playerid, params[])
-{
-	ApplyRandomDamageToVehicle(GetPlayerVehicleID(playerid));
-	return 1;
+	if(chance < 5)
+		SetVehicleHealth(vehicleid, 700 + random(300));
+
+	else if(chance < 30)
+		SetVehicleHealth(vehicleid, 400 + random(300));
+
+	else
+		SetVehicleHealth(vehicleid, 300 + random(300));
+
+	chance = random(100);
+
+	if(chance < 5)
+		gVehicleFuel[vehicleid] = VehicleFuelData[model-400][veh_maxFuel] / 2 + frandom(VehicleFuelData[model-400][veh_maxFuel] / 2);
+
+	else if(chance < 30)
+		gVehicleFuel[vehicleid] = VehicleFuelData[model-400][veh_maxFuel] / 4 + frandom(VehicleFuelData[model-400][veh_maxFuel] / 3);
+
+	else
+		gVehicleFuel[vehicleid] = VehicleFuelData[model-400][veh_maxFuel] / 8 + frandom(VehicleFuelData[model-400][veh_maxFuel] / 4);
+
+	UpdateVehicleDamageStatus(vehicleid,
+		encode_panels(random(4), random(4), random(4), random(4), random(4), random(4), random(4)),
+		encode_doors(random(5), random(5), random(5), random(5), random(5), random(5)),
+		encode_lights(random(2), random(2), random(2), random(2)),
+		encode_tires(random(2), random(2), random(2), random(2)));
+
+	if(VehicleFuelData[model-400][veh_lootType] != LOOT_TYPE_NONE)
+	{
+		new
+			itemid,
+			ItemType:itemtype,
+			Float:x,
+			Float:y,
+			Float:z;
+
+		GetVehicleModelInfo(model, VEHICLE_MODEL_INFO_SIZE, x, y, z);
+
+		gVehicleContainer[vehicleid] = CreateContainer("Trunk", 12, .virtual = 1);
+
+		for(new i = 1; i <= 4; i++)
+		{
+			new loottype = LOOT_TYPE_LOW;
+
+			if(i > 2) loottype = VehicleFuelData[model-400][veh_lootType];
+
+			if(random(100) < 100 / i )
+			{
+				itemtype = GenerateLoot(loottype);
+				itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
+				AddItemToContainer(gVehicleContainer[vehicleid], itemid);
+
+				if(1 <= _:itemtype <= 46)
+					SetItemExtraData(itemid, (WepData[_:itemtype][MagSize] * (random(3))) + random(WepData[_:itemtype][MagSize]));
+			}
+		}
+	}
+
+	GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_SIZE, sx, sy, sz);
+
+	gVehicleArea[vehicleid] = CreateDynamicSphere(0.0, 0.0, 0.0, sy, 0);
+	AttachDynamicAreaToVehicle(gVehicleArea[vehicleid], vehicleid);
+
+	SetVehicleNumberPlate(vehicleid, RandomNumberPlateString());
+
+	Iter_Add(gVehicleIndex, vehicleid);
 }
 
 hook OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
@@ -341,30 +344,80 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 	if(newkeys == 16)
 	{
-		new
-			Float:vx,
-			Float:vy,
-			Float:vz,
-			Float:px,
-			Float:py,
-			Float:pz,
-			Float:sx,
-			Float:sy,
-			Float:sz;
-
-		for(new i; i < MAX_VEHICLES; i++)
+		foreach(new i : gVehicleIndex)
 		{
-			GetVehiclePos(i, vx, vy, vz);
-			GetPlayerPos(playerid, px, py, pz);
-			GetVehicleModelInfo(GetVehicleModel(i), VEHICLE_MODEL_INFO_SIZE, sx, sy, sz);
-
-			if(Distance(vx, vy, vz, px, py, pz) < sy)
+			if(IsPlayerInDynamicArea(playerid, gVehicleArea[i]))
 			{
-				new Float:vr, Float:angle;
+				new
+					Float:px,
+					Float:py,
+					Float:pz,
+					Float:vx,
+					Float:vy,
+					Float:vz,
+					Float:vr,
+					Float:angle;
+
+				GetPlayerPos(playerid, px, py, pz);
+				GetVehiclePos(i, vx, vy, vz);
 				GetVehicleZAngle(i, vr);
 
 				angle = absoluteangle(vr - GetAngleToPoint(vx, vy, px, py));
 
+				if(angle < 25.0 || angle > 335.0)
+				{
+					new Float:vehiclehealth;
+
+					GetVehicleHealth(i, vehiclehealth);
+
+					if(GetItemType(GetPlayerItem(playerid)) == item_Wrench)
+					{
+						if(250.0 <= vehiclehealth < 450.0 || 800.0 <= vehiclehealth < 1000.0)
+						{
+							SetPlayerPos(playerid, px, py, pz);
+							PlayerStartRepairVehicle(playerid, i);
+							break;
+						}
+						else
+						{
+							ShowMsgBox(playerid, "You need another tool", 3000, 100);
+							SetPlayerPos(playerid, px, py, pz);
+						}
+					}	
+					else if(GetItemType(GetPlayerItem(playerid)) == item_Screwdriver)
+					{
+						if(450.0 <= vehiclehealth < 650.0)
+						{
+							SetPlayerPos(playerid, px, py, pz);
+							PlayerStartRepairVehicle(playerid, i);
+							break;
+						}
+						else
+						{
+							ShowMsgBox(playerid, "You need another tool", 3000, 100);
+							SetPlayerPos(playerid, px, py, pz);
+						}
+					}	
+					else if(GetItemType(GetPlayerItem(playerid)) == item_Hammer)
+					{
+						if(650.0 <= vehiclehealth < 800.0)
+						{
+							SetPlayerPos(playerid, px, py, pz);
+							PlayerStartRepairVehicle(playerid, i);
+							break;
+						}
+						else
+						{
+							ShowMsgBox(playerid, "You need another tool", 3000, 100);
+							SetPlayerPos(playerid, px, py, pz);
+						}
+					}
+					else
+					{
+						ShowMsgBox(playerid, "You don't have the right tool", 3000, 100);
+						SetPlayerPos(playerid, px, py, pz);
+					}
+				}
 				if(155.0 < angle < 205.0)
 				{
 					new
@@ -380,6 +433,7 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 					SetVehicleParamsEx(i, engine, lights, alarm, doors, bonnet, 1, objective);
 
 					SetPlayerPos(playerid, px, py, pz);
+					SetPlayerFacingAngle(playerid, GetAngleToPoint(px, py, vx, vy));
 
 					DisplayContainerInventory(playerid, gVehicleContainer[i]);
 					gCurrentContainerVehicle[playerid] = i;
@@ -388,12 +442,64 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				}
 			}
 		}
+		if(oldkeys == 16)
+		{
+			PlayerStopRepairVehicle(playerid);
+		}
 	}
 
 	return 1;
 }
 
-public OnPlayerExitContainerUI(playerid, containerid)
+public OnPlayerEnterDynamicArea(playerid, areaid)
+{
+	foreach(new i : gVehicleIndex)
+	{
+		if(areaid == gVehicleArea[i])
+		{
+			new
+				Float:vx,
+				Float:vy,
+				Float:vz,
+				Float:px,
+				Float:py,
+				Float:pz,
+				Float:sx,
+				Float:sy,
+				Float:sz,
+				Float:vr,
+				Float:angle;
+
+			GetVehiclePos(i, vx, vy, vz);
+			GetPlayerPos(playerid, px, py, pz);
+			GetVehicleModelInfo(GetVehicleModel(i), VEHICLE_MODEL_INFO_SIZE, sx, sy, sz);
+
+			GetVehicleZAngle(i, vr);
+
+			angle = absoluteangle(vr - GetAngleToPoint(vx, vy, px, py));
+
+			if(155.0 < angle < 205.0)
+			{
+				ShowMsgBox(playerid, "Press ~k~~VEHICLE_ENTER_EXIT~ to open trunk", 3000, 100);
+			}
+			if(-25.0 < angle < 25.0 || 335.0 < angle < 385.0)
+			{
+				ShowMsgBox(playerid, "Hold ~k~~VEHICLE_ENTER_EXIT~ to repair", 3000, 100);
+			}
+		}
+	}
+
+	return CallLocalFunction("veh_OnPlayerEnterDynamicArea", "dd", playerid, areaid);
+}
+#if defined _ALS_OnPlayerEnterDynamicArea
+	#undef OnPlayerEnterDynamicArea
+#else
+	#define _ALS_OnPlayerEnterDynamicArea
+#endif
+#define OnPlayerEnterDynamicArea veh_OnPlayerEnterDynamicArea
+forward veh_OnPlayerEnterDynamicArea(playerid, containerid);
+
+public OnPlayerCloseContainer(playerid, containerid)
 {
 	if(IsValidVehicle(gCurrentContainerVehicle[playerid]))
 	{
@@ -411,10 +517,18 @@ public OnPlayerExitContainerUI(playerid, containerid)
 			GetVehicleParamsEx(gCurrentContainerVehicle[playerid], engine, lights, alarm, doors, bonnet, boot, objective);
 			SetVehicleParamsEx(gCurrentContainerVehicle[playerid], engine, lights, alarm, doors, bonnet, 0, objective);
 
-			gCurrentContainerVehicle[playerid] = -1;
+			gCurrentContainerVehicle[playerid] = INVALID_VEHICLE_ID;
 		}
 	}
+	return CallLocalFunction("veh_OnPlayerCloseContainer", "dd", playerid, containerid);
 }
+#if defined _ALS_OnPlayerCloseContainer
+	#undef OnPlayerCloseContainer
+#else
+	#define _ALS_OnPlayerCloseContainer
+#endif
+#define OnPlayerCloseContainer veh_OnPlayerCloseContainer
+forward veh_OnPlayerCloseContainer(playerid, containerid);
 
 RandomNumberPlateString()
 {

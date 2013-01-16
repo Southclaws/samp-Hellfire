@@ -105,6 +105,53 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 		native - SIF/Inventory/Callbacks
 		native -
 
+		native OnPlayerOpenInventory(playerid);
+		{
+			Called:
+				When a player presses H to open his inventory.
+
+			Parameters:
+				<playerid> (int)
+					The player who opened their inventory.
+
+			Returns:
+				1
+					To cancel displaying the inventory to the player.
+		}
+
+		native OnPlayerCloseInventory(playerid);
+		{
+			Called:
+				When a player exits the inventory dialog.
+
+			Parameters:
+				<playerid> (int)
+					The player who closed their inventory.
+
+			Returns:
+				1
+					To disable the player from closing their inventory.
+		}
+
+		native OnPlayerSelectExtraItem(playerid, item)
+		{
+			Called:
+				When a player selects an extra menu item (not an actual
+				inventory item, but a menu item added with AddInventoryListItem)
+
+			Parameters:
+				<playerid> (int)
+					The player who chose the menu item.
+
+				<item> (int)
+					The menu row starting from 0 (however, the actual listitem
+					value would be above INV_MAX_SLOTS)
+
+			Returns:
+				(none)
+
+		}
+
 		native OnPlayerAddToInventory(playerid, itemid);
 		{
 			Called:
@@ -123,21 +170,24 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 					item to his inventory.
 		}
 
-		native OnPlayerOpenInventory(playerid, list[]);
+		native OnPlayerAddedToInventory(playerid, itemid);
 		{
 			Called:
-				When a player presses H to open his inventory.
+				After a player has added an item to their inventory and the
+				inventory index has been updated with the new item.
 
 			Parameters:
 				<playerid> (int)
-					The player who opened their inventory.
+					The player who added an item to his inventory.
+
+				<itemid> (int, itemid)
+					The ID handle of the item that was added.
 
 			Returns:
-				1
-					To cancel displaying the inventory to the player.
+				(none)
 		}
 
-		native OnPlayerViewInventoryOptions(playerid);
+		native OnPlayerViewInventoryOpt(playerid);
 		{
 			Called:
 				When a player opens the options menu for an item in his
@@ -168,6 +218,23 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 				1
 					To cancel the action and disallow the player from removing
 					the item from his inventory.
+		}
+
+		native OnPlayerRemovedFromInventory(playerid, slotid);
+		{
+			Called:
+				After a player has removed an item from his inventory and the
+				inventory index is updated with the item removed.
+
+			Parameters:
+				<playerid> (int)
+					The player who removed an item from his inventory.
+
+				<slotid> (int)
+					The inventory slot which he removed the item from.
+
+			Returns:
+				(none)
 		}
 
 		native OnPlayerSelectInventoryOption(playerid, option);
@@ -269,10 +336,29 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 					If it is full.
 		}
 
-		native AddInventoryOption(option[])
+		native AddInventoryListItem(playerid, itemname[])
 		{
 			Description:
-				Only works properly when used in OnPlayerViewInventoryOptions.
+				Only works properly when used in OnPlayerOpenInventory, this
+				function adds a new menu row under the inventory items. When
+				a newly added row is selected, the callback
+				OnPlayerSelectExtraItem is called.
+
+			Parameters:
+				<playerid> (int)
+					The player to add the new menu item to.
+
+				<itemname> (string)
+					The text to display in the new menu row. Does not require a
+					newline '\n' character.
+
+			Returns:
+		}
+
+		native AddInventoryOption(playerid, option[])
+		{
+			Description:
+				Only works properly when used in OnPlayerViewInventoryOpt.
 				This function adds an option to the inventory item options list.
 				The inventory options are addressed from 0, not the number of
 				default options.
@@ -296,7 +382,7 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 		DisplayPlayerInventoryOptions(playerid, slotid)
 		{
 			Description:
-				Displays the options menu and calls OnPlayerViewInventoryOptions
+				Displays the options menu and calls OnPlayerViewInventoryOpt
 				in order to add any additional options.
 		}
 	}
@@ -337,16 +423,24 @@ Southclaw's Interactivity Framework (SIF) (Formerly: Adventure API)
 
 
 new
-	inv_Data[MAX_PLAYERS][INV_MAX_SLOTS],
-	inv_SelectedSlot[MAX_PLAYERS],
-	inv_OptionsList[128];
+	inv_Data				[MAX_PLAYERS][INV_MAX_SLOTS],
+	inv_ViewingInventory	[MAX_PLAYERS],
+	inv_SelectedSlot		[MAX_PLAYERS],
+	inv_ExtraItemList		[MAX_PLAYERS][128],
+	inv_ExtraItemCount		[MAX_PLAYERS],
+	inv_OptionsList			[MAX_PLAYERS][128],
+	inv_OptionsCount		[MAX_PLAYERS];
 
 
-forward OnPlayerAddToInventory(playerid, itemid);
 forward OnPlayerOpenInventory(playerid);
-forward OnPlayerViewInventoryOptions(playerid);
+forward OnPlayerCloseInventory(playerid);
+forward OnPlayerSelectExtraItem(playerid, item);
+forward OnPlayerAddToInventory(playerid, itemid);
+forward OnPlayerAddedToInventory(playerid, itemid);
 forward OnPlayerRemoveFromInventory(playerid, slotid);
-forward OnPlayerSelectInventoryOption(playerid, option);
+forward OnPlayerRemovedFromInventory(playerid, slotid);
+forward OnPlayerViewInventoryOpt(playerid);
+forward OnPlayerSelectInventoryOpt(playerid, option);
 
 
 /*==============================================================================
@@ -373,7 +467,7 @@ hook OnPlayerConnect(playerid)
 	for(new j; j < INV_MAX_SLOTS; j++)
 	{
 		inv_Data[playerid][j] = INVALID_ITEM_ID;
-		inv_SelectedSlot[i] = -1;
+		inv_SelectedSlot[playerid] = -1;
 	}
 
 	return;
@@ -392,6 +486,9 @@ stock AddItemToInventory(playerid, itemid)
 	if(!IsValidItem(itemid))
 		return 0;
 
+	if(CallLocalFunction("OnPlayerAddToInventory", "dd", playerid, itemid))
+		return 0;
+
 	new i;
 	while(i < INV_MAX_SLOTS)
 	{
@@ -405,11 +502,19 @@ stock AddItemToInventory(playerid, itemid)
 
 	RemoveItemFromWorld(itemid);
 
+	CallLocalFunction("OnPlayerAddedToInventory", "dd", playerid, itemid);
+/*
+	if(inv_ViewingInventory[playerid])
+		DisplayPlayerInventory(playerid);
+*/
 	return 1;
 }
 stock RemoveItemFromInventory(playerid, slotid)
 {
 	if(!(0 <= slotid < INV_MAX_SLOTS))
+		return 0;
+
+	if(CallLocalFunction("OnPlayerRemoveFromInventory", "dd", playerid, slotid))
 		return 0;
 
 	inv_Data[playerid][slotid] = INVALID_ITEM_ID;
@@ -421,7 +526,9 @@ stock RemoveItemFromInventory(playerid, slotid)
 
 		inv_Data[playerid][(INV_MAX_SLOTS - 1)] = INVALID_ITEM_ID;
 	}
-	
+
+	CallLocalFunction("OnPlayerRemovedFromInventory", "dd", playerid, slotid);
+
 	return 1;
 }
 
@@ -442,10 +549,19 @@ stock DisplayPlayerInventory(playerid)
 		}
 	}
 
-	if(CallRemoteFunction("OnPlayerOpenInventory", "d", playerid))
+	inv_ExtraItemList[playerid][0] = EOS;
+	inv_ExtraItemCount[playerid] = 0;
+
+	if(CallLocalFunction("OnPlayerOpenInventory", "d", playerid))
 		return 0;
 	
+	if(!isnull(inv_ExtraItemList[playerid]))
+		strcat(list, inv_ExtraItemList[playerid]);
+
 	ShowPlayerDialog(playerid, d_Inventory, DIALOG_STYLE_LIST, "Inventory", list, "Options", "Close");
+	SelectTextDraw(playerid, 0xFFFF00FF);
+
+	inv_ViewingInventory[playerid] = true;
 
 	return 1;
 }
@@ -471,15 +587,12 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 		if(IsValidItem(itemid))
 		{
-			if(CallLocalFunction("OnPlayerAddToInventory", "dd", playerid, itemid))
-				return 0;
-
 			if(GetItemTypeSize(GetItemType(itemid)) != ITEM_SIZE_SMALL)
-				Msg(playerid, ORANGE, " >  That item is too big for your pocket!");
+				ShowMsgBox(playerid, " >  That item is too big for your inventory", 3000, 150);
 
 			else
 			{
-				if(AddItemToInventory(playerid, itemid))
+				if(AddItemToInventory(playerid, itemid) == 1)
 					ShowMsgBox(playerid, "Item added to inventory", 3000, 150);
 
 				else
@@ -497,11 +610,12 @@ DisplayPlayerInventoryOptions(playerid, slotid)
 		name[MAX_ITEM_NAME];
 
 	GetItemTypeName(GetItemType(inv_Data[playerid][slotid]), name);
-	inv_OptionsList = "Equip\nUse\nDrop\n";
+	inv_OptionsList[playerid] = "Equip\nUse\nDrop\n";
+	inv_OptionsCount[playerid] = 0;
 
-	CallLocalFunction("OnPlayerViewInventoryOptions", "d", playerid);
+	CallLocalFunction("OnPlayerViewInventoryOpt", "d", playerid);
 
-	ShowPlayerDialog(playerid, d_InventoryOptions, DIALOG_STYLE_LIST, name, inv_OptionsList, "Accept", "Back");
+	ShowPlayerDialog(playerid, d_InventoryOptions, DIALOG_STYLE_LIST, name, inv_OptionsList[playerid], "Accept", "Back");
 }
 
 hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
@@ -510,12 +624,31 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			inv_SelectedSlot[playerid] = listitem;
-			DisplayPlayerInventoryOptions(playerid, listitem);
+			if(listitem >= INV_MAX_SLOTS)
+			{
+				CallLocalFunction("OnPlayerSelectExtraItem", "dd", playerid, listitem - INV_MAX_SLOTS);
+				inv_ViewingInventory[playerid] = false;
+				return 1;
+			}
+
+			if(!IsValidItem(inv_Data[playerid][listitem]))
+			{
+				DisplayPlayerInventory(playerid);
+			}
+			else
+			{
+				inv_SelectedSlot[playerid] = listitem;
+				DisplayPlayerInventoryOptions(playerid, listitem);
+			}
 		}
 		else
 		{
+			if(CallLocalFunction("OnPlayerCloseInventory", "d", playerid))
+				DisplayPlayerInventory(playerid);
+
+			CancelSelectTextDraw(playerid);
 			inv_SelectedSlot[playerid] = -1;
+			inv_ViewingInventory[playerid] = false;
 		}
 	}
 	if(dialogid == d_InventoryOptions)
@@ -532,18 +665,16 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if(GetPlayerItem(playerid) == INVALID_ITEM_ID && GetPlayerWeapon(playerid) == 0)
 				{
-					if(CallLocalFunction("OnPlayerRemoveFromInventory", "dd", playerid, inv_SelectedSlot[playerid]))
-						return 0;
-
 					new itemid = inv_Data[playerid][inv_SelectedSlot[playerid]];
 
 					RemoveItemFromInventory(playerid, inv_SelectedSlot[playerid]);
 					CreateItemInWorld(itemid);
 					GiveWorldItemToPlayer(playerid, itemid, 1);
+					DisplayPlayerInventory(playerid);
 				}
 				else
 				{
-					Msg(playerid, ORANGE, " >  You are already holding something");
+					ShowMsgBox(playerid, "You are already holding something", 3000, 200);
 					DisplayPlayerInventory(playerid);
 				}
 			}
@@ -558,10 +689,15 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					GiveWorldItemToPlayer(playerid, itemid, 1);
 
 					PlayerUseItem(playerid);
+
+					CallLocalFunction("OnPlayerCloseInventory", "d", playerid);
+					CancelSelectTextDraw(playerid);
+					inv_SelectedSlot[playerid] = -1;
+					inv_ViewingInventory[playerid] = false;
 				}
 				else
 				{
-					Msg(playerid, ORANGE, " >  You are already holding something");
+					ShowMsgBox(playerid, "You are already holding something", 3000, 200);
 					DisplayPlayerInventory(playerid);
 				}
 			}
@@ -576,16 +712,21 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					GiveWorldItemToPlayer(playerid, itemid, 1);
 
 					PlayerDropItem(playerid);
+
+					CallLocalFunction("OnPlayerCloseInventory", "d", playerid);
+					CancelSelectTextDraw(playerid);
+					inv_SelectedSlot[playerid] = -1;
+					inv_ViewingInventory[playerid] = false;
 				}
 				else
 				{
-					Msg(playerid, ORANGE, " >  You are already holding something");
+					ShowMsgBox(playerid, "You are already holding something", 3000, 200);
 					DisplayPlayerInventory(playerid);
 				}
 			}
 			default:
 			{
-				CallLocalFunction("OnPlayerSelectInventoryOption", "dd", playerid, listitem - 3);
+				CallLocalFunction("OnPlayerSelectInventoryOpt", "dd", playerid, listitem - 3);
 			}
 		}
 	}
@@ -632,13 +773,24 @@ stock IsPlayerInventoryFull(playerid)
 	return IsValidItem(inv_Data[playerid][INV_MAX_SLOTS-1]);
 }
 
-stock AddInventoryOption(option[])
+stock AddInventoryListItem(playerid, itemname[])
 {
-	if(strlen(inv_OptionsList) + strlen(option) > sizeof(inv_OptionsList))
+	if(strlen(inv_ExtraItemList[playerid]) + strlen(itemname) > sizeof(inv_ExtraItemList[]))
 		return 0;
 
-	strcat(inv_OptionsList, option);
-	strcat(inv_OptionsList, "\n");
+	strcat(inv_ExtraItemList[playerid], itemname);
+	strcat(inv_ExtraItemList[playerid], "\n");
 
-	return 1;
+	return inv_ExtraItemCount[playerid]++;
+}
+
+stock AddInventoryOption(playerid, option[])
+{
+	if(strlen(inv_OptionsList[playerid]) + strlen(option) > sizeof(inv_OptionsList[]))
+		return 0;
+
+	strcat(inv_OptionsList[playerid], option);
+	strcat(inv_OptionsList[playerid], "\n");
+
+	return inv_OptionsCount[playerid]++;
 }

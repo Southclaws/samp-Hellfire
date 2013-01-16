@@ -95,31 +95,31 @@ new const VehicleFuelData[212][E_VEHICLE_DATA] =
 	{50.0,	14.0, LOOT_TYPE_LOW}, // 477
 	{60.0,	26.0, LOOT_TYPE_MEDIUM}, // 478
 	{55.0,	13.0, LOOT_TYPE_LOW}, // 479
-	{50.0,	13.0, LOOT_TYPE_LOW}, // 480              38593680y348ygf4utyruigbyhj5eroghtuoyvfhm5uoygtruytuo;l
+	{50.0,	12.0, LOOT_TYPE_LOW}, // 480
 
-	{-1.0,	13.0, LOOT_TYPE_LOW}, // 481
+	{-1.0,	0.0, LOOT_TYPE_LOW}, // 481
 	{70.0,	13.0, LOOT_TYPE_MEDIUM}, // 482
-	{60.0,	13.0, LOOT_TYPE_LOW}, // 483
-	{60.0,	13.0, LOOT_TYPE_LOW}, // 484
-	{30.0,	13.0, LOOT_TYPE_LOW}, // 485
-	{40.0,	13.0, LOOT_TYPE_LOW}, // 486
-	{-1.0,	13.0, LOOT_TYPE_LOW}, // 487
-	{-1.0,	13.0, LOOT_TYPE_LOW}, // 488
-	{70.0,	13.0, LOOT_TYPE_LOW}, // 489
-	{80.0,	13.0, LOOT_TYPE_LOW}, // 490
+	{80.0,	26.0, LOOT_TYPE_MEDIUM}, // 483
+	{900.0,	67.0, LOOT_TYPE_LOW}, // 484
+	{24.0,	4.0, LOOT_TYPE_LOW}, // 485
+	{50.0,	47.0, LOOT_TYPE_LOW}, // 486
+	{240.0,	76.0, LOOT_TYPE_LOW}, // 487
+	{240.0,	76.0, LOOT_TYPE_LOW}, // 488
+	{100.0,	16.0, LOOT_TYPE_LOW}, // 489
+	{100.0,	18.0, LOOT_TYPE_HIGH}, // 490
 
-	{35.0,	13.0, LOOT_TYPE_LOW}, // 491
-	{40.0,	13.0, LOOT_TYPE_LOW}, // 492
-	{60.0,	13.0, LOOT_TYPE_LOW}, // 493
-	{80.0,	13.0, LOOT_TYPE_LOW}, // 494
-	{80.0,	13.0, LOOT_TYPE_LOW}, // 495
-	{30.0,	13.0, LOOT_TYPE_LOW}, // 496
-	{-1.0,	13.0, LOOT_TYPE_LOW}, // 497
-	{75.0,	13.0, LOOT_TYPE_MEDIUM}, // 498
-	{60.0,	13.0, LOOT_TYPE_MEDIUM}, // 499
-	{60.0,	13.0, LOOT_TYPE_LOW}, // 500
+	{45.0,	11.0, LOOT_TYPE_LOW}, // 491
+	{55.0,	12.0, LOOT_TYPE_LOW}, // 492
+	{90.0,	21.0, LOOT_TYPE_LOW}, // 493
+	{80.0,	28.0, LOOT_TYPE_LOW}, // 494
+	{120.0,	31.0, LOOT_TYPE_LOW}, // 495
+	{40.0,	12.0, LOOT_TYPE_LOW}, // 496
+	{240.0,	76.0, LOOT_TYPE_LOW}, // 497
+	{75.0,	19.0, LOOT_TYPE_MEDIUM}, // 498
+	{70.0,	19.0, LOOT_TYPE_MEDIUM}, // 499
+	{77.0,	13.0, LOOT_TYPE_LOW}, // 500
 
-	{10.0,	13.0, LOOT_TYPE_LOW}, // 501
+	{-1.0,	0.0, LOOT_TYPE_LOW}, // 501
 	{80.0,	13.0, LOOT_TYPE_LOW}, // 502
 	{80.0,	13.0, LOOT_TYPE_LOW}, // 503
 	{65.0,	13.0, LOOT_TYPE_LOW}, // 504
@@ -129,6 +129,7 @@ new const VehicleFuelData[212][E_VEHICLE_DATA] =
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 508
 	{-1.0,	13.0, LOOT_TYPE_LOW}, // 509
 	{-1.0,	13.0, LOOT_TYPE_LOW}, // 510
+
 	{-1.0,	13.0, LOOT_TYPE_LOW}, // 511
 	{-1.0,	13.0, LOOT_TYPE_LOW}, // 512
 	{-1.0,	13.0, LOOT_TYPE_LOW}, // 513
@@ -139,6 +140,7 @@ new const VehicleFuelData[212][E_VEHICLE_DATA] =
 	{40.0,	13.0, LOOT_TYPE_LOW}, // 518
 	{-1.0,	13.0, LOOT_TYPE_LOW}, // 519
 	{-1.0,	13.0, LOOT_TYPE_LOW}, // 520
+
 	{45.0,	13.0, LOOT_TYPE_LOW}, // 521
 	{45.0,	13.0, LOOT_TYPE_LOW}, // 522
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 523
@@ -149,6 +151,7 @@ new const VehicleFuelData[212][E_VEHICLE_DATA] =
 	{80.0,	13.0, LOOT_TYPE_HIGH}, // 528
 	{50.0,	13.0, LOOT_TYPE_LOW}, // 529
 	{25.0,	13.0, LOOT_TYPE_LOW}, // 530
+
 	{50.0,	13.0, LOOT_TYPE_LOW}, // 531
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 532
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 533
@@ -159,6 +162,7 @@ new const VehicleFuelData[212][E_VEHICLE_DATA] =
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 538
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 539
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 540
+
 	{50.0,	13.0, LOOT_TYPE_LOW}, // 541
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 542
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 543
@@ -169,6 +173,7 @@ new const VehicleFuelData[212][E_VEHICLE_DATA] =
 	{150.0,	13.0, LOOT_TYPE_LOW}, // 548
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 549
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 550
+
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 551
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 552
 	{200.0,	13.0, LOOT_TYPE_LOW}, // 553
@@ -179,6 +184,7 @@ new const VehicleFuelData[212][E_VEHICLE_DATA] =
 	{50.0,	13.0, LOOT_TYPE_LOW}, // 558
 	{50.0,	13.0, LOOT_TYPE_LOW}, // 559
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 560
+
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 561
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 562
 	{200.0,	13.0, LOOT_TYPE_LOW}, // 563
@@ -189,6 +195,7 @@ new const VehicleFuelData[212][E_VEHICLE_DATA] =
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 568
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 569
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 570
+
 	{20.0,	13.0, LOOT_TYPE_LOW}, // 571
 	{20.0,	13.0, LOOT_TYPE_LOW}, // 572
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 573
@@ -199,6 +206,7 @@ new const VehicleFuelData[212][E_VEHICLE_DATA] =
 	{60.0,	13.0, LOOT_TYPE_LOW}, // 578
 	{70.0,	13.0, LOOT_TYPE_LOW}, // 579
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 580
+
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 581
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 582
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 583
@@ -209,6 +217,7 @@ new const VehicleFuelData[212][E_VEHICLE_DATA] =
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 588
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 589
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 590
+
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 591
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 592
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 593
@@ -219,6 +228,7 @@ new const VehicleFuelData[212][E_VEHICLE_DATA] =
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 598
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 599
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 600
+
 	{100.0,	13.0, LOOT_TYPE_HIGH}, // 601
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 602
 	{50.0,	13.0, LOOT_TYPE_LOW}, // 603
@@ -229,6 +239,7 @@ new const VehicleFuelData[212][E_VEHICLE_DATA] =
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 608
 	{100.0,	13.0, LOOT_TYPE_MEDIUM}, // 609
 	{100.0,	13.0, LOOT_TYPE_LOW}, // 610
+
 	{100.0,	13.0, LOOT_TYPE_LOW} // 611
 };
 
