@@ -22,7 +22,7 @@ public OnPlayerUseItem(playerid, itemid)
 {
 	if(GetItemType(itemid) == item_Briefcase)
 	{
-		DisplayContainerInventory(playerid, GetItemExtraData(itemid), 1);
+		DisplayContainerInventory(playerid, GetItemExtraData(itemid));
 	}
 	return CallLocalFunction("case_OnPlayerUseItem", "dd", playerid, itemid);
 }

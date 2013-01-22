@@ -49,7 +49,8 @@ public OnPlayerUpdate(playerid)
 	else if(ud == KEY_DOWN) forwd	=-VELOCITY_NORM;
 	
 	if(k & KEY_JUMP)forwd *= VELOCITY_MULT;
-	if(k & KEY_SPRINT)hMult = HEIGHT_GAIN*3;
+	if(k & KEY_SPRINT)hMult = HEIGHT_GAIN * 10;
+	if(k & KEY_SPRINT && k & KEY_JUMP) hMult = HEIGHT_GAIN * 10;
 	if(k & KEY_CROUCH)hMult =-HEIGHT_GAIN;
 
 

@@ -7,10 +7,12 @@
 
 
 new
-	PlayerText:ApparelSlot_Head[3],
-	PlayerText:ApparelSlot_Hand[3],
-	PlayerText:ApparelSlot_Tors[3],
-	PlayerText:ApparelSlot_Back[3];
+	PlayerText:GearSlot_Head[3],
+	PlayerText:GearSlot_Hand[3],
+	PlayerText:GearSlot_Tors[3],
+	PlayerText:GearSlot_Back[3],
+	PlayerText:GearSlot_Hols[3],
+	PlayerText:GearSlot_Skin[3];
 
 
 forward CreatePlayerTile(playerid, &PlayerText:title, &PlayerText:tile, &PlayerText:item, Float:x, Float:y, Float:width, Float:height, colour, overlaycolour);
@@ -18,15 +20,19 @@ forward CreatePlayerTile(playerid, &PlayerText:title, &PlayerText:tile, &PlayerT
 
 hook OnPlayerConnect(playerid)
 {
-	CreatePlayerTile(playerid, ApparelSlot_Head[0], ApparelSlot_Head[1], ApparelSlot_Head[2], 480.0, 130.0, 60.0, 60.0, 0xFFFFFF08, 0xFFFFFFFF);
-	CreatePlayerTile(playerid, ApparelSlot_Hand[0], ApparelSlot_Hand[1], ApparelSlot_Hand[2], 420.0, 220.0, 60.0, 60.0, 0xFFFFFF08, 0xFFFFFFFF);
-	CreatePlayerTile(playerid, ApparelSlot_Tors[0], ApparelSlot_Tors[1], ApparelSlot_Tors[2], 480.0, 220.0, 60.0, 60.0, 0xFFFFFF08, 0xFFFFFFFF);
-	CreatePlayerTile(playerid, ApparelSlot_Back[0], ApparelSlot_Back[1], ApparelSlot_Back[2], 540.0, 220.0, 60.0, 60.0, 0xFFFFFF08, 0xFFFFFFFF);
+	CreatePlayerTile(playerid, GearSlot_Head[0], GearSlot_Head[1], GearSlot_Head[2], 490.0, 120.0, 60.0, 60.0, 0xFFFFFF08, 0xFFFFFFFF);
+	CreatePlayerTile(playerid, GearSlot_Hand[0], GearSlot_Hand[1], GearSlot_Hand[2], 560.0, 120.0, 60.0, 60.0, 0xFFFFFF08, 0xFFFFFFFF);
+	CreatePlayerTile(playerid, GearSlot_Tors[0], GearSlot_Tors[1], GearSlot_Tors[2], 490.0, 210.0, 60.0, 60.0, 0xFFFFFF08, 0xFFFFFFFF);
+	CreatePlayerTile(playerid, GearSlot_Back[0], GearSlot_Back[1], GearSlot_Back[2], 560.0, 210.0, 60.0, 60.0, 0xFFFFFF08, 0xFFFFFFFF);
+	CreatePlayerTile(playerid, GearSlot_Hols[0], GearSlot_Hols[1], GearSlot_Hols[2], 490.0, 300.0, 60.0, 60.0, 0xFFFFFF08, 0xFFFFFFFF);
+	CreatePlayerTile(playerid, GearSlot_Skin[0], GearSlot_Skin[1], GearSlot_Skin[2], 560.0, 300.0, 60.0, 60.0, 0xFFFFFF08, 0xFFFFFFFF);
 
-	PlayerTextDrawSetString(playerid, ApparelSlot_Head[0], "Head");
-	PlayerTextDrawSetString(playerid, ApparelSlot_Hand[0], "Hand");
-	PlayerTextDrawSetString(playerid, ApparelSlot_Tors[0], "Torso");
-	PlayerTextDrawSetString(playerid, ApparelSlot_Back[0], "Back");
+	PlayerTextDrawSetString(playerid, GearSlot_Head[0], "Head");
+	PlayerTextDrawSetString(playerid, GearSlot_Hand[0], "Hand");
+	PlayerTextDrawSetString(playerid, GearSlot_Tors[0], "Torso");
+	PlayerTextDrawSetString(playerid, GearSlot_Back[0], "Back");
+	PlayerTextDrawSetString(playerid, GearSlot_Hols[0], "Holster");
+	PlayerTextDrawSetString(playerid, GearSlot_Skin[0], "Clothes");
 }
 
 
@@ -64,10 +70,12 @@ ShowPlayerGear(playerid)
 {
 	for(new i; i < 3; i++)
 	{
-		PlayerTextDrawShow(playerid, ApparelSlot_Head[i]);
-		PlayerTextDrawShow(playerid, ApparelSlot_Hand[i]);
-		PlayerTextDrawShow(playerid, ApparelSlot_Tors[i]);
-		PlayerTextDrawShow(playerid, ApparelSlot_Back[i]);
+		PlayerTextDrawShow(playerid, GearSlot_Head[i]);
+		PlayerTextDrawShow(playerid, GearSlot_Hand[i]);
+		PlayerTextDrawShow(playerid, GearSlot_Tors[i]);
+		PlayerTextDrawShow(playerid, GearSlot_Back[i]);
+		PlayerTextDrawShow(playerid, GearSlot_Hols[i]);
+		PlayerTextDrawShow(playerid, GearSlot_Skin[i]);
 	}
 }
 
@@ -75,80 +83,120 @@ HidePlayerGear(playerid)
 {
 	for(new i; i < 3; i++)
 	{
-		PlayerTextDrawHide(playerid, ApparelSlot_Head[i]);
-		PlayerTextDrawHide(playerid, ApparelSlot_Hand[i]);
-		PlayerTextDrawHide(playerid, ApparelSlot_Tors[i]);
-		PlayerTextDrawHide(playerid, ApparelSlot_Back[i]);
+		PlayerTextDrawHide(playerid, GearSlot_Head[i]);
+		PlayerTextDrawHide(playerid, GearSlot_Hand[i]);
+		PlayerTextDrawHide(playerid, GearSlot_Tors[i]);
+		PlayerTextDrawHide(playerid, GearSlot_Back[i]);
+		PlayerTextDrawHide(playerid, GearSlot_Hols[i]);
+		PlayerTextDrawHide(playerid, GearSlot_Skin[i]);
 	}
 }
 
-UpdatePlayerGear(playerid)
+UpdatePlayerGear(playerid, show = 1)
 {
 	new
-		tmp[MAX_ITEM_NAME],
+		tmp[ITM_MAX_NAME],
 		itemid;
 
 
 	itemid = INVALID_ITEM_ID;
 	if(IsValidItem(itemid))
 	{
-		PlayerTextDrawSetString(playerid, ApparelSlot_Head[UI_ELEMENT_ITEM], "none");
-		PlayerTextDrawSetPreviewModel(playerid, ApparelSlot_Head[UI_ELEMENT_TILE], 23);
-		PlayerTextDrawSetPreviewRot(playerid, ApparelSlot_Head[UI_ELEMENT_TILE], -45.0, 0.0, -45.0, 1.0);
+		PlayerTextDrawSetString(playerid, GearSlot_Head[UI_ELEMENT_ITEM], "none");
+		PlayerTextDrawSetPreviewModel(playerid, GearSlot_Head[UI_ELEMENT_TILE], 23);
+		PlayerTextDrawSetPreviewRot(playerid, GearSlot_Head[UI_ELEMENT_TILE], -45.0, 0.0, -45.0, 1.0);
 	}
 	else
 	{
-		PlayerTextDrawSetString(playerid, ApparelSlot_Head[UI_ELEMENT_ITEM], "<Empty>");
-		PlayerTextDrawSetPreviewModel(playerid, ApparelSlot_Head[UI_ELEMENT_TILE], 19300);
+		PlayerTextDrawSetString(playerid, GearSlot_Head[UI_ELEMENT_ITEM], "<Empty>");
+		PlayerTextDrawSetPreviewModel(playerid, GearSlot_Head[UI_ELEMENT_TILE], 19300);
 	}
 
 	itemid = GetPlayerItem(playerid);
 	if(IsValidItem(itemid))
 	{
 		GetItemTypeName(GetItemType(itemid), tmp);
-		PlayerTextDrawSetString(playerid, ApparelSlot_Hand[UI_ELEMENT_ITEM], tmp);
-		PlayerTextDrawSetPreviewModel(playerid, ApparelSlot_Hand[UI_ELEMENT_TILE], GetItemTypeModel(GetItemType(itemid)));
-		PlayerTextDrawSetPreviewRot(playerid, ApparelSlot_Hand[UI_ELEMENT_TILE], -45.0, 0.0, -45.0, 1.0);
+		PlayerTextDrawSetString(playerid, GearSlot_Hand[UI_ELEMENT_ITEM], tmp);
+		PlayerTextDrawSetPreviewModel(playerid, GearSlot_Hand[UI_ELEMENT_TILE], GetItemTypeModel(GetItemType(itemid)));
+		PlayerTextDrawSetPreviewRot(playerid, GearSlot_Hand[UI_ELEMENT_TILE], -45.0, 0.0, -45.0, 1.0);
 	}
 	else
 	{
-		PlayerTextDrawSetString(playerid, ApparelSlot_Hand[UI_ELEMENT_ITEM], "<Empty>");
-		PlayerTextDrawSetPreviewModel(playerid, ApparelSlot_Hand[UI_ELEMENT_TILE], 19300);
+		if(gPlayerArmedWeapon[playerid] != 0)
+		{
+			PlayerTextDrawSetString(playerid, GearSlot_Hand[UI_ELEMENT_ITEM], WepData[gPlayerArmedWeapon[playerid]][WepName]);
+			PlayerTextDrawSetPreviewModel(playerid, GearSlot_Hand[UI_ELEMENT_TILE], WepData[gPlayerArmedWeapon[playerid]][WepModel]);
+			PlayerTextDrawSetPreviewRot(playerid, GearSlot_Hand[UI_ELEMENT_TILE], -45.0, 0.0, -45.0, 1.0);
+		}
+		else
+		{
+			PlayerTextDrawSetString(playerid, GearSlot_Hand[UI_ELEMENT_ITEM], "<Empty>");
+			PlayerTextDrawSetPreviewModel(playerid, GearSlot_Hand[UI_ELEMENT_TILE], 19300);
+		}
 	}
 
 	itemid = INVALID_ITEM_ID;
 	if(IsValidItem(itemid))
 	{
-		PlayerTextDrawSetString(playerid, ApparelSlot_Tors[UI_ELEMENT_ITEM], "none");
-		PlayerTextDrawSetPreviewModel(playerid, ApparelSlot_Tors[UI_ELEMENT_TILE], 23);
-		PlayerTextDrawSetPreviewRot(playerid, ApparelSlot_Tors[UI_ELEMENT_TILE], -45.0, 0.0, -45.0, 1.0);
+		PlayerTextDrawSetString(playerid, GearSlot_Tors[UI_ELEMENT_ITEM], "none");
+		PlayerTextDrawSetPreviewModel(playerid, GearSlot_Tors[UI_ELEMENT_TILE], 23);
+		PlayerTextDrawSetPreviewRot(playerid, GearSlot_Tors[UI_ELEMENT_TILE], -45.0, 0.0, -45.0, 1.0);
 	}
 	else
 	{
-		PlayerTextDrawSetString(playerid, ApparelSlot_Tors[UI_ELEMENT_ITEM], "<Empty>");
-		PlayerTextDrawSetPreviewModel(playerid, ApparelSlot_Tors[UI_ELEMENT_TILE], 19300);
+		PlayerTextDrawSetString(playerid, GearSlot_Tors[UI_ELEMENT_ITEM], "<Empty>");
+		PlayerTextDrawSetPreviewModel(playerid, GearSlot_Tors[UI_ELEMENT_TILE], 19300);
 	}
 
 	itemid = GetPlayerBackpackItem(playerid);
 	if(IsValidItem(itemid))
 	{
 		GetItemTypeName(GetItemType(itemid), tmp);
-		PlayerTextDrawSetString(playerid, ApparelSlot_Back[UI_ELEMENT_ITEM], tmp);
-		PlayerTextDrawSetPreviewModel(playerid, ApparelSlot_Back[UI_ELEMENT_TILE], GetItemTypeModel(GetItemType(itemid)));
-		PlayerTextDrawSetPreviewRot(playerid, ApparelSlot_Back[UI_ELEMENT_TILE], -45.0, 0.0, -45.0, 1.0);
+		PlayerTextDrawSetString(playerid, GearSlot_Back[UI_ELEMENT_ITEM], tmp);
+		PlayerTextDrawSetPreviewModel(playerid, GearSlot_Back[UI_ELEMENT_TILE], GetItemTypeModel(GetItemType(itemid)));
+		PlayerTextDrawSetPreviewRot(playerid, GearSlot_Back[UI_ELEMENT_TILE], 0.0, 0.0, -45.0, 1.0);
 	}
 	else
 	{
-		PlayerTextDrawSetString(playerid, ApparelSlot_Back[UI_ELEMENT_ITEM], "<Empty>");
-		PlayerTextDrawSetPreviewModel(playerid, ApparelSlot_Back[UI_ELEMENT_TILE], 19300);
+		PlayerTextDrawSetString(playerid, GearSlot_Back[UI_ELEMENT_ITEM], "<Empty>");
+		PlayerTextDrawSetPreviewModel(playerid, GearSlot_Back[UI_ELEMENT_TILE], 19300);
 	}
+
+	itemid = GetPlayerHolsteredWeapon(playerid);
+	if(0 < itemid < WEAPON_PARACHUTE)
+	{
+		PlayerTextDrawSetString(playerid, GearSlot_Hols[UI_ELEMENT_ITEM], "none");
+		PlayerTextDrawSetPreviewModel(playerid, GearSlot_Hols[UI_ELEMENT_TILE], WepData[itemid][WepModel]);
+		PlayerTextDrawSetPreviewRot(playerid, GearSlot_Hols[UI_ELEMENT_TILE], -45.0, 0.0, -45.0, 1.0);
+	}
+	else
+	{
+		PlayerTextDrawSetString(playerid, GearSlot_Hols[UI_ELEMENT_ITEM], "<Empty>");
+		PlayerTextDrawSetPreviewModel(playerid, GearSlot_Hols[UI_ELEMENT_TILE], 19300);
+	}
+
+	itemid = GetPlayerClothes(playerid);
+	if(IsValidClothes(itemid))
+	{
+		GetClothesName(itemid, tmp);
+		PlayerTextDrawSetString(playerid, GearSlot_Skin[UI_ELEMENT_ITEM], tmp);
+		PlayerTextDrawSetPreviewModel(playerid, GearSlot_Skin[UI_ELEMENT_TILE], GetClothesModel(itemid));
+		PlayerTextDrawSetPreviewRot(playerid, GearSlot_Skin[UI_ELEMENT_TILE], 0.0, 0.0, 0.0, 1.0);
+	}
+	else
+	{
+		PlayerTextDrawSetString(playerid, GearSlot_Skin[UI_ELEMENT_ITEM], "<Empty>");
+		PlayerTextDrawSetPreviewModel(playerid, GearSlot_Skin[UI_ELEMENT_TILE], 19300);
+	}
+
+	if(show)
+		ShowPlayerGear(playerid);
 }
 
 public OnPlayerOpenInventory(playerid)
 {
 	ShowPlayerGear(playerid);
 	UpdatePlayerGear(playerid);
-	ShowPlayerGear(playerid);
 
 	return CallLocalFunction("app_OnPlayerOpenInventory", "d", playerid);
 }
@@ -173,6 +221,21 @@ public OnPlayerCloseInventory(playerid)
 #endif
 #define OnPlayerCloseInventory app_OnPlayerCloseInventory
 forward app_OnPlayerCloseInventory(playerid);
+
+public OnPlayerOpenContainer(playerid, containerid)
+{
+	ShowPlayerGear(playerid);
+	UpdatePlayerGear(playerid);
+
+	return CallLocalFunction("app_OnPlayerOpenContainer", "dd", playerid, containerid);
+}
+#if defined _ALS_OnPlayerOpenContainer
+	#undef OnPlayerOpenContainer
+#else
+	#define _ALS_OnPlayerOpenContainer
+#endif
+#define OnPlayerOpenContainer app_OnPlayerOpenContainer
+forward app_OnPlayerOpenContainer(playerid, containerid);
 
 public OnPlayerCloseContainer(playerid, containerid)
 {
@@ -205,11 +268,11 @@ public OnPlayerTakeFromContainer(playerid, containerid, slotid)
 #define OnPlayerTakeFromContainer app_OnPlayerTakeFromContainer
 forward app_OnPlayerTakeFromContainer(playerid, containerid, slotid);
 
-public OnPlayerRemoveFromInventory(playerid)
+public OnPlayerRemoveFromInventory(playerid, slotid)
 {
-	UpdatePlayerGear(playerid);
+	UpdatePlayerGear(playerid, 0);
 
-	return CallLocalFunction("app_OnPlayerRemoveFromInventory", "d", playerid);
+	return CallLocalFunction("app_OnPlayerRemoveFromInventory", "dd", playerid, slotid);
 }
 #if defined _ALS_OnPlayerRemoveFromInv
 	#undef OnPlayerRemoveFromInventory
@@ -217,39 +280,129 @@ public OnPlayerRemoveFromInventory(playerid)
 	#define _ALS_OnPlayerRemoveFromInv
 #endif
 #define OnPlayerRemoveFromInventory app_OnPlayerRemoveFromInventory
-forward app_OnPlayerRemoveFromInventory(playerid);
+forward app_OnPlayerRemoveFromInventory(playerid, slotid);
 
+public OnPlayerAddToInventory(playerid, itemid)
+{
+	UpdatePlayerGear(playerid, 0);
+
+	return CallLocalFunction("app_OnPlayerAddToInventory", "dd", playerid, itemid);
+}
+#if defined _ALS_OnPlayerRemoveFromInv
+	#undef OnPlayerAddToInventory
+#else
+	#define _ALS_OnPlayerRemoveFromInv
+#endif
+#define OnPlayerAddToInventory app_OnPlayerAddToInventory
+forward app_OnPlayerAddToInventory(playerid, itemid);
+
+public OnItemRemovedFromPlayer(playerid, itemid)
+{
+	if(GetItemTypeSize(GetItemType(itemid)) == ITEM_SIZE_CARRY)
+		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
+	
+	return CallLocalFunction("app_OnPlayerAddToInventory", "dd", playerid, itemid);
+}
+#if defined _ALS_OnPlayerRemoveFromInv
+	#undef OnPlayerAddToInventory
+#else
+	#define _ALS_OnPlayerRemoveFromInv
+#endif
+#define OnPlayerAddToInventory app_OnPlayerAddToInventory
+forward app_OnPlayerAddToInventory(playerid, itemid);
 
 hook OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 {
-	if(playertextid == ApparelSlot_Head[UI_ELEMENT_TILE])
+	if(playertextid == GearSlot_Head[UI_ELEMENT_TILE])
 	{
 		Msg(playerid, YELLOW, "Head");
 	}
-	if(playertextid == ApparelSlot_Hand[UI_ELEMENT_TILE])
+	if(playertextid == GearSlot_Hand[UI_ELEMENT_TILE])
 	{
 		new itemid = GetPlayerItem(playerid);
 
 		if(IsValidItem(itemid))
 		{
-			if(GetItemTypeSize(GetItemType(itemid)) != ITEM_SIZE_SMALL)
-				ShowMsgBox(playerid, "That item is too big for your inventory", 3000, 140);
-
+			new containerid = GetPlayerCurrentContainer(playerid);
+			if(IsValidContainer(containerid))
+			{
+				AddItemToContainer(containerid, itemid);
+				UpdatePlayerGear(playerid);
+				DisplayContainerInventory(playerid, containerid);
+			}
 			else
 			{
-				if(AddItemToInventory(playerid, itemid) == 1)
-					ShowMsgBox(playerid, "Item added to inventory", 3000, 150);
-
+				if(GetItemTypeSize(GetItemType(itemid)) != ITEM_SIZE_SMALL)
+				{
+					ShowMsgBox(playerid, "That item is too big for your inventory", 3000, 140);
+				}
 				else
-					ShowMsgBox(playerid, "Inventory full", 3000, 100);
+				{
+					if(AddItemToInventory(playerid, itemid) == 1)
+						ShowMsgBox(playerid, "Item added to inventory", 3000, 150);
+
+					else
+						ShowMsgBox(playerid, "Inventory full", 3000, 100);
+				}
+				UpdatePlayerGear(playerid);
+				DisplayPlayerInventory(playerid);
+			}
+		}
+		else if(gPlayerArmedWeapon[playerid] != 0)
+		{
+			new containerid = GetPlayerCurrentContainer(playerid);
+			if(IsValidContainer(containerid))
+			{
+				if(IsContainerFull(containerid))
+				{
+					new str[CNT_MAX_NAME + 6];
+					GetContainerName(containerid, str);
+					strcat(str, " full");
+					ShowMsgBox(playerid, str, 3000, 150);
+					return 1;
+				}
+
+				itemid = CreateItem(ItemType:gPlayerArmedWeapon[playerid], 0.0, 0.0, 0.0);
+
+				SetItemExtraData(itemid, GetPlayerAmmo(playerid));
+				AddItemToContainer(containerid, itemid);
+				RemovePlayerWeapon(playerid, _:gPlayerArmedWeapon[playerid]);
+				gPlayerArmedWeapon[playerid] = 0;
+
+				UpdatePlayerGear(playerid);
+				DisplayContainerInventory(playerid, containerid);
+			}
+			else
+			{
+				if(IsPlayerInventoryFull(playerid))
+				{
+					ShowMsgBox(playerid, "Inventory full", 3000, 150);
+					return 1;
+				}
+				switch(gPlayerArmedWeapon[playerid])
+				{
+					case 2, 3, 5, 6, 7, 8, 15, 1, 4, 16..18, 22..24, 10..13, 26, 28, 32, 39..41, 43, 44, 45:
+					{
+						itemid = CreateItem(ItemType:gPlayerArmedWeapon[playerid], 0.0, 0.0, 0.0);
+
+						SetItemExtraData(itemid, GetPlayerAmmo(playerid));
+						AddItemToInventory(playerid, itemid);
+						RemovePlayerWeapon(playerid, _:gPlayerArmedWeapon[playerid]);
+						gPlayerArmedWeapon[playerid] = 0;
+
+						ShowMsgBox(playerid, "Item added to inventory", 3000, 150);
+					}
+				}
+				UpdatePlayerGear(playerid);
+				DisplayPlayerInventory(playerid);
 			}
 		}
 	}
-	if(playertextid == ApparelSlot_Tors[UI_ELEMENT_TILE])
+	if(playertextid == GearSlot_Tors[UI_ELEMENT_TILE])
 	{
 		Msg(playerid, YELLOW, "Torso");
 	}
-	if(playertextid == ApparelSlot_Back[UI_ELEMENT_TILE])
+	if(playertextid == GearSlot_Back[UI_ELEMENT_TILE])
 	{
 		new itemid = GetPlayerBackpackItem(playerid);
 
@@ -262,8 +415,63 @@ hook OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 			}
 			else
 			{
-				DisplayContainerInventory(playerid, GetItemExtraData(itemid), 1);
+				DisplayContainerInventory(playerid, GetItemExtraData(itemid));
 			}
 		}
 	}
+	if(playertextid == GearSlot_Hols[UI_ELEMENT_TILE])
+	{
+		if(0 < GetPlayerHolsteredWeapon(playerid) < WEAPON_PARACHUTE)
+		{
+			new containerid = GetPlayerCurrentContainer(playerid);
+			if(IsValidContainer(containerid))
+			{
+				if(IsContainerFull(containerid))
+				{
+					new str[CNT_MAX_NAME + 6];
+					GetContainerName(containerid, str);
+					strcat(str, " full");
+					ShowMsgBox(playerid, str, 3000, 150);
+					return 1;
+				}
+
+				new itemid = CreateItem(ItemType:GetPlayerHolsteredWeapon(playerid), 0.0, 0.0, 0.0);
+
+				SetItemExtraData(itemid, GetPlayerHolsteredWeaponAmmo(playerid));
+				AddItemToContainer(containerid, itemid);
+				RemoveHolsterWeapon(playerid);
+
+				UpdatePlayerGear(playerid);
+				DisplayContainerInventory(playerid, containerid);
+			}
+			else
+			{
+				if(IsPlayerInventoryFull(playerid))
+				{
+					ShowMsgBox(playerid, "Inventory full", 3000, 150);
+					return 1;
+				}
+				switch(GetPlayerHolsteredWeapon(playerid))
+				{
+					case 2, 3, 5, 6, 7, 8, 15, 1, 4, 16..18, 22..24, 10..13, 26, 28, 32, 39..41, 43, 44, 45:
+					{
+						new itemid = CreateItem(ItemType:GetPlayerHolsteredWeapon(playerid), 0.0, 0.0, 0.0);
+
+						SetItemExtraData(itemid, GetPlayerHolsteredWeaponAmmo(playerid));
+						AddItemToInventory(playerid, itemid);
+						RemoveHolsterWeapon(playerid);
+
+						ShowMsgBox(playerid, "Item added to inventory", 3000, 150);
+					}
+				}
+				UpdatePlayerGear(playerid);
+				DisplayPlayerInventory(playerid);
+			}
+		}
+	}
+	if(playertextid == GearSlot_Skin[UI_ELEMENT_TILE])
+	{
+		Msg(playerid, YELLOW, "Clothes");
+	}
+	return 1;
 }

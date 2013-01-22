@@ -80,8 +80,8 @@ DestroyFireworkProjectile(id)
 	fwk_Data[id][fwk_sequence] = 0;
 	fwk_Data[id][fwk_index] = 0;
 
-	Iter_Remove(fwk_ProjectileIndex, id);
-	return 1;
+	Iter_SafeRemove(fwk_ProjectileIndex, id, id);
+	return id;
 
 }
 
@@ -147,7 +147,7 @@ public OnDynamicObjectMoved(objectid)
 			
 			if(index >= MAX_EX_PER_SEQUENCE)
 			{
-				DestroyFireworkProjectile(i);
+				i = DestroyFireworkProjectile(i);
 				return 0;
 			}
 
@@ -155,14 +155,14 @@ public OnDynamicObjectMoved(objectid)
 
 		    if(extype == -1)
 			{
-				DestroyFireworkProjectile(i);
+				i = DestroyFireworkProjectile(i);
 				return 0;
 			}
 
 			while(maxmodels < 8 && fwk_ExplosionTypes[extype][fwk_model][maxmodels] != -1)
 				maxmodels++;
 
-			DestroyFireworkProjectile(i);
+			i = DestroyFireworkProjectile(i);
 			
 			angoffset = random((360/fwk_ExplosionTypes[extype][fwk_spread]));
 

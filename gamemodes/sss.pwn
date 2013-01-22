@@ -3,7 +3,8 @@
 
 	Southclaw's Scavenge and Survive
 
-		Big thanks to Onfire559/Adam for the initial concept long ago.
+		Big thanks to Onfire559/Adam for the initial concept and developing
+		the idea a lot long ago with some very productive discussions!
 		Recently influenced by Minecraft and DayZ, credits to the creators of
 		those games and their fundamental mechanics and concepts.
 
@@ -36,6 +37,8 @@
 #include <playerbar>
 #include <rbits>
 #include <CameraMover>
+#include <FileManager>
+#include <SIF/SIF>
 
 native WP_Hash(buffer[], len, const str[]);
 
@@ -63,6 +66,7 @@ native WP_Hash(buffer[], len, const str[]);
 #define ROW_NAME					"name"
 #define ROW_PASS					"pass"
 #define ROW_SKIN					"skin"
+#define ROW_GEND					"gend"
 #define ROW_IPV4					"ipv4"
 #define ROW_ALIVE					"alive"
 #define ROW_SPAWN					"spawn"
@@ -82,10 +86,6 @@ native WP_Hash(buffer[], len, const str[]);
 #define SKIN_F_HERO					(191)
 #define SKIN_F_MECH					(298)
 #define SKIN_F_BANDIT				(131)
-
-#define CHANNEL_GLOBAL				(-1)
-#define CHANNEL_TEAM				(50)
-#define CHANNEL_VEHICLE				(51)
 
 #define RUN_VELOCITY				(20)
 #define CROUCH_VELOCITY				(20)
@@ -168,6 +168,7 @@ native WP_Hash(buffer[], len, const str[]);
 #define ATTACHSLOT_USE				(1)
 #define ATTACHSLOT_HOLSTER			(2)
 #define ATTACHSLOT_HOLD				(3)
+#define ATTACHSLOT_CUFFS			(4)
 
 
 
@@ -180,19 +181,12 @@ enum
 
 	d_Login,
 	d_Register,
-    d_WelcomeMsg,
+	d_WelcomeMsg,
 	d_LogMsg,
 
 	d_Stats,
-
-	d_Inventory,
-	d_InventoryOptions,
-	d_InventoryCombine,
-	d_ContainerInventory,
-	d_ContainerOptions,
-	d_ContainerPlayerInv,
-	d_ContainerPlayerInvOptions,
 	d_SignEdit,
+	d_Tires,
 
 	d_NotebookPage,
 	d_NotebookEdit,
@@ -222,9 +216,9 @@ new const AdminName[4][14]=
 },
 AdminColours[5]=
 {
-    0xFFFFFFFF,		// 0
-    0x5DFC0AFF,		// 1
-    0x33CCFFAA,		// 2
+	0xFFFFFFFF,		// 0
+	0x5DFC0AFF,		// 1
+	0x33CCFFAA,		// 2
 	0x6600FFFF,		// 3
 	0x6600FFFF		// 4
 };
@@ -236,7 +230,6 @@ enum (<<=1)
 	ChatLocked = 1,
 	ServerLocked,
 	Restarting,
-	ScheduledRestart,
 
 	Realtime,
 	ServerTimeFlow
@@ -250,6 +243,8 @@ new
 	bServerGlobalSettings,
 	gMessageOfTheDay[MAX_MOTD_LEN],
 	gAdminData[MAX_ADMIN][e_admin_data],
+	gDefaultSkinM,
+	gDefaultSkinF,
 	gTotalAdmins;
 
 enum E_WEATHER_DATA
@@ -299,6 +294,20 @@ new
 		{20, "Dusk"}
 	};
 
+//=====================Loot Types
+enum
+{
+	loot_Civilian,
+	loot_Industrial,
+	loot_Police,
+	loot_Military,
+	loot_Medical,
+	loot_CarCivilian,
+	loot_CarIndustrial,
+	loot_CarPolice,
+	loot_CarMilitary,
+	loot_Survivor
+}
 
 //=====================Clock and Timers
 new
@@ -320,6 +329,8 @@ Text:			HitMark_offset		= INVALID_TEXT_DRAW,
 PlayerText:		ClassBackGround		= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		ClassButtonMale		= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		ClassButtonFemale	= PlayerText:INVALID_TEXT_DRAW,
+PlayerText:		HungerBarBackground	= PlayerText:INVALID_TEXT_DRAW,
+PlayerText:		HungerBarForeground	= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		HelpTipText			= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		VehicleNameText		= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		VehicleSpeedText	= PlayerText:INVALID_TEXT_DRAW,
@@ -343,14 +354,13 @@ enum (<<= 1) // 14
 		Spawned,
 		FirstSpawn,
 		HelpTips,
+		GlobalChat,
 
 		RegenHP,
 		RegenAP,
 		Frozen,
 		Muted,
 
-		AfkCheck,
-		IsAfk,
 		DebugMode,
 }
 enum E_PLAYER_DATA
@@ -377,17 +387,16 @@ DB:		gAccounts,
 		gPlayerName				[MAX_PLAYERS][MAX_PLAYER_NAME],
 Float:	gPlayerHP				[MAX_PLAYERS],
 Float:	gPlayerAP				[MAX_PLAYERS],
+Float:	gPlayerFP				[MAX_PLAYERS],
 		gPlayerColour			[MAX_PLAYERS],
 		gPlayerVehicleID		[MAX_PLAYERS],
 Float:	gPlayerVelocity			[MAX_PLAYERS],
 Float:	gCurrentVelocity		[MAX_PLAYERS],
+		gPlayerArmedWeapon		[MAX_PLAYERS],
 
-		gClassBoxFadeLevel		[MAX_PLAYERS],
-Timer:	gClassFadeTimer			[MAX_PLAYERS],
+		gScreenBoxFadeLevel		[MAX_PLAYERS],
+Timer:	gScreenFadeTimer		[MAX_PLAYERS],
 Float:	gPlayerDeathPos			[MAX_PLAYERS][4],
-		gPlayerChatChannel		[MAX_PLAYERS],
-		Blocked					[MAX_PLAYERS][MAX_PLAYERS],
-		Hidden					[MAX_PLAYERS][MAX_PLAYERS],
 
 		tick_WeaponHit			[MAX_PLAYERS],
 		tick_LastDeath			[MAX_PLAYERS],
@@ -399,7 +408,6 @@ Float:	gPlayerDeathPos			[MAX_PLAYERS][4],
 		ChatMessageStreak		[MAX_PLAYERS],
 		ChatMuteTick			[MAX_PLAYERS],
 
-Text3D:	gPlayerAfkLabel			[MAX_PLAYERS],
 Float:	TankHeat				[MAX_PLAYERS],
 Timer:	TankHeatUpdateTimer		[MAX_PLAYERS];
 
@@ -430,21 +438,13 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/System/PlayerFunctions.pwn"
 #include "../scripts/System/VehicleFunctions.pwn"
 #include "../scripts/System/Trajectory.pwn"
-#include "../scripts/System/MessageBox.pwn"
 
 //======================API Scripts
 
-#include "../scripts/SIF/Core.pwn"
-#include "../scripts/SIF/Button.pwn"
-#include "../scripts/SIF/Door.pwn"
-#include "../scripts/SIF/Item.pwn"
-#include "../scripts/SIF/Inventory.pwn"
-#include "../scripts/SIF/Container.pwn"
-
-#include "../scripts/SIF/Modules/WeaponItems.pwn"
-#include "../scripts/SIF/Modules/NewMelee.pwn"
-#include "../scripts/SIF/Modules/Craft.pwn"
-#include "../scripts/SIF/Modules/Notebook.pwn"
+#include <SIF/Modules/WeaponItems.pwn>
+#include <SIF/Modules/NewMelee.pwn>
+#include <SIF/Modules/Craft.pwn>
+#include <SIF/Modules/Notebook.pwn>
 
 
 #include "../scripts/API/Balloon/Balloon.pwn"
@@ -469,6 +469,9 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/Items/shield.pwn"
 #include "../scripts/Items/handcuffs.pwn"
 #include "../scripts/Items/capmine.pwn"
+#include "../scripts/Items/wheel.pwn"
+#include "../scripts/Items/gascan.pwn"
+#include "../scripts/Items/clothes.pwn"
 
 //======================Gameplay Features
 
@@ -478,7 +481,11 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/SSS/HouseLoot.pwn"
 #include "../scripts/SSS/VehicleData.pwn"
 #include "../scripts/SSS/VehicleSpawn.pwn"
+#include "../scripts/SSS/Vehicle.pwn"
+#include "../scripts/SSS/Fuel.pwn"
+
 #include "../scripts/SSS/Inventory.pwn"
+#include "../scripts/SSS/Food.pwn"
 #include "../scripts/SSS/Tutorial.pwn"
 
 #include "../scripts/SSS/Lvl_1.pwn"
@@ -513,7 +520,7 @@ main()
 
 	gAccounts = db_open(ACCOUNT_DATABASE);
 
-	db_free_result(db_query(gAccounts, "CREATE TABLE IF NOT EXISTS `Player` (`"#ROW_NAME"`, `"#ROW_PASS"`, `"#ROW_SKIN"`, `"#ROW_IPV4"`, `"#ROW_ALIVE"`, `"#ROW_SPAWN"`)"));
+	db_free_result(db_query(gAccounts, "CREATE TABLE IF NOT EXISTS `Player` (`"#ROW_NAME"`, `"#ROW_PASS"`, `"#ROW_SKIN"`, `"#ROW_IPV4"`, `"#ROW_ALIVE"`, `"#ROW_GEND"`, `"#ROW_SPAWN"`)"));
 	db_free_result(db_query(gAccounts, "CREATE TABLE IF NOT EXISTS `Bans` (`"#ROW_NAME"`, `"#ROW_IPV4"`, `"#ROW_DATE"`, `"#ROW_REAS"`, `"#ROW_BNBY"`)"));
 
 	tmpResult = db_query(gAccounts, "SELECT * FROM `Player`");
@@ -523,19 +530,19 @@ main()
 	{
 		for(new i;i<rowCount;i++)
 		{
-		    db_get_field_assoc(tmpResult, #ROW_PASS, tmpCurPass, MAX_PASSWORD_LEN);
-		    db_get_field_assoc(tmpResult, #ROW_NAME, tmpName, MAX_PASSWORD_LEN);
-		    if(strlen(tmpCurPass) < 128)
-		    {
-		        WP_Hash(tmpHashPass, MAX_PASSWORD_LEN, tmpCurPass);
+			db_get_field_assoc(tmpResult, #ROW_PASS, tmpCurPass, MAX_PASSWORD_LEN);
+			db_get_field_assoc(tmpResult, #ROW_NAME, tmpName, MAX_PASSWORD_LEN);
+			if(strlen(tmpCurPass) < 128)
+			{
+				WP_Hash(tmpHashPass, MAX_PASSWORD_LEN, tmpCurPass);
 
-		        format(tmpQuery, 512,
-		            "UPDATE `Player` SET `"#ROW_PASS"` = '%s' WHERE `"#ROW_NAME"` = '%s'",
-		            tmpHashPass, tmpName);
+				format(tmpQuery, 512,
+					"UPDATE `Player` SET `"#ROW_PASS"` = '%s' WHERE `"#ROW_NAME"` = '%s'",
+					tmpHashPass, tmpName);
 
 				db_free_result(db_query(gAccounts, tmpQuery));
-		    }
-		    db_next_row(tmpResult);
+			}
+			db_next_row(tmpResult);
 		}
 	}
 	db_free_result(tmpResult);
@@ -592,7 +599,7 @@ public OnGameModeInit()
 	SetMapName("San Androcalypse");
 
 	EnableStuntBonusForAll(false);
-    ManualVehicleEngineAndLights();
+	ManualVehicleEngineAndLights();
 	SetNameTagDrawDistance(1.0);
 	UsePlayerPedAnims();
 	AllowInteriorWeapons(true);
@@ -614,9 +621,9 @@ public OnGameModeInit()
 
 	else
 	{
-	    file_Open(SETTINGS_FILE);
+		file_Open(SETTINGS_FILE);
 		file_GetStr("motd", gMessageOfTheDay);
-	    file_Close();
+		file_Close();
 	}
 
 	if(!fexist(ADMIN_DATA_FILE))
@@ -637,81 +644,144 @@ public OnGameModeInit()
 		SortDeepArray(gAdminData, admin_Level, .order = SORT_DESC);
 	}
 
-	item_Medkit			= DefineItemType("Medkit",			1580,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.269091, 0.166367, 0.000000, 90.000000, 0.000000, 0.000000);
-	item_HardDrive		= DefineItemType("Hard Drive",		328,	ITEM_SIZE_SMALL);
-	item_Key			= DefineItemType("Key",				327,	ITEM_SIZE_SMALL);
-	item_FireworkBox	= DefineItemType("Firework Box",	3014,	ITEM_SIZE_LARGE);
-	item_FireLighter	= DefineItemType("Lighter",			327,	ITEM_SIZE_SMALL);
-	item_timer			= DefineItemType("Timer Device",	19273,	ITEM_SIZE_SMALL);
-	item_explosive		= DefineItemType("Explosive",		1576,	ITEM_SIZE_SMALL);
-	item_timebomb		= DefineItemType("Time Bomb",		1252,	ITEM_SIZE_SMALL);
-	item_battery		= DefineItemType("Battery",			2040,	ITEM_SIZE_MEDIUM);
-	item_fusebox		= DefineItemType("Fuse Box",		2038,	ITEM_SIZE_SMALL);
-	item_Beer			= DefineItemType("Beer",			1543,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.063184, 0.132318, 0.249579, 338.786285, 175.964538, 0.000000);
-	item_Sign			= DefineItemType("Sign",			19471,	ITEM_SIZE_LARGE, 0.0, 0.0, 270.0);
-	item_HealthRegen	= DefineItemType("Adrenaline",		1575,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.262021, 0.014938, 0.000000, 279.040191, 352.944946, 358.980987);
-	item_ArmourRegen	= DefineItemType("ElectroArmour",	19515,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.300333, -0.090105, 0.000000, 0.000000, 0.000000, 180.000000);
-	item_FishRod		= DefineItemType("Fishing Rod",		18632,	ITEM_SIZE_LARGE, 0.0, 0.0, 0.0, 0.091496, 0.019614, 0.000000, 185.619995, 354.958374, 0.000000);
-	item_Wrench			= DefineItemType("Wrench",			18633,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.084695, -0.009181, 0.152275, 98.865089, 270.085449, 0.000000);
-	item_Crowbar		= DefineItemType("Crowbar",			18634,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.066177, 0.011153, 0.038410, 97.289527, 270.962554, 1.114514);
-	item_Hammer			= DefineItemType("Hammer",			18635,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.000000, -0.008230, 0.000000, 6.428617, 0.000000, 0.000000);
-	item_Shield			= DefineItemType("Shield",			18637,	ITEM_SIZE_LARGE, 0.0, 0.0, 0.0, -0.262389, 0.016478, -0.151046, 103.597534, 6.474381, 38.321765);
-	item_Flashlight		= DefineItemType("Flashlight",		18641,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.061910, 0.022700, 0.039052, 190.938354, 0.000000, 0.000000);
-	item_Taser			= DefineItemType("Taser",			18642,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.079878, 0.014009, 0.029525, 180.000000, 0.000000, 0.000000);
-	item_LaserPoint		= DefineItemType("Laser Pointer",	18643,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.066244, 0.010838, -0.000024, 6.443027, 287.441467, 0.000000);
-	item_Screwdriver	= DefineItemType("Screwdriver",		18644,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.099341, 0.021018, 0.009145, 193.644195, 0.000000, 0.000000);
-	item_MobilePhone	= DefineItemType("Mobile Phone",	18865,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.103904, -0.003697, -0.015173, 94.655189, 184.031860, 0.000000);
-	item_Pager			= DefineItemType("Pager",			18875,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.097277, 0.027625, 0.013023, 90.819244, 191.427993, 0.000000);
-	item_Rake			= DefineItemType("Rake",			18890,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, -0.002599, 0.003984, 0.026356, 190.231231, 0.222518, 271.565185);
-	item_HotDog			= DefineItemType("Hotdog",			19346,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.088718, 0.035828, 0.008570, 272.851745, 354.704772, 9.342185);
-	item_EasterEgg		= DefineItemType("Easter Egg",		19345,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.000000, 0.000000, 0.000000, 0.000000, 90.000000, 0.000000);
-	item_Cane			= DefineItemType("Cane",			19348,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.041865, 0.022883, -0.079726, 4.967216, 10.411237, 0.000000);
-	item_HandCuffs		= DefineItemType("Handcuffs",		19418,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.077635, 0.011612, 0.000000, 0.000000, 90.000000, 0.000000);
-	item_Bucket			= DefineItemType("Bucket",			19468,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.293691, -0.074108, 0.020810, 148.961685, 280.067260, 151.782791);
-	item_GasMask		= DefineItemType("Gas Mask",		19472,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.062216, 0.055396, 0.001138, 90.000000, 0.000000, 180.000000);
-	item_Flag			= DefineItemType("Flag",			2993,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.045789, 0.026306, -0.078802, 8.777217, 0.272155, 0.000000);
-	item_Briefcase		= DefineItemType("Briefcase",		1210,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 90.0, 0.285915, 0.078406, -0.009429, 0.000000, 270.000000, 0.000000);
-	item_Backpack		= DefineItemType("Backpack",		3026,	ITEM_SIZE_MEDIUM, 0.0, 270.0, 0.0, 0.470918, 0.150153, 0.055384, 181.319580, 7.513789, 163.436065);
-	item_Satchel		= DefineItemType("Patrol Pack",		363,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.052853, 0.034967, -0.177413, 0.000000, 261.397491, 349.759826);
-	item_Wheel			= DefineItemType("Wheel",			1025,	ITEM_SIZE_MEDIUM, 0.0, 270.0, 0.0, 0.340184, -0.096594, 0.054843, 0.000000, 359.105285, 90.000000);
-	item_Canister1		= DefineItemType("Canister",		1008,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.303921, 0.033764, -0.105052, 0.000000, 0.000000, 0.000000);
-	item_Canister2		= DefineItemType("Canister",		1009,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.314470, 0.022019, -0.013475, 0.000000, 0.000000, 0.000000);
-	item_Canister3		= DefineItemType("Canister",		1010,	ITEM_SIZE_MEDIUM, 0.0, 0.0, 0.0, 0.301039, 0.077488, 0.022019, 90.000000, 0.000000, 0.000000);
-	item_MotionSense	= DefineItemType("Motion Sensor",	327,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.008151, 0.012682, -0.050635, 0.000000, 0.000000, 0.000000);
-	item_CapCase		= DefineItemType("Cap Case",		1213,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.191558, 0.000000, 0.040402, 90.000000, 0.000000, 0.000000);
-	item_CapMineBad		= DefineItemType("Bad Cap Mine",	1576,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.191558, 0.000000, 0.040402, 90.000000, 0.000000, 0.000000);
-	item_CapMine		= DefineItemType("Cap Mine",		1213,	ITEM_SIZE_SMALL, 0.0, 0.0, 0.0, 0.262021, 0.014938, 0.000000, 279.040191, 352.944946, 358.980987);
+	item_Medkit			= DefineItemType("Medkit",			1580,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.269091, 0.166367, 0.000000, 90.000000, 0.000000, 0.000000);
+	item_HardDrive		= DefineItemType("Hard Drive",		328,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0);
+	item_Key			= DefineItemType("Key",				327,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0);
+	item_FireworkBox	= DefineItemType("Firework Box",	3014,	ITEM_SIZE_CARRY,	0.0, 0.0, 0.0,			-0.027872, 0.145617, -0.246524, 243.789840, 347.397491, 349.931610);
+	item_FireLighter	= DefineItemType("Lighter",			327,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0);
+	item_timer			= DefineItemType("Timer Device",	19273,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0);
+	item_explosive		= DefineItemType("Explosive",		1576,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0);
+	item_timebomb		= DefineItemType("Time Bomb",		1252,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0);
+	item_battery		= DefineItemType("Battery",			2040,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0);
+	item_fusebox		= DefineItemType("Fuse Box",		2038,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0);
+	item_Beer			= DefineItemType("Beer",			1543,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.060376, 0.032063, -0.204802, 0.000000, 0.000000, 0.000000);
+	item_Sign			= DefineItemType("Sign",			19471,	ITEM_SIZE_LARGE,	0.0, 0.0, 270.0);
+	item_HealthRegen	= DefineItemType("Adrenaline",		1575,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.262021, 0.014938, 0.000000, 279.040191, 352.944946, 358.980987);
+	item_ArmourRegen	= DefineItemType("ElectroArmour",	19515,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			0.300333, -0.090105, 0.000000, 0.000000, 0.000000, 180.000000);
+	item_FishRod		= DefineItemType("Fishing Rod",		18632,	ITEM_SIZE_LARGE,	90.0, 0.0, 0.0,			0.091496, 0.019614, 0.000000, 185.619995, 354.958374, 0.000000);
+	item_Wrench			= DefineItemType("Wrench",			18633,	ITEM_SIZE_SMALL,	0.0, 90.0, 0.0,			0.084695, -0.009181, 0.152275, 98.865089, 270.085449, 0.000000);
+	item_Crowbar		= DefineItemType("Crowbar",			18634,	ITEM_SIZE_SMALL,	0.0, 90.0, 0.0,			0.066177, 0.011153, 0.038410, 97.289527, 270.962554, 1.114514);
+	item_Hammer			= DefineItemType("Hammer",			18635,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0,		0.000000, -0.008230, 0.000000, 6.428617, 0.000000, 0.000000);
+	item_Shield			= DefineItemType("Shield",			18637,	ITEM_SIZE_LARGE,	0.0, 0.0, 0.0,			-0.262389, 0.016478, -0.151046, 103.597534, 6.474381, 38.321765);
+	item_Flashlight		= DefineItemType("Flashlight",		18641,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			0.061910, 0.022700, 0.039052, 190.938354, 0.000000, 0.000000);
+	item_Taser			= DefineItemType("Taser",			18642,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			0.079878, 0.014009, 0.029525, 180.000000, 0.000000, 0.000000);
+	item_LaserPoint		= DefineItemType("Laser Pointer",	18643,	ITEM_SIZE_SMALL,	0.0, 0.0, 90.0,			0.066244, 0.010838, -0.000024, 6.443027, 287.441467, 0.000000);
+	item_Screwdriver	= DefineItemType("Screwdriver",		18644,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			0.099341, 0.021018, 0.009145, 193.644195, 0.000000, 0.000000);
+	item_MobilePhone	= DefineItemType("Mobile Phone",	18865,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.103904, -0.003697, -0.015173, 94.655189, 184.031860, 0.000000);
+	item_Pager			= DefineItemType("Pager",			18875,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.097277, 0.027625, 0.013023, 90.819244, 191.427993, 0.000000);
+	item_Rake			= DefineItemType("Rake",			18890,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			-0.002599, 0.003984, 0.026356, 190.231231, 0.222518, 271.565185);
+	item_HotDog			= DefineItemType("Hotdog",			19346,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.088718, 0.035828, 0.008570, 272.851745, 354.704772, 9.342185);
+	item_EasterEgg		= DefineItemType("Easter Egg",		19345,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.000000, 0.000000, 0.000000, 0.000000, 90.000000, 0.000000);
+	item_Cane			= DefineItemType("Cane",			19348,	ITEM_SIZE_MEDIUM,	270.0, 0.0, 0.0,		0.041865, 0.022883, -0.079726, 4.967216, 10.411237, 0.000000);
+	item_HandCuffs		= DefineItemType("Handcuffs",		19418,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0,		0.077635, 0.011612, 0.000000, 0.000000, 90.000000, 0.000000);
+	item_Bucket			= DefineItemType("Bucket",			19468,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0,			0.293691, -0.074108, 0.020810, 148.961685, 280.067260, 151.782791);
+	item_GasMask		= DefineItemType("Gas Mask",		19472,	ITEM_SIZE_SMALL,	180.0, 0.0, 0.0,		0.062216, 0.055396, 0.001138, 90.000000, 0.000000, 180.000000);
+	item_Flag			= DefineItemType("Flag",			2993,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.045789, 0.026306, -0.078802, 8.777217, 0.272155, 0.000000);
+	item_Briefcase		= DefineItemType("Briefcase",		1210,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 90.0,			0.285915, 0.078406, -0.009429, 0.000000, 270.000000, 0.000000);
+	item_Backpack		= DefineItemType("Backpack",		3026,	ITEM_SIZE_MEDIUM,	270.0, 0.0, 90.0,		0.470918, 0.150153, 0.055384, 181.319580, 7.513789, 163.436065);
+	item_Satchel		= DefineItemType("Patrol Pack",		363,	ITEM_SIZE_MEDIUM,	270.0, 0.0, 0.0,		0.052853, 0.034967, -0.177413, 0.000000, 261.397491, 349.759826);
+	item_Wheel			= DefineItemType("Wheel",			1025,	ITEM_SIZE_CARRY,	0.0, 270.0, 0.0,		-0.098016, 0.356168, -0.309851, 258.455596, 346.618103, 354.313049);
+	item_Canister1		= DefineItemType("Canister",		1008,	ITEM_SIZE_LARGE,	0.0, 0.0, 270.0,		0.303921, 0.033764, -0.105052, 0.000000, 0.000000, 0.000000);
+	item_Canister2		= DefineItemType("Canister",		1009,	ITEM_SIZE_LARGE,	0.0, 0.0, 270.0,		0.314470, 0.022019, -0.013475, 0.000000, 0.000000, 0.000000);
+	item_Canister3		= DefineItemType("Canister",		1010,	ITEM_SIZE_LARGE,	0.0, 0.0, 270.0,		0.301039, 0.077488, 0.022019, 90.000000, 0.000000, 0.000000);
+	item_MotionSense	= DefineItemType("Motion Sensor",	327,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.008151, 0.012682, -0.050635, 0.000000, 0.000000, 0.000000);
+	item_CapCase		= DefineItemType("Cap Case",		1213,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.191558, 0.000000, 0.040402, 90.000000, 0.000000, 0.000000);
+	item_CapMineBad		= DefineItemType("Bad Cap Mine",	1576,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.191558, 0.000000, 0.040402, 90.000000, 0.000000, 0.000000);
+	item_CapMine		= DefineItemType("Cap Mine",		1213,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.262021, 0.014938, 0.000000, 279.040191, 352.944946, 358.980987);
+	item_Pizza			= DefineItemType("Pizza",			1582,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0,			0.320344, 0.064041, 0.168296, 92.941909, 358.492523, 14.915378);
+	item_Burger			= DefineItemType("Burger",			2703,	ITEM_SIZE_SMALL,	-76.0, 257.0, -11.0,	0.066739, 0.041782, 0.026828, 3.703052, 3.163064, 6.946474);
+	item_BurgerBox		= DefineItemType("Burger",			2768,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.107883, 0.093265, 0.029676, 91.010627, 7.522015, 0.000000);
+	item_Taco			= DefineItemType("Taco",			2769,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.069803, 0.057707, 0.039241, 0.000000, 78.877342, 0.000000);
+	item_GasCan			= DefineItemType("Petrol Can",		1650,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0,			0.143402, 0.027548, 0.063652, 0.000000, 253.648208, 0.000000);
+	item_Clothes		= DefineItemType("Clothes",			2891,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0,			0.269091, 0.166367, 0.000000, 90.000000, 0.000000, 0.000000);
+
 
 	DefineItemDamage(item_Beer,			23.0,	"SWORD", 		"sword_1");
 	DefineItemDamage(item_Sign,			23.0,	"SWORD", 		"sword_1");
 	DefineItemDamage(item_FishRod,		23.0,	"SWORD", 		"sword_1");
 	DefineItemDamage(item_Shield,		23.0,	"SWORD", 		"sword_1");
-	DefineItemDamage(item_Wrench,		23.0,	"SWORD", 		"sword_1");
-	DefineItemDamage(item_Crowbar,		23.0,	"SWORD", 		"sword_1");
-	DefineItemDamage(item_Hammer,		23.0,	"SWORD", 		"sword_1");
-	DefineItemDamage(item_Screwdriver,	23.0,	"SWORD", 		"sword_1");
-	DefineItemDamage(item_Cane,			23.0,	"SWORD", 		"sword_1");
+	DefineItemDamage(item_Wrench,		23.0,	"BASEBALL", 	"Bat_Hit_1");
+	DefineItemDamage(item_Crowbar,		23.0,	"BASEBALL", 	"Bat_Hit_1");
+	DefineItemDamage(item_Hammer,		23.0,	"BASEBALL", 	"Bat_Hit_1");
+	DefineItemDamage(item_Screwdriver,	23.0,	"KNIFE", 		"KNIFE_3");
+	DefineItemDamage(item_Cane,			23.0,	"BASEBALL", 	"Bat_Hit_1");
 	DefineItemDamage(item_Rake,			23.0,	"SWORD", 		"sword_1");
 	DefineItemDamage(item_Canister1,	23.0,	"SWORD", 		"sword_1");
 	DefineItemDamage(item_Canister2,	23.0,	"SWORD", 		"sword_1");
 	DefineItemDamage(item_Canister3,	23.0,	"SWORD", 		"sword_1");
 
 
+	DefineFoodItem(item_HotDog,			30.0);
+	DefineFoodItem(item_Pizza,			50.0);
+	DefineFoodItem(item_Burger,			25.0);
+	DefineFoodItem(item_BurgerBox,		25.0);
+	DefineFoodItem(item_Taco,			20.0);
+
+
 	DefineItemCombo(item_timer, item_explosive, item_timebomb);
 	DefineItemCombo(item_explosive, item_MotionSense, item_CapMineBad);
 	DefineItemCombo(item_CapMineBad, item_CapCase, item_CapMine);
 
+
+	DefineLootIndex(loot_Civilian);
+	DefineLootIndex(loot_Industrial);
+	DefineLootIndex(loot_Police);
+	DefineLootIndex(loot_Military);
+	DefineLootIndex(loot_Medical);
+	DefineLootIndex(loot_CarCivilian);
+	DefineLootIndex(loot_CarIndustrial);
+	DefineLootIndex(loot_CarPolice);
+	DefineLootIndex(loot_CarMilitary);
+	DefineLootIndex(loot_Survivor);
+
+
+	CreateFuelOutlet(-1679.3594, 403.0547, 6.3828, 2.0, 100.0, float(random(100)));
+	CreateFuelOutlet(-1675.2188, 407.1953, 6.3828, 2.0, 100.0, float(random(100)));
+	CreateFuelOutlet(-1669.9063, 412.5313, 6.3828, 2.0, 100.0, float(random(100)));
+	CreateFuelOutlet(-1665.5234, 416.9141, 6.3828, 2.0, 100.0, float(random(100)));
+	CreateFuelOutlet(-1685.9688, 409.6406, 6.3828, 2.0, 100.0, float(random(100)));
+	CreateFuelOutlet(-1681.8281, 413.7813, 6.3828, 2.0, 100.0, float(random(100)));
+	CreateFuelOutlet(-1676.5156, 419.1172, 6.3828, 2.0, 100.0, float(random(100)));
+	CreateFuelOutlet(-1672.1328, 423.5000, 6.3828, 2.0, 100.0, float(random(100)));
+
+
+	gDefaultSkinM =	DefineSkinItem(60, "Civilian", 1, 1.0);
+	gDefaultSkinF =	DefineSkinItem(192, "Civilian", 0, 1.0);
+
+	DefineSkinItem(170,		"Civilian",			1, 1.0);
+	DefineSkinItem(188,		"Civilian",			1, 1.0);
+	DefineSkinItem(29,		"Civilian",			1, 1.0);
+	DefineSkinItem(206,		"Civilian",			1, 1.0);
+	DefineSkinItem(50,		"Mechanic",			1, 0.5);
+	DefineSkinItem(254,		"Biker",			1, 0.3);
+	DefineSkinItem(287,		"Military",			1, 0.2);
+	DefineSkinItem(101,		"Southclaw",		1, 0.1);
+	DefineSkinItem(156,		"Morgan Freeman",	1, 0.01);
+
+	DefineSkinItem(65,		"Civilian",			0, 1.0);
+	DefineSkinItem(41,		"Civilian",			0, 1.0);
+	DefineSkinItem(93,		"Civilian",			0, 1.0);
+	DefineSkinItem(233,		"Civilian",			0, 1.0);
+	DefineSkinItem(193,		"Civilian",			0, 1.0);
+	DefineSkinItem(194,		"Civilian",			0, 1.0);
+	DefineSkinItem(192,		"Mechanic",			0, 0.5);
+	DefineSkinItem(191,		"Military",			0, 0.2);
+	DefineSkinItem(198,		"Cowgirl",			0, 0.1);
+
+
+
+
 	CallLocalFunction("OnLoad", "");
+
 
 	LoadVehicles();
 	LoadTextDraws();
+
 
 	for(new i; i < MAX_PLAYERS; i++)
 	{
 		ResetVariables(i);
 	}
-
-	defer SpawnVehicles();
 
 	return 1;
 }
@@ -739,12 +809,6 @@ RestartGamemode()
 	SendRconCommand("gmx");
 }
 
-timer SpawnVehicles[1000]()
-{
-	for(new i; i < MAX_VEHICLES; i++)
-		SetVehicleToRespawn(i);
-}
-
 task GameUpdate[1000]()
 {
 	if(bServerGlobalSettings & ServerTimeFlow)
@@ -761,8 +825,7 @@ task GameUpdate[1000]()
 
 		if(hour == 0 && minute == 0 && second < 6)
 		{
-		    if(Iter_Count(Player) == 0)RestartGamemode();
-		    else t:bServerGlobalSettings<ScheduledRestart>;
+			RestartGamemode();
 		}
 
 		if(bServerGlobalSettings & Realtime)
@@ -786,16 +849,15 @@ task GameUpdate[1000]()
 		TextDrawSetString(ClockText, szClockText);
 	}
 
-	if(tickcount() - gLastWeatherChange > 480000 && RandomCondition(5))
+	if(tickcount() - gLastWeatherChange > 600000 && RandomCondition(5))
 	{
-	    new id = random(sizeof(WeatherData));
+		new id = random(sizeof(WeatherData));
 		gLastWeatherChange = tickcount();
 		gWeatherID = WeatherData[id][weather_id];
 		PlayerLoop(i)
 		{
 			if(GetPlayerVirtualWorld(i) == 0)
 			{
-			    MsgF(i, YELLOW, " >  Weather report: "#C_BLUE"%s", WeatherData[id][weather_name]);
 				SetPlayerWeather(i, WeatherData[gWeatherID][weather_id]);
 			}
 		}
@@ -804,6 +866,8 @@ task GameUpdate[1000]()
 
 ptask PlayerUpdate[100](playerid)
 {
+	ResetPlayerMoney(playerid);
+
 	if(bPlayerGameSettings[playerid] & RegenHP)
 	{
 		if(tickcount() - tick_StartRegenHP[playerid] > REGEN_HP_TIME)
@@ -885,46 +949,88 @@ ptask PlayerUpdate[100](playerid)
 		gCurrentVelocity[playerid] = gPlayerVelocity[playerid];
 	}
 
-	UpdateIcons(playerid);
+	if(gScreenBoxFadeLevel[playerid] == 0)
+	{
+		if(gPlayerHP[playerid] < 30.0)
+		{
+			PlayerTextDrawBoxColor(playerid, ClassBackGround, floatround((30.0 - gPlayerHP[playerid]) * 4.4));
+			PlayerTextDrawShow(playerid, ClassBackGround);
+		}
+		else
+		{
+			PlayerTextDrawHide(playerid, ClassBackGround);
+		}
+	}
+
 	SetPlayerTime(playerid, gTimeHour, gTimeMinute);
 
 	return 1;
 }
 
-ptask AfkCheckUpdate[3000](playerid)
+ptask FoodUpdate[1000](playerid)
 {
-	if(bPlayerGameSettings[playerid] & Spawned)
-	{
-	    new
-			playerstate = GetPlayerState(playerid);
+	new animidx = GetPlayerAnimationIndex(playerid);
 
-		if(bPlayerGameSettings[playerid] & AfkCheck)
+	if(animidx == 43) // Sitting
+	{
+		gPlayerFP[playerid] -= 0.0001;
+	}
+	else if(animidx == 1159) // Crouching
+	{
+		gPlayerFP[playerid] -= 0.003;
+	}
+	else if(animidx == 1195)
+	{
+		gPlayerFP[playerid] -= 0.03;	
+	}
+	else if(animidx == 1231) // Running
+	{
+		new k, ud, lr;
+		GetPlayerKeys(playerid, k, ud, lr);
+
+		if(k & KEY_WALK) // Walking
 		{
-			if(!(bPlayerGameSettings[playerid] & IsAfk))
-			{
-				if(tickcount() - tick_ExitVehicle[playerid] > 2000 && ((1 <= playerstate <= 3) || playerstate == 8))
-				{
-					OnPlayerPauseStateChange(playerid, 1);
-				}
-			}
+			gPlayerFP[playerid] -= 0.001;
+		}
+		else if(k & KEY_SPRINT) // Sprinting
+		{
+			gPlayerFP[playerid] -= 0.012;
+		}
+		else if(k & KEY_JUMP) // Jump
+		{
+			gPlayerFP[playerid] -= 0.03;
+		}
+		else // Running
+		{
+			gPlayerFP[playerid] -= 0.008;
 		}
 	}
-	if(!(bPlayerGameSettings[playerid] & AfkCheck))
+	else // Idle
 	{
-		if(bPlayerGameSettings[playerid] & IsAfk)
-		{
-			OnPlayerPauseStateChange(playerid, 0);
-		}
+		gPlayerFP[playerid] -= 0.0004;
 	}
 
-	t:bPlayerGameSettings[playerid]<AfkCheck>;
+	if(gPlayerFP[playerid] > 100.0)
+		gPlayerFP[playerid] = 100.0;
+
+	if(gPlayerFP[playerid] < 30.0)
+	{
+		SetPlayerDrunkLevel(playerid, 2000 + floatround((30.0 - gPlayerFP[playerid]) * 10.0));
+	}
+	if(gPlayerFP[playerid] < 20.0)
+	{
+		gPlayerHP[playerid] -= (20.0 - gPlayerFP[playerid]) / 10.0;
+	}
+	if(gPlayerFP[playerid] < 0.0)
+	{
+		gPlayerFP[playerid] = 0.0;
+	}
+
+	PlayerTextDrawLetterSize(playerid, HungerBarForeground, 0.500000, -(gPlayerFP[playerid] / 10.0));
+	PlayerTextDrawShow(playerid, HungerBarBackground);
+	PlayerTextDrawShow(playerid, HungerBarForeground);
 }
 
-ptask TimeReward[3600000](playerid)
-{
-	GivePlayerMoney(playerid, 10);
-	Msg(playerid, BLUE, " >  You have been awarded "#C_YELLOW"$10"#C_BLUE" for staying on the server for an hour!");
-}
 timer TankHeatUpdate[100](playerid)
 {
 	if(GetVehicleModel(GetPlayerVehicleID(playerid)) != 432)stop TankHeatUpdateTimer[playerid];
@@ -935,52 +1041,17 @@ timer TankHeatUpdate[100](playerid)
 	UpdatePlayerProgressBar(playerid, TankHeatBar);
 }
 
-UpdateIcons(playerid)
-{
-	new colour[1 char];
-
-	colour[0] = ColourData[gPlayerColour[playerid]][colour_value];
-
-	colour{3} = 0;
-
-	PlayerLoop(i)
-	{
-		ShowPlayerNameTagForPlayer(i, playerid, false);
-		SetPlayerMarkerForPlayer(i, playerid, colour[0]);
-	}
-
-	return 1;
-}
-
-OnPlayerPauseStateChange(playerid, newstate)
-{
-	if(newstate)
-	{
-		t:bPlayerGameSettings[playerid]<IsAfk>;
-		gPlayerAfkLabel[playerid] = Create3DTextLabel("Player Is Away", YELLOW, 0.0, 0.0, 0.0, 100.0, GetPlayerVirtualWorld(playerid), 1);
-		Attach3DTextLabelToPlayer(gPlayerAfkLabel[playerid], playerid, 0.0, 0.0, 0.5);
-	    return 1;
-	}
-	else
-	{
-		f:bPlayerGameSettings[playerid]<IsAfk>;
-		Delete3DTextLabel(gPlayerAfkLabel[playerid]);
-	    return 1;
-	}
-}
-
 public OnPlayerConnect(playerid)
 {
-    gPlayerColour[playerid] = playerid;
-	SetPlayerColor(playerid, ColourData[playerid][colour_value]);
+	gPlayerColour[playerid] = playerid;
+	SetPlayerColor(playerid, 0xB8B8B800);
 	SetPlayerWeather(playerid, WeatherData[gWeatherID][weather_id]);
 	GetPlayerName(playerid, gPlayerName[playerid], MAX_PLAYER_NAME);
 
 	if(IsPlayerNPC(playerid))return 1;
 
 	new
-	    jointype,
-	    tmpadminlvl,
+		tmpadminlvl,
 		tmpIP[16],
 		tmpByte[4],
 		tmpCountry[32],
@@ -999,11 +1070,11 @@ public OnPlayerConnect(playerid)
 	
 	if(db_num_rows(tmpResult) > 0)
 	{
-	    new
-	        str[256],
-	        tmptime[12],
-	        tm<timestamp>,
-	        timestampstr[64],
+		new
+			str[256],
+			tmptime[12],
+			tm<timestamp>,
+			timestampstr[64],
 			reason[64],
 			bannedby[24];
 
@@ -1021,9 +1092,8 @@ public OnPlayerConnect(playerid)
 
 		ShowPlayerDialog(playerid, d_NULL, DIALOG_STYLE_MSGBOX, "Banned", str, "Close", "");
 
-	    Kick(playerid);
-	    MsgAllF(YELLOW, " >  Banned Player: "#C_BLUE"%s"#C_YELLOW" tried to join the server. He "#C_RED"epically failed!", gPlayerName[playerid]);
-	    return 1;
+		Kick(playerid);
+		return 1;
 	}
 
 	for(new idx; idx<gTotalAdmins; idx++)
@@ -1032,7 +1102,6 @@ public OnPlayerConnect(playerid)
 		{
 			tmpadminlvl = gAdminData[idx][admin_Level];
 			if(tmpadminlvl > 3) tmpadminlvl = 3;
-			jointype = 1;
 			break;
 		}
 	}
@@ -1052,15 +1121,9 @@ public OnPlayerConnect(playerid)
 
 	TextDrawShowForPlayer(playerid, ClockText);
 
-	Msg(playerid, BLUE, HORIZONTAL_RULE);
-	Msg(playerid, YELLOW, " >  Hello and welcome to the Hellfire Server! "#C_BLUE"A Server For Everyone!");
-	Msg(playerid, YELLOW, " >  Don't forget to read the "#C_RED"'/Rules' "#C_YELLOW"Have Fun :D");
-	MsgF(playerid, YELLOW, " >  MOTD: "#C_BLUE"%s", gMessageOfTheDay);
-	Msg(playerid, BLUE, HORIZONTAL_RULE);
-
 	if(db_num_rows(tmpResult) >= 1)
 	{
-	    new
+		new
 			tmpField[50],
 			dbIP;
 
@@ -1069,12 +1132,22 @@ public OnPlayerConnect(playerid)
 		db_get_field_assoc(tmpResult, #ROW_SKIN, tmpField, 4);
 		gPlayerData[playerid][ply_Skin] = strval(tmpField);
 
+		db_get_field_assoc(tmpResult, #ROW_SKIN, tmpField, 4);
+
+		if(strval(tmpField))
+			t:bPlayerGameSettings[playerid]<Gender>;
+
+		else
+			f:bPlayerGameSettings[playerid]<Gender>;
+
 		db_get_field_assoc(tmpResult, #ROW_IPV4, tmpField, 12);
 		dbIP = strval(tmpField);
 
 		db_get_field_assoc(tmpResult, #ROW_ALIVE, tmpField, 2);
+
 		if(tmpField[0] == '1')
 			t:bPlayerGameSettings[playerid]<Alive>;
+
 		else
 			f:bPlayerGameSettings[playerid]<Alive>;
 
@@ -1092,17 +1165,16 @@ public OnPlayerConnect(playerid)
 
 		else
 		{
-		    new str[128];
+			new str[128];
 			format(str, 128, ""C_WHITE"Welcome Back %P"#C_WHITE", Please log into to your account below!\n\n"#C_YELLOW"Enjoy your stay :)", playerid);
 			ShowPlayerDialog(playerid, d_Login, DIALOG_STYLE_PASSWORD, "Login To Your Account", str, "Accept", "Leave");
 		}
 	}
 	else
 	{
-	    new str[150];
-	    format(str, 150, ""#C_WHITE"Hello %P"#C_WHITE", You must be new here!\nPlease create an account by entering a "#C_BLUE"password"#C_WHITE" below:", playerid);
-        ShowPlayerDialog(playerid, d_Register, DIALOG_STYLE_PASSWORD, "Register For A New Account", str, "Accept", "Leave");
-		jointype = 2;
+		new str[150];
+		format(str, 150, ""#C_WHITE"Hello %P"#C_WHITE", You must be new here!\nPlease create an account by entering a "#C_BLUE"password"#C_WHITE" below:", playerid);
+		ShowPlayerDialog(playerid, d_Register, DIALOG_STYLE_PASSWORD, "Register For A New Account", str, "Accept", "Leave");
 	}
 	if(bServerGlobalSettings & ServerLocked)
 	{
@@ -1112,22 +1184,12 @@ public OnPlayerConnect(playerid)
 		return false;
 	}
 
-
-	if(jointype == 1)
-		MsgAllF(GREEN, " >  %P (%d)"#C_GREEN" has joined the fun! "#C_BLUE"[Country: %s] "#C_YELLOW"(Level %d %s)", playerid, playerid, tmpCountry, tmpadminlvl, AdminName[tmpadminlvl]);
-
-	else if(jointype == 2)
-		MsgAllF(GREEN, " >  %P (%d)"#C_GREEN" has joined the fun! "#C_BLUE"[Country: %s] "#C_YELLOW"(New Player)", playerid, playerid, tmpCountry);
-
-	else
-		MsgAllF(GREEN, " >  %P (%d)"#C_GREEN" has joined the fun! "#C_BLUE"[Country: %s]", playerid, playerid, tmpCountry);
+	MsgAllF(WHITE, " >  %P (%d)"#C_WHITE" has joined [Country: %s]", playerid, playerid, tmpCountry);
 
 	CheckForExtraAccounts(playerid, gPlayerName[playerid]);
-	PlaySoundForAll(1139);
-
 
 	SetAllWeaponSkills(playerid, 500);
-    LoadPlayerTextDraws(playerid);
+	LoadPlayerTextDraws(playerid);
 	SetPlayerScore(playerid, 0);
 	Streamer_ToggleIdleUpdate(playerid, true);
 
@@ -1140,6 +1202,7 @@ public OnPlayerConnect(playerid)
 	file_Close();
 
 	t:bPlayerGameSettings[playerid]<HelpTips>;
+	t:bPlayerGameSettings[playerid]<GlobalChat>;
 	SetSpawn(playerid, -907.5452, 272.7235, 1014.1449, 0.0);
 	SpawnPlayer(playerid);
 
@@ -1148,7 +1211,7 @@ public OnPlayerConnect(playerid)
 CheckForExtraAccounts(playerid, name[])
 {
 	new
-	    rowCount,
+		rowCount,
 		tmpIpQuery[128],
 		tmpIpField[32],
 		DBResult:tmpIpResult,
@@ -1166,17 +1229,19 @@ CheckForExtraAccounts(playerid, name[])
 	{
 		for(new i;i<rowCount && i < 5;i++)
 		{
-		    db_get_field(tmpIpResult, 0, tmpIpField, 128);
+			db_get_field(tmpIpResult, 0, tmpIpField, 128);
 			if(i>0)strcat(tmpNameList, ", ");
-		    strcat(tmpNameList, tmpIpField);
-		    db_next_row(tmpIpResult);
+			strcat(tmpNameList, tmpIpField);
+			db_next_row(tmpIpResult);
 		}
-		MsgAllF(YELLOW, " >  Aliases: "#C_BLUE"(%d)"#C_ORANGE" %s", rowCount, tmpNameList);
+		MsgAdminsF(1, YELLOW, " >  Aliases: "#C_BLUE"(%d)"#C_ORANGE" %s", rowCount, tmpNameList);
 	}
 	db_free_result(tmpIpResult);
 }
 public OnPlayerRequestClass(playerid, classid)
 {
+	if(IsPlayerNPC(playerid))return 1;
+
 	t:bPlayerGameSettings[playerid]<FirstSpawn>;
 
 	SetSpawn(playerid, -907.5452, 272.7235, 1014.1449, 0.0);
@@ -1185,6 +1250,8 @@ public OnPlayerRequestClass(playerid, classid)
 }
 public OnPlayerRequestSpawn(playerid)
 {
+	if(IsPlayerNPC(playerid))return 1;
+
 	t:bPlayerGameSettings[playerid]<FirstSpawn>;
 
 	SetSpawn(playerid, -907.5452, 272.7235, 1014.1449, 0.0);
@@ -1210,7 +1277,7 @@ CreateNewUserfile(playerid, password[])
 		VALUES('%s', '%s', '%d', '%d', '0', '0.0, 0.0, 0.0, 0.0')",
 		gPlayerName[playerid], password, gPlayerData[playerid][ply_Skin], gPlayerData[playerid][ply_IP]);
 
-    db_free_result(db_query(gAccounts, tmpQuery));
+	db_free_result(db_query(gAccounts, tmpQuery));
 
 	for(new idx; idx<gTotalAdmins; idx++)
 	{
@@ -1223,7 +1290,7 @@ CreateNewUserfile(playerid, password[])
 	if(pAdmin(playerid)>0)MsgF(playerid, BLUE, " >  Your admin level: %d", pAdmin(playerid));
 
 	t:bPlayerGameSettings[playerid]<LoggedIn>;
-    t:bPlayerGameSettings[playerid]<HasAccount>;
+	t:bPlayerGameSettings[playerid]<HasAccount>;
 }
 Login(playerid)
 {
@@ -1248,7 +1315,7 @@ Login(playerid)
 	t:bPlayerGameSettings[playerid]<LoggedIn>;
 	IncorrectPass[playerid]=0;
 
-    LogMessage(playerid);
+	LogMessage(playerid);
 }
 
 SavePlayerData(playerid)
@@ -1273,8 +1340,12 @@ SavePlayerData(playerid)
 		format(tmpQuery, sizeof(tmpQuery),
 			"UPDATE `Player` SET \
 			`"#ROW_ALIVE"` = '1', \
+			`"#ROW_SKIN"` = '%d', \
+			`"#ROW_GEND"` = '%d', \
 			`"#ROW_SPAWN"` = '%f %f %f %f' \
 			WHERE `"#ROW_NAME"` = '%s'",
+			GetPlayerClothes(playerid),
+			(bPlayerGameSettings[playerid] & Gender) ? 1 : 0,
 			x, y, z, a,
 			gPlayerName[playerid]);
 
@@ -1285,6 +1356,8 @@ SavePlayerData(playerid)
 		format(tmpQuery, sizeof(tmpQuery),
 			"UPDATE `Player` SET \
 			`"#ROW_ALIVE"` = '0', \
+			`"#ROW_SKIN"` = '0', \
+			`"#ROW_GEND"` = '0', \
 			`"#ROW_SPAWN"` = '0.0 0.0 0.0 0.0' \
 			WHERE `"#ROW_NAME"` = '%s'",
 			gPlayerName[playerid]);
@@ -1302,7 +1375,7 @@ SavePlayerInventory(playerid)
 	new
 		filename[MAX_PLAYER_FILE],
 		File:file,
-		healtharmour[2],
+		characterdata[3],
 		helditems[2],
 		inventoryitems[8];
 
@@ -1310,12 +1383,13 @@ SavePlayerInventory(playerid)
 
 	file = fopen(filename, io_write);
 
-	healtharmour[0] = _:gPlayerHP[playerid];
-	healtharmour[1] = _:gPlayerAP[playerid];
+	characterdata[0] = _:gPlayerHP[playerid];
+	characterdata[1] = _:gPlayerAP[playerid];
+	characterdata[2] = _:gPlayerFP[playerid];
 
-	printf("SAVE: Health: %f Armour: %f", healtharmour[0], healtharmour[1]);
+	printf("SAVE: Health: %f Armour: %f", characterdata[0], characterdata[1]);
 
-	fblockwrite(file, healtharmour, 2);
+	fblockwrite(file, characterdata, 3);
 
 	if(GetPlayerHolsteredWeapon(playerid) != 0)
 	{
@@ -1355,7 +1429,7 @@ SavePlayerInventory(playerid)
 	for(new i, j; j < 4; i += 2, j++)
 	{
 		inventoryitems[i] = _:GetItemType(GetInventorySlotItem(playerid, j));
-		inventoryitems[i+1] = GetItemExtraData(GetInventorySlotItem(playerid, j));
+		inventoryitems[i + 1] = GetItemExtraData(GetInventorySlotItem(playerid, j));
 	}
 
 	fblockwrite(file, inventoryitems, 8);
@@ -1384,7 +1458,7 @@ LoadPlayerInventory(playerid)
 		filename[MAX_PLAYER_FILE],
 		File:file,
 		filepos,
-		healtharmour[2],
+		characterdata[3],
 		helditems[2],
 		inventoryitems[8],
 		bagdata[17],
@@ -1400,12 +1474,13 @@ LoadPlayerInventory(playerid)
 
 	file = fopen(filename, io_read);
 
-	fblockread(file, healtharmour, 2);
+	fblockread(file, characterdata, 3);
 
-	printf("LOAD: Health: %f Armour: %f", healtharmour[0], healtharmour[1]);
+	printf("LOAD: %s - Health: %f Armour: %f Food: %f", gPlayerName[playerid], characterdata[0], characterdata[1], characterdata[2]);
 
-	gPlayerHP[playerid] = Float:healtharmour[0];
-	gPlayerAP[playerid] = Float:healtharmour[1];
+	gPlayerHP[playerid] = Float:characterdata[0];
+	gPlayerAP[playerid] = Float:characterdata[1];
+	gPlayerFP[playerid] = Float:characterdata[2];
 
 	fblockread(file, helditems, 2);
 
@@ -1414,7 +1489,7 @@ LoadPlayerInventory(playerid)
 	{
 		if(0 < helditems[0] <= WEAPON_PARACHUTE)
 		{
-			HolsterWeapon(playerid, helditems[0], helditems[1]);
+			HolsterWeapon(playerid, helditems[0], helditems[1], 800);
 		}
 	}
 
@@ -1425,6 +1500,7 @@ LoadPlayerInventory(playerid)
 		if(0 < helditems[0] <= WEAPON_PARACHUTE)
 		{
 			GivePlayerWeapon(playerid, helditems[0], helditems[1]);
+			gPlayerArmedWeapon[playerid] = helditems[0];
 		}
 		else
 		{
@@ -1511,7 +1587,6 @@ public OnPlayerDisconnect(playerid, reason)
 	if(bServerGlobalSettings & Restarting)return 0;
 	if(bPlayerGameSettings[playerid] & LoggedIn)SavePlayerData(playerid);
 
-	DisConChecks(playerid);
 	ResetVariables(playerid);
 
 	UnloadPlayerTextDraws(playerid);
@@ -1522,17 +1597,7 @@ public OnPlayerDisconnect(playerid, reason)
 		case 1:MsgAllF(GREY, " >  %s left the server.", gPlayerName[playerid]);
 	}
 
-	if(Iter_Count(Player) == 0)
-	{
-		if(bServerGlobalSettings & ScheduledRestart)RestartGamemode();
-		else ReloadVehicles();
-	}
-	
 	return 1;
-}
-DisConChecks(playerid)
-{
-	if(bPlayerGameSettings[playerid] & IsAfk)Delete3DTextLabel(gPlayerAfkLabel[playerid]);
 }
 
 
@@ -1540,19 +1605,16 @@ ResetVariables(playerid)
 {
 	gPlayerHP[playerid] = 100.0;
 	gPlayerAP[playerid] = 0.0;
+	gPlayerFP[playerid] = 80.0;
 
 	bPlayerGameSettings[playerid]			= 0;
 
 	pAdmin(playerid)						= 0,
 	gPlayerData[playerid][ply_Skin]			= 0,
 
-    gPlayerVehicleID[playerid]				= INVALID_VEHICLE_ID,
-	gPlayerChatChannel[playerid]			= -1;
+	gPlayerVehicleID[playerid]				= INVALID_VEHICLE_ID,
 	Warnings[playerid]						= 0;
 	IncorrectPass[playerid]					= 0;
-
-	PlayerLoop(i)
-		Blocked[playerid][i] = false;
 
 	SetPlayerSkillLevel(playerid, WEAPONSKILL_PISTOL,			100);
 	SetPlayerSkillLevel(playerid, WEAPONSKILL_SAWNOFF_SHOTGUN,	100);
@@ -1612,7 +1674,7 @@ LogMessage(playerid)
 CMD:changename(playerid, params[])
 {
 	new newname[24];
- 	if (sscanf(params, "s[24]", newname)) Msg(playerid, YELLOW, "Usage: /changename [new name]");
+	if (sscanf(params, "s[24]", newname)) Msg(playerid, YELLOW, "Usage: /changename [new name]");
 	else
 	{
 		new
@@ -1714,12 +1776,17 @@ public OnPlayerSpawn(playerid)
 		TextDrawShowForPlayer(playerid, DeathButton);
 		SelectTextDraw(playerid, 0xFFFFFF88);
 		gPlayerHP[playerid] = 100.0;
+		gPlayerAP[playerid] = 0.0;
+		gPlayerFP[playerid] = 80.0;
 	}
 	else
 	{
 		if(bPlayerGameSettings[playerid] & Alive)
 		{
-			SetPlayerSkin(playerid, gPlayerData[playerid][ply_Skin]);
+			if(!IsValidClothes(gPlayerData[playerid][ply_Skin]))
+				goto invalid_clothes_id_jump;
+
+			SetPlayerClothes(playerid, gPlayerData[playerid][ply_Skin]);
 
 			SetPlayerPos(playerid,
 				gPlayerData[playerid][ply_posX],
@@ -1738,7 +1805,11 @@ public OnPlayerSpawn(playerid)
 		}
 		else
 		{
+			invalid_clothes_id_jump:
+
 			gPlayerHP[playerid] = 100.0;
+			gPlayerAP[playerid] = 0.0;
+			gPlayerFP[playerid] = 80.0;
 			PlayerCreateNewCharacter(playerid);
 		}
 	}
@@ -1762,8 +1833,8 @@ PlayerCreateNewCharacter(playerid)
 	SetPlayerCameraPos(playerid, -907.4642, 277.0962, 1014.1492);
 	Streamer_UpdateEx(playerid, -907.5452, 272.7235, 1014.1449);
 
-	gClassBoxFadeLevel[playerid] = 255;
-	PlayerTextDrawBoxColor(playerid, ClassBackGround, gClassBoxFadeLevel[playerid]);
+	gScreenBoxFadeLevel[playerid] = 255;
+	PlayerTextDrawBoxColor(playerid, ClassBackGround, gScreenBoxFadeLevel[playerid]);
 	PlayerTextDrawShow(playerid, ClassBackGround);
 	PlayerTextDrawShow(playerid, ClassButtonMale);
 	PlayerTextDrawShow(playerid, ClassButtonFemale);
@@ -1825,10 +1896,10 @@ OnPlayerSelectGender(playerid)
 		tmpitem;
 
 	if(bPlayerGameSettings[playerid] & Gender)
-		SetPlayerSkin(playerid, SKIN_M_NORMAL);
+		SetPlayerClothes(playerid, gDefaultSkinM);
 
 	else
-		SetPlayerSkin(playerid, SKIN_F_NORMAL);
+		SetPlayerClothes(playerid, gDefaultSkinF);
 
 	SetPlayerPos(playerid, gSpawns[r][0], gSpawns[r][1], gSpawns[r][2]);
 	SetPlayerFacingAngle(playerid, gSpawns[r][3]);
@@ -1846,9 +1917,9 @@ OnPlayerSelectGender(playerid)
 	t:bPlayerGameSettings[playerid]<Spawned>;
 	t:bPlayerGameSettings[playerid]<Alive>;
 
-	gClassBoxFadeLevel[playerid] = 255;
-	stop gClassFadeTimer[playerid];
-	gClassFadeTimer[playerid] = repeat FadeOutClassBackground(playerid);
+	gScreenBoxFadeLevel[playerid] = 255;
+	stop gScreenFadeTimer[playerid];
+	gScreenFadeTimer[playerid] = repeat FadeScreen(playerid);
 
 	backpackitem = CreateItem(item_Satchel, gSpawns[r][0], gSpawns[r][1], gSpawns[r][2]);
 
@@ -1872,14 +1943,15 @@ OnPlayerSelectGender(playerid)
 
 }
 
-timer FadeOutClassBackground[100](playerid)
+timer FadeScreen[100](playerid)
 {
-	PlayerTextDrawBoxColor(playerid, ClassBackGround, gClassBoxFadeLevel[playerid]);
+	PlayerTextDrawBoxColor(playerid, ClassBackGround, gScreenBoxFadeLevel[playerid]);
 	PlayerTextDrawShow(playerid, ClassBackGround);
-	gClassBoxFadeLevel[playerid] -= 4;
 
-	if(gClassBoxFadeLevel[playerid] <= 0)
-		stop gClassFadeTimer[playerid];
+	gScreenBoxFadeLevel[playerid] -= 4;
+
+	if(gScreenBoxFadeLevel[playerid] <= 0)
+		stop gScreenFadeTimer[playerid];
 }
 
 
@@ -1917,20 +1989,28 @@ internal_OnPlayerDeath(playerid, killerid, reason)
 
 	if(GetPlayerHolsteredWeapon(playerid) > 0)
 	{
-		CreateItem(ItemType:GetPlayerHolsteredWeapon(playerid),
+		new itemid = CreateItem(ItemType:GetPlayerHolsteredWeapon(playerid),
 			gPlayerDeathPos[playerid][0] + floatsin(195.0, degrees),
 			gPlayerDeathPos[playerid][1] + floatcos(195.0, degrees),
 			gPlayerDeathPos[playerid][2] - FLOOR_OFFSET);
 
+		SetItemExtraData(itemid, GetPlayerHolsteredWeaponAmmo(playerid));
+
 		ClearPlayerHolsterWeapon(playerid);
 	}
 
-	if(GetPlayerWeapon(playerid) > 0)
+	if(IsValidItem(GetPlayerItem(playerid)))
 	{
-		CreateItem(ItemType:GetPlayerWeapon(playerid),
+		RemoveCurrentItem(playerid);
+	}
+	else if(GetPlayerWeapon(playerid) > 0)
+	{
+		new itemid = CreateItem(ItemType:GetPlayerWeapon(playerid),
 			gPlayerDeathPos[playerid][0] + floatsin(45.0, degrees),
 			gPlayerDeathPos[playerid][1] + floatcos(45.0, degrees),
 			gPlayerDeathPos[playerid][2] - FLOOR_OFFSET);
+
+		SetItemExtraData(itemid, GetPlayerAmmo(playerid));
 	}
 
 	for(new i; i < INV_MAX_SLOTS; i++)
@@ -1979,23 +2059,10 @@ timer HideHelpTip[time](playerid, time)
 
 public OnPlayerUpdate(playerid)
 {
-	f:bPlayerGameSettings[playerid]<AfkCheck>;
 	if(bPlayerGameSettings[playerid] & Frozen)return 0;
-	if(bPlayerGameSettings[playerid] & DebugMode)
-	{
-	    new
-			idx = GetPlayerAnimationIndex(playerid),
-			animlib[32],
-			animname[32],
-			str[78];
-
-		GetAnimationName(idx, animlib, 32, animname, 32);
-		format(str, 78, "AnimIDX:%d~n~AnimName:%s~n~AnimLib:%s", idx, animname, animlib);
-		ShowMsgBox(playerid, str);
-	}
 	if(IsPlayerInAnyVehicle(playerid))
 	{
-	    static
+		static
 			str[8],
 			Float:vx,
 			Float:vy,
@@ -2003,8 +2070,12 @@ public OnPlayerUpdate(playerid)
 
 		GetVehicleVelocity(gPlayerVehicleID[playerid], vx, vy, vz);
 		gPlayerVelocity[playerid] = floatsqroot( (vx*vx)+(vy*vy)+(vz*vz) ) * 150.0;
-	    format(str, 32, "%.0fkm/h", gPlayerVelocity[playerid]);
-	    PlayerTextDrawSetString(playerid, VehicleSpeedText, str);
+		format(str, 32, "%.0fkm/h", gPlayerVelocity[playerid]);
+		PlayerTextDrawSetString(playerid, VehicleSpeedText, str);
+	}
+	else
+	{
+		SetPlayerArmedWeapon(playerid, gPlayerArmedWeapon[playerid]);
 	}
 
 	SetPlayerHealth(playerid, gPlayerHP[playerid]);
@@ -2022,8 +2093,8 @@ public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid)
 		ShowMsgBox(playerid, str, 1000, 120);
 	}
 */
-    if(issuerid == INVALID_PLAYER_ID)
-    {
+	if(issuerid == INVALID_PLAYER_ID)
+	{
 		if(weaponid == 53)
 			GivePlayerHP(playerid, -(amount*0.5), .weaponid = weaponid);
 
@@ -2081,7 +2152,7 @@ internal_HitPlayer(playerid, targetid, weaponid, type = 0)
 	{
 		switch(weaponid)
 		{
-		    case 25, 27, 30, 31, 33, 34:head = IsPlayerAimingAtHead(playerid, targetid);
+			case 25, 27, 30, 31, 33, 34:head = IsPlayerAimingAtHead(playerid, targetid);
 		}
 	}
 
@@ -2189,7 +2260,7 @@ SetPlayerHP(playerid, Float:hp, shooterid = INVALID_PLAYER_ID, weaponid = 54)
 		internal_OnPlayerDeath(playerid, shooterid, weaponid);
 
 	if(hp > 100.0)
-	    hp = 100.0;
+		hp = 100.0;
 
 	gPlayerHP[playerid] = hp;
 }
@@ -2218,16 +2289,16 @@ timer HideHitMark[500](playerid, Text:hitmark)
 	if(weaponid==34)
 	{
 		new
-		    Float:pX,
-		    Float:pY,
-		    Float:pZ,
-		    Float:iX,
-		    Float:iY,
-		    Float:iZ,
+			Float:pX,
+			Float:pY,
+			Float:pZ,
+			Float:iX,
+			Float:iY,
+			Float:iZ,
 
-		    Float:vX,
-		    Float:vY,
-		    Float:vZ,
+			Float:vX,
+			Float:vY,
+			Float:vZ,
 
 			Float:pA;
 
@@ -2297,13 +2368,13 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				GetVehiclePos(iPlayerVehicleID, Player_vX, Player_vY, Player_vZ);
 
 				for(new tmp_vID; tmp_vID<MAX_VEHICLES; tmp_vID++)
-		   		{
-		   		    GetVehiclePos(tmp_vID, tmp_vX, tmp_vY, tmp_vZ);
-			   		if( (Distance(tmp_vX, tmp_vY, tmp_vZ, Player_vX, Player_vY, Player_vZ)<7.0) && (tmp_vID != iPlayerVehicleID) )
-			   		{
-			   			if(IsTrailerAttachedToVehicle(iPlayerVehicleID))DetachTrailerFromVehicle(iPlayerVehicleID);
-			   			AttachTrailerToVehicle(tmp_vID, iPlayerVehicleID);
-			   			break;
+				{
+					GetVehiclePos(tmp_vID, tmp_vX, tmp_vY, tmp_vZ);
+					if( (Distance(tmp_vX, tmp_vY, tmp_vZ, Player_vX, Player_vY, Player_vZ)<7.0) && (tmp_vID != iPlayerVehicleID) )
+					{
+						if(IsTrailerAttachedToVehicle(iPlayerVehicleID))DetachTrailerFromVehicle(iPlayerVehicleID);
+						AttachTrailerToVehicle(tmp_vID, iPlayerVehicleID);
+						break;
 					}
 				}
 			}
@@ -2322,7 +2393,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 	{
 		if(newkeys & KEY_JUMP && !(oldkeys & KEY_JUMP) && GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_CUFFED)ApplyAnimation(playerid, "GYMNASIUM", "gym_jog_falloff",4.1,0,1,1,0,0);
 
-	    new iWepState = GetPlayerWeaponState(playerid);
+		new iWepState = GetPlayerWeaponState(playerid);
 		if((newkeys&KEY_FIRE)&&(iWepState!=WEAPONSTATE_RELOADING&&iWepState!=WEAPONSTATE_NO_BULLETS))OnPlayerShoot(playerid);
 	}
 
@@ -2334,62 +2405,64 @@ OnPlayerShoot(playerid)
 	#pragma unused playerid
 }
 
+CMD:g(playerid, params[])
+{
+	if(bPlayerGameSettings[playerid] & GlobalChat)
+	{
+		f:bPlayerGameSettings[playerid]<GlobalChat>;
+		Msg(playerid, WHITE, " >  Your text chat is now local only.");
+	}
+	else
+	{
+		t:bPlayerGameSettings[playerid]<GlobalChat>;
+		Msg(playerid, WHITE, " >  Your text chat is now global.");
+	}
+	return 1;
+}
+CMD:l(playerid, params[])
+{
+	if(bPlayerGameSettings[playerid] & GlobalChat)
+	{
+		f:bPlayerGameSettings[playerid]<GlobalChat>;
+		Msg(playerid, WHITE, " >  Your text chat is now local only.");
+	}
+	else
+	{
+		t:bPlayerGameSettings[playerid]<GlobalChat>;
+		Msg(playerid, WHITE, " >  Your text chat is now global.");
+	}
+	return 1;
+}
+
 public OnPlayerText(playerid, text[])
 {
 	new tmpMuteTime = tickcount() - ChatMuteTick[playerid];
 
-	if(bServerGlobalSettings & ChatLocked)
-	{
-		Msg(playerid, ORANGE, " >  Chat Locked");
-		return 0;
-	}
-	if(bPlayerGameSettings[playerid]&Muted)
+	if(bPlayerGameSettings[playerid] & Muted)
 	{
 		Msg(playerid, RED, " >  You are muted");
 		return 0;
 	}
 	if(tmpMuteTime < 10000)
 	{
-	    MsgF(playerid, RED, " >  You are muted for chat flooding, %s remaining.", MsToString(10000-tmpMuteTime, 2));
-	    return 0;
+		MsgF(playerid, RED, " >  You are muted for chat flooding, %s remaining.", MsToString(10000-tmpMuteTime, 2));
+		return 0;
 	}
-
 
 	if(tickcount() - tick_LastChatMessage[playerid] < 1000)
 	{
 		ChatMessageStreak[playerid]++;
 		if(ChatMessageStreak[playerid] == 5)
 		{
-		    ChatMuteTick[playerid] = tickcount();
-		    return 0;
+			ChatMuteTick[playerid] = tickcount();
+			return 0;
 		}
 	}
 	else ChatMessageStreak[playerid]--;
 
 	tick_LastChatMessage[playerid] = tickcount();
 
-	if(gPlayerChatChannel[playerid] != CHANNEL_GLOBAL)
-	{
-	    if(gPlayerChatChannel[playerid] < MAX_PLAYERS)
-	    {
-	    	if(!IsPlayerConnected(gPlayerChatChannel[playerid]))
-	    	{
-	    	    gPlayerChatChannel[playerid] = -1;
-	    	    Msg(playerid, RED, " >  The player you were chatting with has gone offline");
-	    	    return 0;
-	    	}
-	    	MsgF(gPlayerChatChannel[playerid], GREEN, "(P)%P"#C_WHITE": %s", playerid, text);
-	    	MsgF(playerid, GREEN, "(P)%P"#C_WHITE": %s", playerid, text);
-	    }
-	    else if(gPlayerChatChannel[playerid] == CHANNEL_VEHICLE)
-	    {
-			PlayerLoop(i)
-				if(IsPlayerInVehicle(i, GetPlayerVehicleID(playerid)))
-					MsgF(i, WHITE, "(V)%P"#C_WHITE": %s", playerid, TagScan(text));
-	    }
-	    return 0;
-	}
-	else PlayerSendChat(playerid, text);
+	PlayerSendChat(playerid, text);
 
 	return 0;
 }
@@ -2398,8 +2471,7 @@ PlayerSendChat(playerid, textInput[])
 	new
 		text[256];
 
-	format(text, 173, "%C(%d) %P"#C_WHITE": %s",
-		AdminColours[pAdmin(playerid)],
+	format(text, 173, "(%d) %P"#C_WHITE": %s",
 		playerid,
 		playerid,
 		TagScan(textInput));
@@ -2414,84 +2486,78 @@ PlayerSendChat(playerid, textInput[])
 		{
 			if(text[c] == ' ' || text[c] ==  ',' || text[c] ==  '.')
 			{
-			    splitpos = c;
-			    break;
+				splitpos = c;
+				break;
 			}
 		}
 
 		strcat(text2, text[splitpos]);
 		text[splitpos] = 0;
 
-		PlayerLoop(i)if(!Hidden[playerid][i])
+		if(bPlayerGameSettings[playerid] & GlobalChat)
 		{
-			SendClientMessage(i, WHITE, text);
-			SendClientMessage(i, WHITE, text2);
+			foreach(new i : Player)
+			{
+				SendClientMessage(i, WHITE, text);
+				SendClientMessage(i, WHITE, text2);
+			}
+		}
+		else
+		{
+			new
+				Float:x,
+				Float:y,
+				Float:z;
+
+			GetPlayerPos(playerid, x, y, z);
+
+			foreach(new i : Player)
+			{
+				if(IsPlayerInRangeOfPoint(i, 20.0, x, y, z))
+				{
+					SendClientMessage(i, WHITE, text);
+					SendClientMessage(i, WHITE, text2);
+				}
+			}
 		}
 	}
 	else
 	{
-		PlayerLoop(i)if(!Hidden[playerid][i])
-			SendClientMessage(i, WHITE, text);
+		if(bPlayerGameSettings[playerid] & GlobalChat)
+		{
+			foreach(new i : Player)
+			{
+				SendClientMessage(i, WHITE, text);
+			}
+		}
+		else
+		{
+			new
+				Float:x,
+				Float:y,
+				Float:z;
+
+			GetPlayerPos(playerid, x, y, z);
+
+			foreach(new i : Player)
+			{
+				if(IsPlayerInRangeOfPoint(i, 20.0, x, y, z))
+				{
+					SendClientMessage(i, WHITE, text);
+				}
+			}
+		}
 	}
 
 	return 1;
 }
 
-stock HasIP(str[])
-{
-	new
-	    tmp[17],
-		len = strlen(str),
-		i;
-
-	while(i < len)
-	{
-		if('0' <= str[i] <= '9')
-		{
-			strmid(tmp, str, i, i+16);
-
-			if(!sscanf(tmp, "{p<.>dddd}"))return 1;
-			if(!sscanf(tmp, "{p<.>ddd}{p<:>dd}"))return 1;
-		}
-		i++;
-	}
-	return 0;
-}
 enum E_COLOUR_EMBED_DATA
 {
 	ce_char,
 	ce_colour[9]
 }
-stock const Phonetics[26][10]=
-{
-	"alpha",
-	"bravo",
-	"charlie",
-	"delta",
-	"echo",
-	"foxtrot",
-	"golf",
-	"hotel",
-	"india",
-	"juliet",
-	"kilo",
-	"lima",
-	"mike",
-	"november",
-	"oscar",
-	"papa",
-	"quebec",
-	"romeo",
-	"sierra",
-	"tango",
-	"uniform",
-	"vector",
-	"whiskey",
-	"x-ray",
-	"yankee",
-	"zulu"
-},
-EmbedColours[9][E_COLOUR_EMBED_DATA]=
+new EmbedColours[9][E_COLOUR_EMBED_DATA]=
 {
 	{'r', #C_RED},
 	{'g', #C_GREEN},
@@ -2516,44 +2582,10 @@ stock TagScan(chat[], colour = WHITE)
 	
 	while(a < (length - 1) && tags < 3)
 	{
-		if(text[a] == '#')
+		if(text[a]=='@')
 		{
-			/*
-			if(IsCharAlphabetic(text[a+1]))
+			if(IsCharNumeric(text[a+1]))
 			{
-			    new replacements;
-			    for(new i;i<sizeof(Phonetics);i++)
-			    {
-			        if(text[a+1] == Phonetics[i][0])
-			        {
-						strdel(text[a], 0, 2);
-						strins(text[a], Phonetics[i], 0);
-		                length+=strlen(Phonetics[i]);
-						a+=strlen(Phonetics[i]);
-						replacements++;
-						break;
-			        }
-			    }
-			    if(replacements==0)a++;
-			}
-			*/
-			if(IsCharAlphabetic(text[a+1]))
-			{
-				text[a+1] = tolower(text[a+1]);
-
-                strdel(text[a], 0, 2);
-				strins(text[a], Phonetics[ text[a+1]-65 ], 0);
-
-				a += strlen(Phonetics[ text[a+1]-65 ]);
-				length += strlen(Phonetics[ text[a+1]-65 ]) - 2;
-				continue;
-			}
-			else a++;
-		}
-		else if(text[a]=='@')
-		{
-		    if(IsCharNumeric(text[a+1]))
-		    {
 				new
 					id,
 					tmp[3];
@@ -2564,14 +2596,9 @@ stock TagScan(chat[], colour = WHITE)
 				if(IsPlayerConnected(id))
 				{
 					new
-						tmpName[MAX_PLAYER_NAME+20];
+						tmpName[MAX_PLAYER_NAME+17];
 
-					if(bPlayerGameSettings[id] & IsAfk)
-						format(tmpName, MAX_PLAYER_NAME+20, "%P(!)%C", id, colour);
-
-					else
-						format(tmpName, MAX_PLAYER_NAME+17, "%P%C", id, colour);
-
+					format(tmpName, MAX_PLAYER_NAME+17, "%P%C", id, colour);
 
 					if(id<10)
 						strdel(text[a], 0, 2);
@@ -2581,7 +2608,7 @@ stock TagScan(chat[], colour = WHITE)
 
 					strins(text[a], tmpName, 0);
 
-	                length += strlen(tmpName);
+					length += strlen(tmpName);
 					a += strlen(tmpName);
 					tags++;
 					continue;
@@ -2594,20 +2621,20 @@ stock TagScan(chat[], colour = WHITE)
 		{
 			if(IsCharAlphabetic(text[a+1]))
 			{
-			    new replacements;
-			    for(new i;i<sizeof(EmbedColours);i++)
-			    {
-			        if(text[a+1] == EmbedColours[i][ce_char])
-			        {
+				new replacements;
+				for(new i;i<sizeof(EmbedColours);i++)
+				{
+					if(text[a+1] == EmbedColours[i][ce_char])
+					{
 						strdel(text[a], 0, 2);
 						strins(text[a], EmbedColours[i][ce_colour], 0);
-		                length+=8;
+						length+=8;
 						a+=8;
 						replacements++;
 						break;
-			        }
-			    }
-			    if(replacements==0)a++;
+					}
+				}
+				if(replacements==0)a++;
 			}
 			else a++;
 		}
@@ -2627,8 +2654,8 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	{
 		new model = GetVehicleModel(vehicleid);
 
-	    if(newstate == PLAYER_STATE_DRIVER)
-	    {
+		if(newstate == PLAYER_STATE_DRIVER)
+		{
 			SetPlayerArmedWeapon(playerid, 0);
 
 			if(model == 432)
@@ -2636,7 +2663,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 				TankHeatUpdateTimer[playerid] = repeat TankHeatUpdate(playerid);
 				ShowPlayerProgressBar(playerid, TankHeatBar);
 			}
-	    }
+		}
 
 		gPlayerVehicleID[playerid] = vehicleid;
 
@@ -2646,13 +2673,10 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		PlayerTextDrawSetString(playerid, VehicleNameText, VehicleNames[model-400]);
 		PlayerTextDrawShow(playerid, VehicleNameText);
 		PlayerTextDrawShow(playerid, VehicleSpeedText);
-
-		Streamer_SetFloatData(STREAMER_TYPE_AREA, gPlayerArea[playerid], E_STREAMER_SIZE, 20.0);
-		AttachDynamicAreaToVehicle(gPlayerArea[playerid], vehicleid);
 	}
 	if(oldstate == PLAYER_STATE_DRIVER || oldstate == PLAYER_STATE_PASSENGER)
 	{
-	    gPlayerVehicleID[playerid] = INVALID_VEHICLE_ID;
+		gPlayerVehicleID[playerid] = INVALID_VEHICLE_ID;
 
 		f:bVehicleSettings[vehicleid]<v_Occupied>;
 
@@ -2660,15 +2684,6 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		PlayerTextDrawHide(playerid, VehicleSpeedText);
 		HidePlayerProgressBar(playerid, TankHeatBar);
 		stop TankHeatUpdateTimer[playerid];
-
-		if(gPlayerChatChannel[playerid] == CHANNEL_VEHICLE)
-		{
-			gPlayerChatChannel[playerid] = CHANNEL_GLOBAL;
-			Msg(playerid, YELLOW, " >  You are now talking on the "#C_BLUE"global "#C_YELLOW"chat channel");
-		}
-
-		Streamer_SetFloatData(STREAMER_TYPE_AREA, gPlayerArea[playerid], E_STREAMER_SIZE, 1.4);
-		AttachDynamicAreaToPlayer(gPlayerArea[playerid], playerid);
 	}
 	return 1;
 }
@@ -2780,11 +2795,11 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	format(szFuncName, 64, "cmd_%s", cmd[1]); // Format the standard command function name
 	if(funcidx(szFuncName) == -1) // If it doesn't exist, all hope is not lost! It might be defined as an admin command which has the admin level after the command name
 	{
-	    new
+		new
 			iLvl = pAdmin(playerid), // The player's admin level
 			iLoop = 4; // The highest admin level
 
-	    while(iLoop>0) // Loop backwards through admin levels, from 4 to 1
+		while(iLoop>0) // Loop backwards through admin levels, from 4 to 1
 		{
 			format(szFuncName, 64, "cmd_%s_%d", cmd[1], iLoop); // format the function to include the admin variable
 			if(funcidx(szFuncName) != -1)break; // if this function exists, break the loop, at this point iLoop can never be worth 0
@@ -2949,6 +2964,33 @@ LoadPlayerTextDraws(playerid)
 	PlayerTextDrawBoxColor			(playerid, ClassButtonFemale, 255);
 	PlayerTextDrawTextSize			(playerid, ClassButtonFemale, 300.000000, 100.000000);
 	PlayerTextDrawSetSelectable		(playerid, ClassButtonFemale, true);
+
+
+//======================================================================HelpTips
+
+	HungerBarBackground				=CreatePlayerTextDraw(playerid, 612.000000, 101.000000, "_");
+	PlayerTextDrawBackgroundColor	(playerid, HungerBarBackground, 255);
+	PlayerTextDrawFont				(playerid, HungerBarBackground, 1);
+	PlayerTextDrawLetterSize		(playerid, HungerBarBackground, 0.500000, -10.200000);
+	PlayerTextDrawColor				(playerid, HungerBarBackground, -1);
+	PlayerTextDrawSetOutline		(playerid, HungerBarBackground, 0);
+	PlayerTextDrawSetProportional	(playerid, HungerBarBackground, 1);
+	PlayerTextDrawSetShadow			(playerid, HungerBarBackground, 1);
+	PlayerTextDrawUseBox			(playerid, HungerBarBackground, 1);
+	PlayerTextDrawBoxColor			(playerid, HungerBarBackground, 255);
+	PlayerTextDrawTextSize			(playerid, HungerBarBackground, 618.000000, 10.000000);
+
+	HungerBarForeground				=CreatePlayerTextDraw(playerid, 613.000000, 100.000000, "_");
+	PlayerTextDrawBackgroundColor	(playerid, HungerBarForeground, 255);
+	PlayerTextDrawFont				(playerid, HungerBarForeground, 1);
+	PlayerTextDrawLetterSize		(playerid, HungerBarForeground, 0.500000, -10.000000);
+	PlayerTextDrawColor				(playerid, HungerBarForeground, -1);
+	PlayerTextDrawSetOutline		(playerid, HungerBarForeground, 0);
+	PlayerTextDrawSetProportional	(playerid, HungerBarForeground, 1);
+	PlayerTextDrawSetShadow			(playerid, HungerBarForeground, 1);
+	PlayerTextDrawUseBox			(playerid, HungerBarForeground, 1);
+	PlayerTextDrawBoxColor			(playerid, HungerBarForeground, -2130771840);
+	PlayerTextDrawTextSize			(playerid, HungerBarForeground, 617.000000, 10.000000);
 
 
 //======================================================================HelpTips

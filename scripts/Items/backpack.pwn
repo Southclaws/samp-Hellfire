@@ -77,7 +77,7 @@ public OnPlayerUseItem(playerid, itemid)
 {
 	if(GetItemType(itemid) == item_Backpack || GetItemType(itemid) == item_Satchel)
 	{
-		DisplayContainerInventory(playerid, GetItemExtraData(itemid), 1);
+		DisplayContainerInventory(playerid, GetItemExtraData(itemid));
 	}
 	return CallLocalFunction("pack_OnPlayerUseItem", "dd", playerid, itemid);
 }
@@ -105,7 +105,7 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 */
 		if(newkeys & KEY_NO)
 		{
-			if(!IsValidItem(GetPlayerItem(playerid)))
+			if(!IsValidItem(GetPlayerItem(playerid)) && GetPlayerWeapon(playerid) == 0)
 			{
 				RemovePlayerAttachedObject(playerid, 1);
 				CreateItemInWorld(gPlayerBackpack[playerid], 0.0, 0.0, 0.0, .world = GetPlayerVirtualWorld(playerid), .interior = GetPlayerInterior(playerid));
@@ -135,7 +135,7 @@ public OnPlayerAddToInventory(playerid, itemid)
 	{
 		new
 			containerid = GetItemExtraData(gPlayerBackpack[playerid]),
-			containername[MAX_CONTAINER_NAME];
+			containername[CNT_MAX_NAME];
 
 		GetContainerName(containerid, containername);
 
@@ -209,7 +209,7 @@ forward pack_OnPlayerGiveItem(playerid, targetid, itemid);
 
 public OnPlayerViewInventoryOpt(playerid)
 {
-	if(IsValidItem(gPlayerBackpack[playerid]))
+	if(IsValidItem(gPlayerBackpack[playerid]) && !IsValidContainer(GetPlayerCurrentContainer(playerid)))
 	{
 		pack_InventoryOptionID[playerid] = AddInventoryOption(playerid, "Remove");
 	}
@@ -248,8 +248,8 @@ public OnPlayerSelectInventoryOpt(playerid, option)
 			if(IsContainerFull(containerid))
 			{
 				new
-					str[MAX_CONTAINER_NAME + 6],
-					name[MAX_CONTAINER_NAME];
+					str[CNT_MAX_NAME + 6],
+					name[CNT_MAX_NAME];
 
 				GetContainerName(containerid, name);
 				format(str, sizeof(str), "%s full", name);

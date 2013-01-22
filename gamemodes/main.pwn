@@ -1,25 +1,9 @@
 #include <a_samp>
+#include <SIF/SIf>
 
 
 main()
 {
-	new i[32];
-
-	i = "hello";
-
-
-	switch(0)
-	{
-		case 6:
-		{
-			print("hi");
-		}
-		default:
-		{
-			print("nope");
-		}
-	}
-
 }
 
 

@@ -1,6 +1,6 @@
 #include <YSI\y_hooks>
 
-#define MAX_ZIPLINE (16)
+#define MAX_ZIPLINE (32)
 
 
 enum E_ZIPLINE_DATA
@@ -47,9 +47,9 @@ hook OnGameModeInit()
 {
 	for(new i;i<MAX_PLAYERS;i++)
 	{
-	    zip_currentZipline[i] = -1;
+		zip_currentZipline[i] = -1;
 	}
-    return CallLocalFunction("zip_OnFilterScriptInit", "");
+	return CallLocalFunction("zip_OnFilterScriptInit", "");
 }
 
 stock CreateZipline(
@@ -65,7 +65,7 @@ stock CreateZipline(
 	zip_Data[id][zip_lineID] = CreateLineSegment(19087, 2.46,
 		x1, y1, z1,
 		x2, y2, z2,
-		.RotX = 90.0, .worldid = worldid, .interiorid = interiorid);
+		.RotX = 90.0, .worldid = worldid, .interiorid = interiorid, .maxlength = 1000.0);
 
 	SetLineSegmentDest(zip_Data[id][zip_lineID], x2, y2, z2);
 
@@ -92,21 +92,21 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 {
 	foreach(new i : zip_Index)
 	{
-	    if(areaid == zip_Data[i][zip_startArea])
-	    {
-	        ShowMsgBox(playerid, "Press F to use zipline", 0, 140);
-	    }
-	    if(areaid == zip_Data[i][zip_endArea] && zip_currentZipline[playerid] != -1)
-	    {
-	        ExitZipline(playerid);
-	    }
+		if(areaid == zip_Data[i][zip_startArea])
+		{
+			ShowMsgBox(playerid, "Press F to use zipline", 0, 140);
+		}
+		if(areaid == zip_Data[i][zip_endArea] && zip_currentZipline[playerid] != -1)
+		{
+			ExitZipline(playerid);
+		}
 	}
-    return CallLocalFunction("zip_OnPlayerEnterDynamicArea", "dd", playerid, areaid);
+	return CallLocalFunction("zip_OnPlayerEnterDynamicArea", "dd", playerid, areaid);
 }
 #if defined _ALS_OnPlayerEnterDynamicArea
-    #undef OnPlayerEnterDynamicArea
+	#undef OnPlayerEnterDynamicArea
 #else
-    #define _ALS_OnPlayerEnterDynamicArea
+	#define _ALS_OnPlayerEnterDynamicArea
 #endif
 #define OnPlayerEnterDynamicArea zip_OnPlayerEnterDynamicArea
 forward zip_OnPlayerEnterDynamicArea(playerid, areaid);
@@ -115,12 +115,12 @@ forward zip_OnPlayerEnterDynamicArea(playerid, areaid);
 public OnPlayerLeaveDynamicArea(playerid, areaid)
 {
 	HideMsgBox(playerid);
-    return CallLocalFunction("zip_OnPlayerLeaveDynamicArea", "dd", playerid, areaid);
+	return CallLocalFunction("zip_OnPlayerLeaveDynamicArea", "dd", playerid, areaid);
 }
 #if defined _ALS_OnPlayerLeaveDynamicArea
-    #undef OnPlayerLeaveDynamicArea
+	#undef OnPlayerLeaveDynamicArea
 #else
-    #define _ALS_OnPlayerLeaveDynamicArea
+	#define _ALS_OnPlayerLeaveDynamicArea
 #endif
 #define OnPlayerLeaveDynamicArea zip_OnPlayerLeaveDynamicArea
 forward zip_OnPlayerLeaveDynamicArea(playerid, areaid);
@@ -134,18 +134,18 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		{
 			foreach(new i : zip_Index)
 			{
-			    if(IsPlayerInDynamicArea(playerid, zip_Data[i][zip_startArea]))
-			    {
+				if(IsPlayerInDynamicArea(playerid, zip_Data[i][zip_startArea]))
+				{
 					EnterZipline(playerid, i);
-				    return 1;
-			    }
-			    else if(IsPlayerInDynamicArea(playerid, zip_Data[i][zip_endArea]))
-			    {
+					return 1;
+				}
+				else if(IsPlayerInDynamicArea(playerid, zip_Data[i][zip_endArea]))
+				{
 					return 1;
 				}
 				else
 				{
-				    new
+					new
 						Float:x,
 						Float:y,
 						Float:z,
@@ -174,9 +174,9 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 EnterZipline(playerid, id)
 {
 	new
-	    Float:x,
-	    Float:y,
-	    Float:z,
+		Float:x,
+		Float:y,
+		Float:z,
 		Float:dist;
 
 	GetPlayerPos(playerid, x, y, z);
@@ -216,14 +216,38 @@ hook OnPlayerUpdate(playerid)
 {
 	if(zip_currentZipline[playerid] != -1)
 	{
+		new
+			Float:x,
+			Float:y,
+			Float:z,
+			Float:dist,
+			Float:heightmult = 0.027;
+
+		GetPlayerPos(playerid, x, y, z);
+
+		dist = GetDistancePointLine(
+			zip_Data[zip_currentZipline[playerid]][zip_startPosX],
+			zip_Data[zip_currentZipline[playerid]][zip_startPosY],
+			zip_Data[zip_currentZipline[playerid]][zip_startPosZ]-1.0,
+			zip_Data[zip_currentZipline[playerid]][zip_vecX],
+			zip_Data[zip_currentZipline[playerid]][zip_vecY],
+			zip_Data[zip_currentZipline[playerid]][zip_vecZ],
+			x, y, z);
+
+		if(dist > 0.5)
+		{
+			heightmult = 0.02;
+			return 1;
+		}
+
 		SetPlayerVelocity(playerid,
 			zip_Data[zip_currentZipline[playerid]][zip_vecX] * zip_PlayerSpeedMult[playerid],
 			zip_Data[zip_currentZipline[playerid]][zip_vecY] * zip_PlayerSpeedMult[playerid],
-			(zip_Data[zip_currentZipline[playerid]][zip_vecZ] + 0.03) * zip_PlayerSpeedMult[playerid]);
+			(zip_Data[zip_currentZipline[playerid]][zip_vecZ] + heightmult) * zip_PlayerSpeedMult[playerid]);
 
-		if(zip_PlayerSpeedMult[playerid] < 0.5)zip_PlayerSpeedMult[playerid]+=0.01;
+		if(zip_PlayerSpeedMult[playerid] < 0.5)zip_PlayerSpeedMult[playerid] += 0.01;
 	}
 
-    return 1;
+	return 1;
 }
 

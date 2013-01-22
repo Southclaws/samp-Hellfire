@@ -1,5 +1,5 @@
 #define MAX_LINE (32)
-#define LIN_MAX_OBJ (128)
+#define LIN_MAX_OBJ (512)
 
 
 enum E_LINE_DATA

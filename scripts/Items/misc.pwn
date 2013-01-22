@@ -20,8 +20,12 @@ new stock
 	ItemType:item_Flag			= INVALID_ITEM_TYPE, // marking territory
 	ItemType:item_CapCase		= INVALID_ITEM_TYPE, // For encasing motion sensor mines
 	ItemType:item_MotionSense	= INVALID_ITEM_TYPE, // Used to create mines
-	ItemType:item_Wheel			= INVALID_ITEM_TYPE, // For fixing popped tires
 	ItemType:item_Canister1		= INVALID_ITEM_TYPE,
 	ItemType:item_Canister2		= INVALID_ITEM_TYPE,
-	ItemType:item_Canister3		= INVALID_ITEM_TYPE;
+	ItemType:item_Canister3		= INVALID_ITEM_TYPE,
+
+	ItemType:item_Pizza			= INVALID_ITEM_TYPE,
+	ItemType:item_Burger		= INVALID_ITEM_TYPE,	
+	ItemType:item_BurgerBox		= INVALID_ITEM_TYPE,	
+	ItemType:item_Taco			= INVALID_ITEM_TYPE;
 

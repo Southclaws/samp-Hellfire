@@ -26,7 +26,7 @@
 #include <zcmd>		// If you don't have ZCMD, get it, don't go asking me to make a strcmp version!
 
 
-#define DIALOG_INDEX			(9000)		// Default dialog index to start dialog IDs from
+#define DIALOG_INDEX			(600)		// Default dialog index to start dialog IDs from
 #define ANIM_SAVE_FILE			"SavedAnimations.txt"
 #define MOUSE_HOVER_COLOUR      0xFFFF00FF	// Yellow
 
@@ -310,7 +310,7 @@ public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 		gCurrentIdx[playerid]--;
 		if(gCurrentIdx[playerid] <= 0)gCurrentIdx[playerid] = MAX_ANIMS-1;
 
-	    GetAnimationName(gCurrentIdx[playerid],
+		GetAnimationName(gCurrentIdx[playerid],
 			gCurrentLib[playerid], MAX_LIB_NAME,
 			gCurrentAnim[playerid], MAX_ANIM_NAME);
 
@@ -322,7 +322,7 @@ public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 		gCurrentIdx[playerid]++;
 		if(gCurrentIdx[playerid] == MAX_ANIMS)gCurrentIdx[playerid] = 1;
 
-	    GetAnimationName(gCurrentIdx[playerid],
+		GetAnimationName(gCurrentIdx[playerid],
 			gCurrentLib[playerid], MAX_LIB_NAME,
 			gCurrentAnim[playerid], MAX_ANIM_NAME);
 
@@ -374,7 +374,8 @@ EnterAnimationBrowser(playerid)
 
 	SetPlayerCameraLookAt(playerid, x, y, z, CAMERA_MOVE);
 	
-	if(!(0 < gCurrentIdx[playerid] < MAX_ANIMS))gCurrentIdx[playerid] = 1811;
+	if(!(0 < gCurrentIdx[playerid] < MAX_ANIMS))
+		gCurrentIdx[playerid] = 1811;
 
 	LoadPlayerTextDraws(playerid);
 	ShowBrowserControls(playerid);

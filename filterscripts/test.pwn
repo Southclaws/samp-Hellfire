@@ -167,12 +167,35 @@ CMD:vhp(playerid, params[])
 	return 1;
 }
 
-CMD:nos(playerid,params[])
+CMD:skin(playerid,params[])
 {
-	if(!IsPlayerInAnyVehicle(playerid))
-		SendClientMessage(playerid,-1,"You are not in a vehicle.");
+	SetPlayerSkin(playerid, strval(params));
+	return 1;
+}
 
-	AddVehicleComponent(GetPlayerVehicleID(playerid), 1010);
+CMD:mouse(playerid, params[])
+{
+	SelectTextDraw(playerid, -1);
 
 	return 1;
+}
+
+#include "../scripts/System/MathFunctions.pwn"
+CMD:dist(playerid, params[])
+{
+	new id = strval(params);
+	new
+		Float:x1,
+		Float:y1,
+		Float:z1,
+		Float:x2,
+		Float:y2,
+		Float:z2;
+	GetPlayerPos(playerid, x1, y1, z1);
+	GetPlayerPos(id, x2, y2, z2);
+
+	printf("%f", Distance2D(x1, y1, x2, y2));
+
+	return 1;
+
 }

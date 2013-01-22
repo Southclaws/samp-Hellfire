@@ -12,7 +12,7 @@ public OnPlayerUseItem(playerid, itemid)
 	{
 		PlayerDropItem(playerid);
 		SetItemExtraData(itemid, 1);
-		Msg(playerid, YELLOW, " >  Mine primed in");
+		Msg(playerid, YELLOW, " >  Mine primed");
 		return 1;
 	}
 	return CallLocalFunction("cap_OnPlayerUseItem", "dd", playerid, itemid);
@@ -29,7 +29,27 @@ public OnPlayerPickUpItem(playerid, itemid)
 {
 	if(GetItemType(itemid) == item_CapMineBad)
 	{
-		if(random(100) < 50)
+		if(GetItemExtraData(itemid) == 1)
+		{
+			if(random(100) < 50)
+			{
+				new
+					Float:x,
+					Float:y,
+					Float:z;
+
+				GetItemPos(itemid, x, y, z);
+				CreateExplosion(x, y, z, 11, 8.0);
+
+				DestroyItem(itemid);
+
+				return 1;
+			}
+		}
+	}
+	if(GetItemType(itemid) == item_CapMine)
+	{
+		if(GetItemExtraData(itemid) == 1)
 		{
 			new
 				Float:x,
@@ -43,20 +63,6 @@ public OnPlayerPickUpItem(playerid, itemid)
 
 			return 1;
 		}
-	}
-	if(GetItemType(itemid) == item_CapMine)
-	{
-		new
-			Float:x,
-			Float:y,
-			Float:z;
-
-		GetItemPos(itemid, x, y, z);
-		CreateExplosion(x, y, z, 11, 8.0);
-
-		DestroyItem(itemid);
-
-		return 1;
 	}
 	return CallLocalFunction("cap_OnPlayerPickUpItem", "dd", playerid, itemid);
 }

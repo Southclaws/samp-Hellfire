@@ -86,7 +86,7 @@ public OnLoad()
 							LootOffsets[j][k][0], LootOffsets[j][k][1], LootOffsets[j][k][2],
 							x, y, z);
 
-						CreateLootSpawn(x, y, z, 3, 30, 70, 20, 2);
+						CreateLootSpawn(x, y, z, 3, 30, loot_Civilian);
 					}
 				}
 			}

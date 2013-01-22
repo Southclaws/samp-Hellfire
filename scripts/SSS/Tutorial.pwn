@@ -3,7 +3,7 @@ static
 
 Tutorial_Start(playerid)
 {
-	ShowHelpTip(playerid, "Using your inventory effectively is key to scavenging items quickly and efficiently! When you have a bag on your back it is available for extra storage.~n~~b~Press H to open your inventory now.");
+	ShowHelpTip(playerid, "Using your inventory effectively is key to scavenging items quickly and efficiently! When you have a bag on your back it is available for extra storage.~n~~b~Press H to open your inventory now.~n~~n~~w~/skip to close the tutorial.");
 
 	TutorialState[playerid] = 1;
 }
@@ -11,6 +11,12 @@ Tutorial_Start(playerid)
 CMD:tutorial(playerid, params[])
 {
 	Tutorial_Start(playerid);
+	return 1;
+}
+CMD:skip(playerid, params[])
+{
+	ShowHelpTip(playerid, "Tutorial skipped, you can start it at any time by typing /tutorial.", 5000);
+	TutorialState[playerid] = 0;
 	return 1;
 }
 
