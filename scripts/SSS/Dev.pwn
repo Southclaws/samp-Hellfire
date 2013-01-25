@@ -859,7 +859,8 @@ CMD:additem(playerid, params[])
 	itemid = CreateItem(type,
 			x + (0.5 * floatsin(-r, degrees)),
 			y + (0.5 * floatcos(-r, degrees)),
-			z-0.8568, .rz = r, .zoffset = 0.7);
+			z - 0.8568, .rz = r, .zoffset = 0.7);
+
 
 	if(0 < _:type <= WEAPON_PARACHUTE)
 		SetItemExtraData(itemid, WepData[_:type][MagSize]);

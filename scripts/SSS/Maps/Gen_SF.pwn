@@ -15,9 +15,12 @@ public OnLoad()
 	District_City1();
 	District_City2();
 	District_Naval();
+	District_Police();
 	District_Industrial();
 	District_Airport();
 	District_MontFoster();
+	District_Ship1();
+	District_Ship2();
 
 	LinkTP(
 		CreateButton(-904.7388, 335.7443, 1014.1530, "Press F to open", 0),
@@ -253,6 +256,10 @@ District_Bayfront()
 	CreateLootSpawn(-1725.810058, 1235.810058, 16.989999,	3, 40, loot_Industrial);
 	CreateLootSpawn(-1679.069946, 1210.069946, 20.239999,	3, 40, loot_Industrial);
 	CreateLootSpawn(-1661.189941, 1217.130004, 6.340000,	3, 40, loot_Industrial);
+
+	CreateLootSpawn(-1504.85859, 1374.5058458, 3.053452,	3, 20, loot_Survivor);
+	CreateLootSpawn(-2671.62367, 1595.3435734, 2.273575,	3, 20, loot_Survivor);
+	CreateLootSpawn(-2691.40367, 1595.0735734, 2.263575,	3, 20, loot_Survivor);
 }
 District_City1()
 {
@@ -344,6 +351,10 @@ District_City1()
 }
 District_City2()
 {
+	LinkTP(
+		CreateButton(-1753.70, 883.57, 295.56, "Press ~k~~VEHICLE_ENTER_EXIT~"),
+		CreateButton(-1749.37, 871.82, 25.23, "Press ~k~~VEHICLE_ENTER_EXIT~"));
+
 	CreateZipline(
 		-2114.91, 923.88, 86.04,
 		-1948.34, 952.88, 61.47);
@@ -482,6 +493,14 @@ District_Naval()
 
 	CreateLootSpawn(-1341.034763, 493.847340, 32.344374,	2, 40, loot_Survivor);
 	CreateLootSpawn(-1383.904763, 493.747340, 26.94374,		2, 40, loot_Survivor);
+}
+District_Police()
+{
+	CreateLootSpawn(-1615.52, 685.33, 6.48,		3, 30, loot_Police);
+	CreateLootSpawn(-1590.78, 716.26, -6.15,	3, 30, loot_Police);
+	CreateLootSpawn(-1623.20, 668.23, -5.86,	3, 30, loot_Police);
+	CreateLootSpawn(-1576.75, 683.36, 6.33,		3, 30, loot_Police);
+	CreateLootSpawn(-1670.43, 696.55, 29.70,	3, 30, loot_Police);
 }
 District_Industrial()
 {
@@ -632,4 +651,32 @@ District_MontFoster()
 	CreateLootSpawn(-2287.800048, -341.369995, 49.979999,	5, 45, loot_Survivor);
 	CreateLootSpawn(-2529.790039, -657.880004, 146.989990,	5, 45, loot_Survivor);
 	CreateLootSpawn(-2635.080078, -498.980010, 69.379997,	4, 30, loot_Survivor);
+}
+District_Ship1()
+{
+	CreateLootSpawn(-2303.82, 1545.11, 17.89, 4, 30, loot_Industrial);
+	CreateLootSpawn(-2351.49, 1550.50, 22.24, 4, 25, loot_Survivor);
+	CreateLootSpawn(-2404.19, 1548.50, 25.07, 4, 30, loot_Industrial);
+	CreateLootSpawn(-2512.85, 1545.25, 16.40, 4, 30, loot_Industrial);
+	CreateLootSpawn(-2499.11, 1552.21, 23.23, 4, 25, loot_Survivor);
+	CreateLootSpawn(-2485.59, 1533.88, 27.10, 4, 30, loot_Industrial);
+	CreateLootSpawn(-2472.23, 1550.56, 35.85, 4, 30, loot_Industrial);
+	CreateLootSpawn(-2474.53, 1552.21, 32.26, 4, 25, loot_Survivor);
+	CreateLootSpawn(-2477.65, 1549.85, 32.30, 4, 30, loot_Industrial);
+	CreateLootSpawn(-2471.47, 1538.77, 32.28, 4, 30, loot_Industrial);
+	CreateLootSpawn(-2436.10, 1555.23, 1.22, 4, 25, loot_Survivor);
+	CreateLootSpawn(-2426.36, 1536.40, 1.23, 4, 30, loot_Industrial);
+	CreateLootSpawn(-2389.63, 1548.60, 1.15, 4, 30, loot_Industrial);
+	CreateLootSpawn(-2404.49, 1534.92, 1.18, 4, 25, loot_Survivor);
+	CreateLootSpawn(-2366.65, 1540.04, 1.14, 4, 30, loot_Industrial);
+	CreateLootSpawn(-2378.08, 1554.39, 1.17, 4, 30, loot_Industrial);
+}
+District_Ship2()
+{
+	CreateLootSpawn(-1478.84, 1489.43, 7.32, 4, 30, loot_Industrial);
+	CreateLootSpawn(-1404.98, 1486.13, 6.24, 4, 25, loot_Survivor);
+	CreateLootSpawn(-1371.58, 1486.57, 2.71, 4, 30, loot_Industrial);
+	CreateLootSpawn(-1390.89, 1482.97, 0.95, 4, 25, loot_Survivor);
+	CreateLootSpawn(-1433.17, 1483.05, 0.93, 4, 30, loot_Industrial);
+	CreateLootSpawn(-1425.41, 1490.25, 0.97, 4, 25, loot_Survivor);
 }

@@ -139,7 +139,7 @@ public OnLoad()
 	AddItemToLootIndex(loot_CarCivilian,	item_BurgerBox,					0.8);
 	AddItemToLootIndex(loot_CarCivilian,	item_Taco,						1.0);
 	AddItemToLootIndex(loot_CarCivilian,	item_GasCan,					0.8);
-	AddItemToLootIndex(loot_CarCivilian,	item_Clothes,				0.9);
+	AddItemToLootIndex(loot_CarCivilian,	item_Clothes,					0.9);
 
 	// loot_CarIndustrial
 	AddItemToLootIndex(loot_CarIndustrial,	item_battery,					1.0);

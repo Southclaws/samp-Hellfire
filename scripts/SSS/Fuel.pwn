@@ -1,6 +1,6 @@
 #include <YSI\y_hooks>
 
-#define MAX_FUEL_LOCATIONS	(8)
+#define MAX_FUEL_LOCATIONS	(12)
 #define FUEL_CAN_CAPACITY	(20)
 
 
@@ -163,6 +163,7 @@ StartRefuellingVehicle(playerid, vehicleid)
 		return 0;
 
 	CancelPlayerMovement(playerid);
+	ApplyAnimation(playerid, "PED", "DRIVE_BOAT", 4.0, 1, 0, 0, 0, 0);
 	SetPlayerProgressBarMaxValue(playerid, ActionBar, GetVehicleFuelCapacity(vehicleid));
 	ShowPlayerProgressBar(playerid, ActionBar);
 
@@ -190,7 +191,13 @@ timer RefuelVehicleUpdate[500](playerid, vehicleid)
 	new
 		itemid = GetPlayerItem(playerid),
 		canfuel,
-		Float:vehiclefuel;
+		Float:vehiclefuel,
+		Float:px,
+		Float:py,
+		Float:pz,
+		Float:vx,
+		Float:vy,
+		Float:vz;
 
 	canfuel = GetItemExtraData(itemid);
 	vehiclefuel = GetVehicleFuel(vehicleid);
@@ -201,9 +208,14 @@ timer RefuelVehicleUpdate[500](playerid, vehicleid)
 		return;
 	}
 
+
 	SetPlayerProgressBarValue(playerid, ActionBar, vehiclefuel);
 	SetPlayerProgressBarMaxValue(playerid, ActionBar, GetVehicleFuelCapacity(vehicleid));
 	ShowPlayerProgressBar(playerid, ActionBar);
+
+	GetVehiclePos(vehicleid, vx, vy, vz);
+	GetPlayerPos(playerid, px, py, pz);
+	SetPlayerFacingAngle(playerid, GetAngleToPoint(px, py, vx, vy));
 
 	SetItemExtraData(itemid, canfuel - 1);
 	SetVehicleFuel(vehicleid, vehiclefuel + 1.0);

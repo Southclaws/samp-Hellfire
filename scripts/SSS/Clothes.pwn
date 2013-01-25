@@ -15,7 +15,6 @@ Float:		skin_lootSpawnChance
 
 
 new
-ItemType:	item_Clothes = INVALID_ITEM_TYPE,
 			gPlayerCurrentSkin[MAX_PLAYERS],
 Timer:		skin_UpdateTimer[MAX_PLAYERS],
 			skin_CurrentlyUsing[MAX_PLAYERS],
@@ -50,7 +49,6 @@ stock GetPlayerClothes(playerid)
 }
 stock SetPlayerClothes(playerid, skinid)
 {
-	printf("Setting clothes to %d", skinid);
 	if(!(0 <= skinid < skin_Total))
 		return 0;
 
@@ -169,6 +167,7 @@ StartUsingClothes(playerid, itemid)
 	SetPlayerProgressBarValue(playerid, ActionBar, 0.0);
 	SetPlayerProgressBarMaxValue(playerid, ActionBar, 20.0);
 	ShowPlayerProgressBar(playerid, ActionBar);
+	CancelPlayerMovement(playerid);
 
 	skin_CurrentlyUsing[playerid] = 1;
 	skin_UseProgress[playerid] = 0.0;
@@ -201,4 +200,16 @@ timer UseClothesUpdate[100](playerid, itemid)
 
 	skin_UseProgress[playerid] += 1.0;
 	return;
+}
+
+
+CMD:getexdat(playerid, params[])
+{
+	new id = strval(params);
+
+	if(IsValidItem(id))
+	{
+		printf("EXTRA DATA FOR %d: %d", id, GetItemExtraData(id));
+	}
+	return 1;
 }

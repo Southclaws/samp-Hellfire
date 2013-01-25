@@ -19,7 +19,7 @@ CMD:adminlvl(playerid, params[])
 
 //==============================================================================Player
 
-ACMD:view[4](playerid, params[])
+ACMD:view[3](playerid, params[])
 {
 	new id;
 
@@ -33,7 +33,7 @@ ACMD:view[4](playerid, params[])
 
 	return 1;
 }
-ACMD:gamename[4](playerid,params[])
+ACMD:gamename[3](playerid,params[])
 {
 	if(!(0 < strlen(params) < 64))
 		return Msg(playerid,YELLOW," >  Usage: /gamename [name]");
@@ -43,7 +43,7 @@ ACMD:gamename[4](playerid,params[])
 
 	return 1;
 }
-ACMD:hostname[4](playerid,params[])
+ACMD:hostname[3](playerid,params[])
 {
 	if(!(0 < strlen(params) < 64))
 		return Msg(playerid,YELLOW," >  Usage: /hostname [name]");
@@ -56,7 +56,7 @@ ACMD:hostname[4](playerid,params[])
 
 	return 1;
 }
-ACMD:mapname[4](playerid,params[])
+ACMD:mapname[3](playerid,params[])
 {
 	if(!(0 < strlen(params) < 64))
 		return Msg(playerid,YELLOW," >  Usage: /mapname [name]");
@@ -65,7 +65,7 @@ ACMD:mapname[4](playerid,params[])
 
 	return 1;
 }
-ACMD:gmx[4](playerid, params[])
+ACMD:gmx[3](playerid, params[])
 {
 	MsgAll(BLUE, " ");
 	MsgAll(BLUE, " ");
@@ -82,7 +82,7 @@ ACMD:gmx[4](playerid, params[])
 	RestartGamemode();
 	return 1;
 }
-ACMD:loadfs[4](playerid, params[])
+ACMD:loadfs[3](playerid, params[])
 {
 	if(!(0 < strlen(params) < 64))
 		return Msg(playerid, YELLOW, " >  Usage: /loadfs [FS name]");
@@ -94,7 +94,7 @@ ACMD:loadfs[4](playerid, params[])
 
 	return 1;
 }
-ACMD:reloadfs[4](playerid, params[])
+ACMD:reloadfs[3](playerid, params[])
 {
 	if(!(0 < strlen(params) < 64))
 		return Msg(playerid, YELLOW, " >  Usage: /loadfs [FS name]");
@@ -106,7 +106,7 @@ ACMD:reloadfs[4](playerid, params[])
 
 	return 1;
 }
-ACMD:unloadfs[4](playerid, params[])
+ACMD:unloadfs[3](playerid, params[])
 {
 	if(!(0 < strlen(params) < 64))
 		return Msg(playerid, YELLOW, " >  Usage: /loadfs [FS name]");
@@ -118,15 +118,18 @@ ACMD:unloadfs[4](playerid, params[])
 
 	return 1;
 }
-CMD:additem(playerid, params[])
+ACMD:additem[3](playerid, params[])
 {
 	new
-		ItemType:type = ItemType:strval(params),
+		ItemType:type,
+		exdata,
 		itemid,
 		Float:x,
 		Float:y,
 		Float:z,
 		Float:r;
+
+	sscanf(params, "dD(0)", _:type, exdata);
 
 	GetPlayerPos(playerid, x, y, z);
 	GetPlayerFacingAngle(playerid, r);
@@ -134,10 +137,17 @@ CMD:additem(playerid, params[])
 	itemid = CreateItem(type,
 			x + (0.5 * floatsin(-r, degrees)),
 			y + (0.5 * floatcos(-r, degrees)),
-			z-0.8568, .rz = r, .zoffset = 0.7);
+			z - 0.8568, .rz = r, .zoffset = 0.7);
 
-	if(0 < _:type <= WEAPON_PARACHUTE)
-		SetItemExtraData(itemid, WepData[_:type][MagSize]);
+	if(exdata != 0)
+	{
+		SetItemExtraData(itemid, exdata);	
+	}
+	else
+	{
+		if(0 < _:type <= WEAPON_PARACHUTE)
+			SetItemExtraData(itemid, WepData[_:type][MagSize]);
+	}
 
 	return 1;
 }

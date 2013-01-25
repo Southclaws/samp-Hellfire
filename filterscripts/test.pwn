@@ -1,5 +1,6 @@
 #include <a_samp>
 #include <YSI\y_va>
+#include <YSI\y_timers>
 #include <formatex>
 #include "../scripts/System/PlayerFunctions.pwn"
 //#include "../scripts/API/Camera Sequencer/CameraMover.inc"
@@ -198,4 +199,39 @@ CMD:dist(playerid, params[])
 
 	return 1;
 
+}
+
+new
+	Timer:StartCrawlTimer[MAX_PLAYERS],
+	Timer:CrawlUpdateTimer[MAX_PLAYERS];
+
+public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
+{
+/*	if(newkeys & KEY_CROUCH)
+	{
+		stop StartCrawlTimer[playerid];
+		StartCrawlTimer[playerid] = defer CrawlUpdate(playerid);
+	}
+	if(oldkeys & KEY_CROUCH)
+	{
+		stop StartCrawlTimer[playerid];
+	}
+	if(newkeys & KEY_SPRINT)
+	{
+		stop CrawlUpdateTimer[playerid];
+		ClearAnimations(playerid);
+	}
+*/}
+
+timer CrawlUpdate[800](playerid)
+{
+	ApplyAnimation(playerid, "PED", "CAR_CRAWLOUTRHS", 1.0, 0, 1, 1, 1, 800);
+	stop CrawlUpdateTimer[playerid];
+	CrawlUpdateTimer[playerid] = defer CrawlUpdate(playerid);
+}
+
+CMD:crawl(playerid, params[])
+{
+	ApplyAnimation(playerid, "PED", "CAR_CRAWLOUTRHS", 4.1, 0, 1, 1, 1, 500);
+	return 1;
 }

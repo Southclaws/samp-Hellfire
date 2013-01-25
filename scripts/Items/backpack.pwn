@@ -77,6 +77,7 @@ public OnPlayerUseItem(playerid, itemid)
 {
 	if(GetItemType(itemid) == item_Backpack || GetItemType(itemid) == item_Satchel)
 	{
+		CancelPlayerMovement(playerid);
 		DisplayContainerInventory(playerid, GetItemExtraData(itemid));
 	}
 	return CallLocalFunction("pack_OnPlayerUseItem", "dd", playerid, itemid);
@@ -96,13 +97,6 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 	if(IsValidItem(gPlayerBackpack[playerid]))
 	{
-/*
-		if(newkeys & KEY_CTRL_BACK)
-		{
-			if(IsValidItem(gPlayerBackpack[playerid]))
-				DisplayContainerInventory(playerid, GetItemExtraData(gPlayerBackpack[playerid]), 1);
-		}
-*/
 		if(newkeys & KEY_NO)
 		{
 			if(!IsValidItem(GetPlayerItem(playerid)) && GetPlayerWeapon(playerid) == 0)
@@ -211,7 +205,7 @@ public OnPlayerViewInventoryOpt(playerid)
 {
 	if(IsValidItem(gPlayerBackpack[playerid]) && !IsValidContainer(GetPlayerCurrentContainer(playerid)))
 	{
-		pack_InventoryOptionID[playerid] = AddInventoryOption(playerid, "Remove");
+		pack_InventoryOptionID[playerid] = AddInventoryOption(playerid, "Move to bag");
 	}
 
 	return CallLocalFunction("pack_PlayerViewInventoryOpt", "d", playerid);

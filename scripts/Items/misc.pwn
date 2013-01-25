@@ -6,7 +6,6 @@ new stock
 
 	ItemType:item_FishRod		= INVALID_ITEM_TYPE, // fishing?
 	ItemType:item_Crowbar		= INVALID_ITEM_TYPE, // open jammed doors or locked crates
-	ItemType:item_Flashlight	= INVALID_ITEM_TYPE, // if light obj is found use that to light up stuff when used with F
 	ItemType:item_Taser			= INVALID_ITEM_TYPE, // stuns players (needs anim, or just other hand)
 	ItemType:item_LaserPoint	= INVALID_ITEM_TYPE, // combine with explosives to make trip mine
 	ItemType:item_MobilePhone	= INVALID_ITEM_TYPE, // remote detonator? communication?
@@ -24,6 +23,7 @@ new stock
 	ItemType:item_Canister2		= INVALID_ITEM_TYPE,
 	ItemType:item_Canister3		= INVALID_ITEM_TYPE,
 
+	ItemType:item_Clothes		= INVALID_ITEM_TYPE,
 	ItemType:item_Pizza			= INVALID_ITEM_TYPE,
 	ItemType:item_Burger		= INVALID_ITEM_TYPE,	
 	ItemType:item_BurgerBox		= INVALID_ITEM_TYPE,	

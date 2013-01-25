@@ -57,12 +57,13 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 StartEating(playerid, foodtype)
 {
 	food_CurrentlyEating[playerid] = foodtype;
+	stop food_UpdateTimer[playerid];
 	food_UpdateTimer[playerid] = repeat EatUpdate(playerid);
 	ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.1, 0, 0, 0, 0, 0);
 }
 timer EatUpdate[100](playerid)
 {
-	if(food_EatProgress[playerid] == 30.0)
+	if(food_EatProgress[playerid] == 32.0)
 	{
 		gPlayerFP[playerid] += food_Data[food_CurrentlyEating[playerid]][food_foodValue];
 		DestroyItem(GetPlayerItem(playerid));
@@ -85,6 +86,7 @@ StopEating(playerid)
 	food_EatProgress[playerid] = 0.0;
 	food_CurrentlyEating[playerid] = -1;
 	HidePlayerProgressBar(playerid, ActionBar);
+	ClearAnimations(playerid);
 }
 
 

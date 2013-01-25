@@ -26,7 +26,7 @@ DefineLootIndex(indexvalue)
 	loot_IndexUpper++;
 }
 
-AddItemToLootIndex(index, ItemType:itemtype, Float:spawnchance, exdata = 0)
+AddItemToLootIndex(index, ItemType:itemtype, Float:spawnchance, exdata = -1)
 {
 	if(index > loot_IndexUpper)
 		return 0;
@@ -104,7 +104,7 @@ CreateLootSpawn(Float:x, Float:y, Float:z, size, spawnchance, lootindex)
 		if(0 < _:tmpitem <= WEAPON_PARACHUTE)
 			SetItemExtraData(itemid, (WepData[_:tmpitem][MagSize] * (random(3))) + random(WepData[_:tmpitem][MagSize]-1) + 1);
 		
-		else
+		if(exdata != -1)
 			SetItemExtraData(itemid, exdata);
 
 		if(tmpitem == item_Satchel || tmpitem == item_Backpack)

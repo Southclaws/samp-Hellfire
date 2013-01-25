@@ -54,7 +54,7 @@ Float:		gVehicleFuel[MAX_VEHICLES],
 			gPlayerVehicleData[MAX_VEHICLES][E_PLAYER_VEHICLE_DATA];
 
 
-new gModelGroup[13][68]=
+new gModelGroup[13][78]=
 {
 	// VEHICLE_GROUP_CASUAL
 	{
@@ -66,42 +66,47 @@ new gModelGroup[13][68]=
 		579,405,421,426,445,466,467,492,
 		507,516,529,540,546,547,550,551,
 		566,585,587,412,534,535,536,567,
-		575,576, 0, ...
+		575,576,509,481,510,462,448,463,
+		586,468,471,0
 	},
 	// VEHICLE_GROUP_CASUAL_DESERT,
 	{
 	    404,479,445,542,466,467,549,540,
 		424,400,500,505,489,499,422,600,
-		515,543,554,443,508,525, 0, ...
+		515,543,554,443,508,525,509,481,
+		510,462,448,463,586,468,471,0,...
 	},
 	// VEHICLE_GROUP_CASUAL_COUNTRY,
 	{
 	    499,422,498,609,455,403,414,514,
 		600,413,515,440,543,531,478,456,
 		554,445,518,401,527,542,546,410,
-		549,508,525, 0, ...
+		549,508,525,509,481,510,462,448,
+		463,586,468,471,0,...
 	},
 	// VEHICLE_GROUP_SPORT,
 	{
 		558,559,560,561,562,565,411,451,
-		477,480,494,502,503,506,541, 0, ...
+		477,480,494,502,503,506,541,581,
+		522,461,521,0,...
 	},
 	// VEHICLE_GROUP_OFFROAD,
 	{
-		400,505,579,422,478,543,554, 0, ...
+		400,505,579,422,478,543,554,468,
+		586,0,...
 	},
 	// VEHICLE_GROUP_BIKE,
 	{
 	    509,481,510,462,448,463,586,468,
-		471, 0, ...
+		471,0,...
 	},
 	// VEHICLE_GROUP_FASTBIKE,
 	{
-	    581,522,461,521, 0, ...
+	    581,522,461,521,0,...
 	},
 	// VEHICLE_GROUP_MILITARY,
 	{
-	    433,432,601,470, 0, ...
+	    433,432,601,470,0,...
 	},
 	// VEHICLE_GROUP_POLICE,
 	{
@@ -109,21 +114,21 @@ new gModelGroup[13][68]=
 	},
 	// VEHICLE_GROUP_BIGPLANE,
 	{
-	    519,553,577,592, 0, ...
+	    519,553,577,592,0,...
 	},
 	// VEHICLE_GROUP_SMALLPLANE,
 	{
-	    460,476,511,512,513,593, 0, ...
+	    460,476,511,512,513,593,0,...
 	},
 	// VEHICLE_GROUP_HELICOPTER,
 	{
 	    548,487,417,487,488,487,497,487,
-		563,477,469,487, 0, ...
+		563,477,469,487,0,...
 	},
 	// VEHICLE_GROUP_BOAT,
 	{
 	    472,473,493,595,484,430,453,452,
-		446,454, 0, ...
+		446,454,0,...
 	}
 };
 
@@ -193,7 +198,15 @@ LoadStaticVehiclesFromFile(file[], bool:prints = true)
 	{
 		if(!sscanf(line, "p<,>ffffD(0)", posX, posY, posZ, rotZ, model))
 		{
-			AddStaticVehicle(model, posX, posY, posZ, rotZ, -1, -1);
+			new id;
+			id = AddStaticVehicle(model, posX, posY, posZ, rotZ, -1, -1);
+
+			if(model == 449)
+			{
+				Iter_Add(gVehicleIndex, id);
+				ApplyVehicleData(id);
+			}
+
 			gTotalVehicles++;
 			count++;
 		}
@@ -303,6 +316,8 @@ LoadPlayerVehicles(bool:prints = true)
 
 			sscanf(item, "p<.>s[24]{s[24]}", gVehicleOwner[vehicleid]);
 
+			printf("Loading vehicle %d for %s", vehicleid, gVehicleOwner[vehicleid]);
+
 			if(IsValidVehicle(vehicleid))
 			{
 				Iter_Add(gVehicleIndex, vehicleid);
@@ -319,7 +334,6 @@ LoadPlayerVehicles(bool:prints = true)
 
 				for(new i, j; j < CNT_MAX_SLOTS; i += 2, j++)
 				{
-					printf("[LOAD]\tVehicle Inv Slot: %d = ItemType: %d Ex: %d", j, array[13 + i], array[13 + i + 1]);
 					if(IsValidItemType(ItemType:array[13 + i]))
 					{
 						itemid = CreateItem(ItemType:array[13 + i], 0.0, 0.0, 0.0);
@@ -342,6 +356,7 @@ LoadPlayerVehicles(bool:prints = true)
 
 SavePlayerVehicle(vehicleid, name[MAX_PLAYER_NAME])
 {
+	printf("Saving vehicle %d for %s", vehicleid, name);
 	if(!IsValidVehicle(vehicleid))
 		return 0;
 
@@ -373,7 +388,6 @@ SavePlayerVehicle(vehicleid, name[MAX_PLAYER_NAME])
 			array[13 + i] = -1;
 			array[13 + i + 1] = 0;
 		}
-		printf("[SAVE]\tVehicle Inv Slot: %d = ItemType: %d Ex: %d", j, array[13 + i], array[13 + i + 1]);
 	}
 
 	gVehicleOwner[vehicleid] = name;
@@ -409,11 +423,11 @@ timer ApplyVehicleConditionToAll[1000]()
 {
 	foreach(new i : gVehicleIndex)
 	{
-		ApplyVehicleCondition(i);
+		ApplyVehicleData(i);
 	}
 }
 
-ApplyVehicleCondition(vehicleid)
+ApplyVehicleData(vehicleid)
 {
 	new
 		model = GetVehicleModel(vehicleid),
@@ -490,10 +504,10 @@ ApplyVehicleCondition(vehicleid)
 					itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
 					AddItemToContainer(gVehicleContainer[vehicleid], itemid);
 
-					if(1 <= _:itemtype <= 46)
+					if(0 < _:itemtype <= WEAPON_PARACHUTE)
 						SetItemExtraData(itemid, (WepData[_:itemtype][MagSize] * (random(3))) + random(WepData[_:itemtype][MagSize]));
 
-					else
+					if(exdata != -1)
 						SetItemExtraData(itemid, exdata);
 
 					if(itemtype == item_Satchel || itemtype == item_Backpack)
@@ -531,16 +545,21 @@ public OnVehicleDeath(vehicleid)
 	{
 		DestroyItem(GetContainerSlotItem(gVehicleContainer[vehicleid], i));
 	}
+
 	DestroyContainer(gVehicleContainer[vehicleid]);
 	DestroyDynamicArea(gVehicleArea[vehicleid]);
 	Iter_Remove(gVehicleIndex, vehicleid);
+
 	DestroyVehicle(vehicleid);
 }
 
 hook OnPlayerStateChange(playerid, newstate, oldstate)
 {
 	if(oldstate == PLAYER_STATE_DRIVER)
+	{
+		SetCameraBehindPlayer(playerid);
 		SavePlayerVehicle(gPlayerVehicleID[playerid], gPlayerName[playerid]);
+	}
 }
 
 public OnPlayerAddedToContainer(playerid, containerid, itemid)
@@ -550,7 +569,7 @@ public OnPlayerAddedToContainer(playerid, containerid, itemid)
 	{
 		if(IsValidVehicle(gCurrentContainerVehicle[playerid]))
 		{
-			if(containerid == gVehicleContainer[gCurrentContainerVehicle[playerid]])
+			if(!isnull(gVehicleOwner[gCurrentContainerVehicle[playerid]]) && !strcmp(gVehicleOwner[gCurrentContainerVehicle[playerid]], gPlayerName[playerid]))
 			{
 				SavePlayerVehicle(gCurrentContainerVehicle[playerid], gPlayerName[playerid]);
 			}
@@ -572,9 +591,12 @@ public OnPlayerTakenFromContainer(playerid, containerid, slotid)
 	printf("OnPlayerTakenFromContainer %d %d %d", playerid, containerid, slotid);
 	if(IsValidVehicle(gCurrentContainerVehicle[playerid]))
 	{
-		if(containerid == gVehicleContainer[gCurrentContainerVehicle[playerid]])
+		if(IsValidVehicle(gCurrentContainerVehicle[playerid]))
 		{
-			SavePlayerVehicle(gCurrentContainerVehicle[playerid], gPlayerName[playerid]);
+			if(!isnull(gVehicleOwner[gCurrentContainerVehicle[playerid]]) && !strcmp(gVehicleOwner[gCurrentContainerVehicle[playerid]], gPlayerName[playerid]))
+			{
+				SavePlayerVehicle(gCurrentContainerVehicle[playerid], gPlayerName[playerid]);
+			}
 		}
 	}
 

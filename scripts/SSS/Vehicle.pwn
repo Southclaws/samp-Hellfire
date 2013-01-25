@@ -91,8 +91,15 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 					}
 					else
 					{
-						ShowMsgBox(playerid, "You don't have the right tool", 3000, 100);
-						SetPlayerPos(playerid, px, py, pz);
+						if(GetVehicleModel(i) == 449)
+						{
+							PutPlayerInVehicle(playerid, i, 0);
+						}
+						else
+						{
+							ShowMsgBox(playerid, "You don't have the right tool", 3000, 100);
+							SetPlayerPos(playerid, px, py, pz);
+						}
 					}
 				}
 				if(155.0 < angle < 205.0)

@@ -169,6 +169,7 @@ native WP_Hash(buffer[], len, const str[]);
 #define ATTACHSLOT_HOLSTER			(2)
 #define ATTACHSLOT_HOLD				(3)
 #define ATTACHSLOT_CUFFS			(4)
+#define ATTACHSLOT_TORCH			(5)
 
 
 
@@ -194,17 +195,7 @@ enum
 }
 
 
-new
-	HORIZONTAL_RULE[] = {"-------------------------------------------------------------------------------------------------------------------------"},
-	RandomCountries[5][16] =
-	{
-		"Narnia",
-		"Mordor",
-		"Liberty City",
-		"Vice City",
-		"Alderaan"
-	};
-
+new HORIZONTAL_RULE[] = {"-------------------------------------------------------------------------------------------------------------------------"};
 
 //=====================Player Tag Names
 new const AdminName[4][14]=
@@ -471,7 +462,7 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/Items/capmine.pwn"
 #include "../scripts/Items/wheel.pwn"
 #include "../scripts/Items/gascan.pwn"
-#include "../scripts/Items/clothes.pwn"
+#include "../scripts/Items/flashlight.pwn"
 
 //======================Gameplay Features
 
@@ -485,6 +476,7 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/SSS/Fuel.pwn"
 
 #include "../scripts/SSS/Inventory.pwn"
+#include "../scripts/SSS/Clothes.pwn"
 #include "../scripts/SSS/Food.pwn"
 #include "../scripts/SSS/Tutorial.pwn"
 
@@ -744,9 +736,13 @@ public OnGameModeInit()
 	CreateFuelOutlet(-1676.5156, 419.1172, 6.3828, 2.0, 100.0, float(random(100)));
 	CreateFuelOutlet(-1672.1328, 423.5000, 6.3828, 2.0, 100.0, float(random(100)));
 
+	CreateFuelOutlet(-2410.80, 970.85, 44.48, 2.0, 100.0, float(random(100)));
+	CreateFuelOutlet(-2410.80, 976.19, 44.48, 2.0, 100.0, float(random(100)));
+	CreateFuelOutlet(-2410.80, 981.52, 44.48, 2.0, 100.0, float(random(100)));
 
-	gDefaultSkinM =	DefineSkinItem(60, "Civilian", 1, 1.0);
-	gDefaultSkinF =	DefineSkinItem(192, "Civilian", 0, 1.0);
+
+	gDefaultSkinM =	DefineSkinItem(60, "Civilian", 1, 0.0);
+	gDefaultSkinF =	DefineSkinItem(192, "Civilian", 0, 0.0);
 
 	DefineSkinItem(170,		"Civilian",			1, 1.0);
 	DefineSkinItem(188,		"Civilian",			1, 1.0);
@@ -951,9 +947,9 @@ ptask PlayerUpdate[100](playerid)
 
 	if(gScreenBoxFadeLevel[playerid] == 0)
 	{
-		if(gPlayerHP[playerid] < 30.0)
+		if(gPlayerHP[playerid] < 40.0)
 		{
-			PlayerTextDrawBoxColor(playerid, ClassBackGround, floatround((30.0 - gPlayerHP[playerid]) * 4.4));
+			PlayerTextDrawBoxColor(playerid, ClassBackGround, floatround((40.0 - gPlayerHP[playerid]) * 4.4));
 			PlayerTextDrawShow(playerid, ClassBackGround);
 		}
 		else
@@ -1015,7 +1011,7 @@ ptask FoodUpdate[1000](playerid)
 
 	if(gPlayerFP[playerid] < 30.0)
 	{
-		SetPlayerDrunkLevel(playerid, 2000 + floatround((30.0 - gPlayerFP[playerid]) * 10.0));
+		SetPlayerDrunkLevel(playerid, 2000 + floatround((31.0 - gPlayerFP[playerid]) * 300.0));
 	}
 	if(gPlayerFP[playerid] < 20.0)
 	{
@@ -1117,7 +1113,7 @@ public OnPlayerConnect(playerid)
 	else
 		GetCountryName(tmpIP, tmpCountry);
 	
-	if(isnull(tmpCountry))format(tmpCountry, sizeof(tmpCountry), "Unknown (%s maybe?)", RandomCountries[random(sizeof(RandomCountries))]);
+	if(isnull(tmpCountry))tmpCountry = "Unknown";
 
 	TextDrawShowForPlayer(playerid, ClockText);
 
@@ -1132,13 +1128,18 @@ public OnPlayerConnect(playerid)
 		db_get_field_assoc(tmpResult, #ROW_SKIN, tmpField, 4);
 		gPlayerData[playerid][ply_Skin] = strval(tmpField);
 
-		db_get_field_assoc(tmpResult, #ROW_SKIN, tmpField, 4);
+		db_get_field_assoc(tmpResult, #ROW_GEND, tmpField, 2);
 
-		if(strval(tmpField))
-			t:bPlayerGameSettings[playerid]<Gender>;
-
-		else
+		if(strval(tmpField) == 0)
+		{
+			print("Female");
 			f:bPlayerGameSettings[playerid]<Gender>;
+		}
+		else
+		{
+			print("Male");
+			t:bPlayerGameSettings[playerid]<Gender>;
+		}
 
 		db_get_field_assoc(tmpResult, #ROW_IPV4, tmpField, 12);
 		dbIP = strval(tmpField);
@@ -1208,6 +1209,21 @@ public OnPlayerConnect(playerid)
 
 	return 1;
 }
+
+CMD:gender(playerid, params[])
+{
+	if(bPlayerGameSettings[playerid] & Gender)
+	{
+		Msg(playerid, -1, "Male");
+	}
+	else
+	{
+		Msg(playerid, -1, "Female");
+	}
+
+	return 1;
+}
+
 CheckForExtraAccounts(playerid, name[])
 {
 	new
@@ -1403,6 +1419,7 @@ SavePlayerInventory(playerid)
 		helditems[1] = 0;
 		fblockwrite(file, helditems, 2);
 	}
+	printf("SAVE: holster %d %d", helditems[0], helditems[1]);
 
 	if(GetPlayerWeapon(playerid) > 0)
 	{
@@ -1425,6 +1442,7 @@ SavePlayerInventory(playerid)
 			fblockwrite(file, helditems, 2);
 		}
 	}
+	printf("SAVE: holding %d %d", helditems[0], helditems[1]);
 
 	for(new i, j; j < 4; i += 2, j++)
 	{
@@ -1484,26 +1502,31 @@ LoadPlayerInventory(playerid)
 
 	fblockread(file, helditems, 2);
 
-	printf("holster: %d %d", helditems[0], helditems[1]);
-	if(helditems[0] != -1)
+	printf("LOAD: holster: %d %d", helditems[0], helditems[1]);
+	if(0 < helditems[0] <= WEAPON_PARACHUTE)
 	{
-		if(0 < helditems[0] <= WEAPON_PARACHUTE)
+		print("\tHolster valid");
+		if(helditems[1] > 0)
 		{
+			print("\tholstering weapon with ammo");
 			HolsterWeapon(playerid, helditems[0], helditems[1], 800);
 		}
 	}
 
 	fblockread(file, helditems, 2);
-	printf("helditems: %d %d", helditems[0], helditems[1]);
+	printf("LOAD: helditems: %d %d", helditems[0], helditems[1]);
 	if(helditems[0] != -1)
 	{
+		print("\tHeld item [0] NOT -1");
 		if(0 < helditems[0] <= WEAPON_PARACHUTE)
 		{
+			print("\tGiving a weapon");
 			GivePlayerWeapon(playerid, helditems[0], helditems[1]);
 			gPlayerArmedWeapon[playerid] = helditems[0];
 		}
 		else
 		{
+			print("Giving an item");
 			itemid = CreateItem(ItemType:helditems[0], 0.0, 0.0, 0.0);
 			SetItemExtraData(itemid, helditems[1]);
 			GiveWorldItemToPlayer(playerid, itemid, false);
@@ -1627,8 +1650,8 @@ ResetVariables(playerid)
 LogMessage(playerid)
 {
 	new
-		str1[700],
-		str2[300],
+		str1[800],
+		str2[400],
 		admins[48],
 		admincount;
 
@@ -1646,19 +1669,20 @@ LogMessage(playerid)
 
 	format(str1, 400,
 		""#C_WHITE"%s\n\n\
-		Welcome to "#C_BLUE"Scavenge and Survive!\n\n\n\n\
+		Welcome to "#C_BLUE"Scavenge and Survive!\n\n\n\
 		"#C_WHITE"The object is to survive for as long as possible.\n\n\
 		You will have a better chance if you are in a group.\n\n\
 		But be careful who you trust.\n\n\
 		Items can be found scattered around.\n\n",
 		HORIZONTAL_RULE);
 
-	format(str2, 300,
+	format(str2, 400,
 		"Weapons are rare so conserve your ammunition.\n\n\
 		And last but not least...\n\n\
-		"#C_RED"NEVER "#C_WHITE"attack an unarmed player.\n\n\n\n\
+		"#C_RED"NEVER "#C_WHITE"attack an unarmed player.\n\n\n\
 		"#C_WHITE"The current time is "#C_YELLOW"%02d:%02d"#C_WHITE"\n\
-		The current weather is "#C_YELLOW"%s"#C_WHITE"\n\n\n\n\
+		The current weather is "#C_YELLOW"%s"#C_WHITE"\n\n\n\
+		Type /help to access this menu, type /g to toggle chat channel\n\n\n\
 		%s",
 		gTimeHour,
 		gTimeMinute,
@@ -1669,6 +1693,12 @@ LogMessage(playerid)
 	strcat(str1, str2);
 
 	ShowPlayerDialog(playerid, d_LogMsg, DIALOG_STYLE_MSGBOX, "Welcome to the Server", str1, "Accept", "");
+}
+
+CMD:help(playerid, params[])
+{
+	LogMessage(playerid);
+	return 1;
 }
 
 CMD:changename(playerid, params[])
@@ -2076,6 +2106,15 @@ public OnPlayerUpdate(playerid)
 	else
 	{
 		SetPlayerArmedWeapon(playerid, gPlayerArmedWeapon[playerid]);
+
+		new
+			id,
+			ammo;
+
+		GetPlayerWeaponData(playerid, WepData[gPlayerArmedWeapon[playerid]][GtaSlot], id, ammo);
+
+		if(ammo == 0)
+			SetPlayerArmedWeapon(playerid, 0);
 	}
 
 	SetPlayerHealth(playerid, gPlayerHP[playerid]);
@@ -2471,10 +2510,20 @@ PlayerSendChat(playerid, textInput[])
 	new
 		text[256];
 
-	format(text, 173, "(%d) %P"#C_WHITE": %s",
-		playerid,
-		playerid,
-		TagScan(textInput));
+	if(bPlayerGameSettings[playerid] & GlobalChat)
+	{
+		format(text, 256, "[Global] (%d) %P"#C_WHITE": %s",
+			playerid,
+			playerid,
+			TagScan(textInput));
+	}
+	else
+	{
+		format(text, 256, "[Local] (%d) %P"#C_WHITE": %s",
+			playerid,
+			playerid,
+			TagScan(textInput));
+	}
 
 	if(strlen(text) > 127)
 	{
@@ -2838,7 +2887,7 @@ LoadTextDraws()
 	print("- Loading TextDraws...");
 
 //=========================================================================Death
-	DeathText				=TextDrawCreate(320.000000, 300.000000, "YOU ARE DEAD!");
+	DeathText					=TextDrawCreate(320.000000, 300.000000, "YOU ARE DEAD!");
 	TextDrawAlignment			(DeathText, 2);
 	TextDrawBackgroundColor		(DeathText, 255);
 	TextDrawFont				(DeathText, 1);
@@ -2966,7 +3015,12 @@ LoadPlayerTextDraws(playerid)
 	PlayerTextDrawSetSelectable		(playerid, ClassButtonFemale, true);
 
 
-//======================================================================HelpTips
+//======================================================================Tooltips
+
+	//
+
+
+//======================================================================Food Bar
 
 	HungerBarBackground				=CreatePlayerTextDraw(playerid, 612.000000, 101.000000, "_");
 	PlayerTextDrawBackgroundColor	(playerid, HungerBarBackground, 255);
@@ -3067,11 +3121,70 @@ UnloadPlayerTextDraws(playerid)
 	DestroyPlayerProgressBar(playerid, ActionBar);
 }
 
+public OnPlayerOpenInventory(playerid)
+{
+	TextDrawHideForPlayer(playerid, MapCover1);
+	TextDrawHideForPlayer(playerid, MapCover2);
+
+	return CallLocalFunction("SSS_OnPlayerOpenInventory", "d", playerid);
+}
+#if defined _ALS_OnPlayerOpenInventory
+	#undef OnPlayerOpenInventory
+#else
+	#define _ALS_OnPlayerOpenInventory
+#endif
+#define OnPlayerOpenInventory SSS_OnPlayerOpenInventory
+forward OnPlayerOpenInventory(playerid);
+
+public OnPlayerCloseInventory(playerid)
+{
+	TextDrawShowForPlayer(playerid, MapCover1);
+	TextDrawShowForPlayer(playerid, MapCover2);
+
+	return CallLocalFunction("SSS_OnPlayerCloseInventory", "d", playerid);
+}
+#if defined _ALS_OnPlayerCloseInventory
+	#undef OnPlayerCloseInventory
+#else
+	#define _ALS_OnPlayerCloseInventory
+#endif
+#define OnPlayerCloseInventory SSS_OnPlayerCloseInventory
+forward OnPlayerCloseInventory(playerid);
+
+public OnPlayerOpenContainer(playerid)
+{
+	TextDrawHideForPlayer(playerid, MapCover1);
+	TextDrawHideForPlayer(playerid, MapCover2);
+
+	return CallLocalFunction("SSS_OnPlayerOpenContainer", "d", playerid);
+}
+#if defined _ALS_OnPlayerOpenContainer
+	#undef OnPlayerOpenContainer
+#else
+	#define _ALS_OnPlayerOpenContainer
+#endif
+#define OnPlayerOpenContainer SSS_OnPlayerOpenContainer
+forward OnPlayerOpenContainer(playerid);
+
+public OnPlayerCloseContainer(playerid)
+{
+	TextDrawShowForPlayer(playerid, MapCover1);
+	TextDrawShowForPlayer(playerid, MapCover2);
+
+	return CallLocalFunction("SSS_OnPlayerCloseContainer", "d", playerid);
+}
+#if defined _ALS_OnPlayerCloseContainer
+	#undef OnPlayerCloseContainer
+#else
+	#define _ALS_OnPlayerCloseContainer
+#endif
+#define OnPlayerCloseContainer SSS_OnPlayerCloseContainer
+forward OnPlayerCloseContainer(playerid);
 
 public OnButtonPress(playerid, buttonid)
 {
 	print("OnButtonPress <Main Script>");
-	return 1;
+	return 0;
 }
 
 public OnPlayerActivateCheckpoint(playerid, checkpointid)
