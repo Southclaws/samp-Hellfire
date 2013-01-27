@@ -62,6 +62,19 @@ stock DestroyFuelOutlet(id)
 	return 1;
 }
 
+stock IsPlayerAtAnyFuelOutlet(playerid)
+{
+	if(!(0 <= playerid < MAX_PLAYERS))
+		return 0;
+
+	foreach(new i : fuel_Index)
+	{
+		if(IsPlayerInDynamicArea(playerid, fuel_Data[i][fuel_areaId]))
+			return 1;
+	}
+	return 0;
+}
+
 hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
 	if(newkeys & 16)

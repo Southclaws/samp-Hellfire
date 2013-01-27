@@ -41,6 +41,7 @@ ptask ToolTipUpdate[1000](playerid)
 			else
 				AddToolTipText(playerid, KEYTEXT_DROP_ITEM, "Drop weapon");
 
+			AddToolTipText(playerid, KEYTEXT_INVENTORY, "Open inventory");
 			ShowPlayerToolTip(playerid);
 		}
 		else
@@ -134,6 +135,12 @@ ptask ToolTipUpdate[1000](playerid)
 					else if(itemtype == item_Backpack)
 						AddToolTipText(playerid, KEYTEXT_INTERACT, "Open backpack");
 
+					if(itemtype == item_GasCan)
+					{
+						if(IsPlayerAtAnyFuelOutlet(playerid))
+							AddToolTipText(playerid, KEYTEXT_INTERACT, "Fill fuel can");
+					}
+
 					else
 						AddToolTipText(playerid, KEYTEXT_INTERACT, "Use item");
 				}
@@ -147,10 +154,13 @@ ptask ToolTipUpdate[1000](playerid)
 				else
 					AddToolTipText(playerid, KEYTEXT_DROP_ITEM, "Drop item");
 
+				AddToolTipText(playerid, KEYTEXT_INVENTORY, "Open inventory");
 				ShowPlayerToolTip(playerid);
 			}
 			else
 			{
+				ClearToolTipText(playerid);
+
 				new inplayerarea;
 
 				foreach(new i : Player)
@@ -164,12 +174,12 @@ ptask ToolTipUpdate[1000](playerid)
 
 				if(IsPlayerHandcuffed(inplayerarea))
 				{
-					ClearToolTipText(playerid);
 					AddToolTipText(playerid, KEYTEXT_INTERACT, "Remove handcuffs");
 					ShowPlayerToolTip(playerid);
 				}
 
-				HidePlayerToolTip(playerid);
+				AddToolTipText(playerid, KEYTEXT_INVENTORY, "Open inventory");
+				ShowPlayerToolTip(playerid);
 			}
 		}
 	}
