@@ -54,7 +54,7 @@ public OnPlayerOpenContainer(playerid, containerid)
 		}
 	}
 
-	return CallLocalFunction("tut_OnPlayerOpenContainer", "d", playerid);
+	return CallLocalFunction("tut_OnPlayerOpenContainer", "dd", playerid, containerid);
 }
 #if defined _ALS_OnPlayerOpenContainer
 	#undef OnPlayerOpenContainer
@@ -62,7 +62,7 @@ public OnPlayerOpenContainer(playerid, containerid)
 	#define _ALS_OnPlayerOpenContainer
 #endif
 #define OnPlayerOpenContainer tut_OnPlayerOpenContainer
-forward tut_OnPlayerOpenContainer(playerid);
+forward tut_OnPlayerOpenContainer(playerid, containerid);
 
 public OnPlayerViewContainerOpt(playerid, containerid)
 {

@@ -500,3 +500,8 @@ stock SetPlayerCuffs(playerid, bool:toggle)
 		return 1;
 	}
 }
+
+stock IsPlayerHandcuffed(playerid)
+{
+	return IsPlayerAttachedObjectSlotUsed(playerid, ATTACHSLOT_CUFFS);
+}

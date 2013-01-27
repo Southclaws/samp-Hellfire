@@ -156,7 +156,7 @@ script_race_EnterDynamicRaceCP(playerid, checkpointid)
 	{
 	    if(checkpointid == rc_JoinCP[i] && !(bPlayerGameSettings[playerid] & InRace))
 	    {
-	        new vehicleType = GetVehicleType(GetPlayerVehicleID(playerid));
+	        new vehicleType = GetVehicleType(GetVehicleModel(GetPlayerVehicleID(playerid)));
 
 			if(IsPlayerInAnyVehicle(playerid) && (vehicleType != VTYPE_HELI && vehicleType != VTYPE_PLANE && vehicleType != VTYPE_SEA && vehicleType != VTYPE_TRAILER && vehicleType != VTYPE_TRAIN))
 			{

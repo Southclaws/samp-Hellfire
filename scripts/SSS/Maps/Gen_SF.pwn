@@ -352,8 +352,8 @@ District_City1()
 District_City2()
 {
 	LinkTP(
-		CreateButton(-1753.70, 883.57, 295.56, "Press ~k~~VEHICLE_ENTER_EXIT~"),
-		CreateButton(-1749.37, 871.82, 25.23, "Press ~k~~VEHICLE_ENTER_EXIT~"));
+		CreateButton(-1753.70, 883.57, 295.56, "Press ~k~~VEHICLE_ENTER_EXIT~ to enter"),
+		CreateButton(-1749.37, 871.82, 25.23, "Press ~k~~VEHICLE_ENTER_EXIT~ to enter"));
 
 	CreateZipline(
 		-2114.91, 923.88, 86.04,

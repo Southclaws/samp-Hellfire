@@ -322,7 +322,6 @@ LoadPlayerVehicles(bool:prints = true)
 			{
 				Iter_Add(gVehicleIndex, vehicleid);
 
-				gVehicleContainer[vehicleid] = CreateContainer("Trunk", 12, .virtual = 1);
 				gVehicleFuel[vehicleid] = Float:array[2];
 				gVehicleColours[vehicleid][0] = array[7];
 				gVehicleColours[vehicleid][1] = array[8];
@@ -332,13 +331,17 @@ LoadPlayerVehicles(bool:prints = true)
 				gPlayerVehicleData[vehicleid][pv_lights]	= array[11];
 				gPlayerVehicleData[vehicleid][pv_tires]		= array[12];
 
-				for(new i, j; j < CNT_MAX_SLOTS; i += 2, j++)
+				if(VehicleFuelData[array[0]-400][veh_trunkSize])
 				{
-					if(IsValidItemType(ItemType:array[13 + i]))
+					gVehicleContainer[vehicleid] = CreateContainer("Trunk", VehicleFuelData[array[0]-400][veh_trunkSize], .virtual = 1);
+					for(new i, j; j < CNT_MAX_SLOTS; i += 2, j++)
 					{
-						itemid = CreateItem(ItemType:array[13 + i], 0.0, 0.0, 0.0);
-						SetItemExtraData(itemid, array[13 + i + 1]);
-						AddItemToContainer(gVehicleContainer[vehicleid], itemid);
+						if(IsValidItemType(ItemType:array[13 + i]))
+						{
+							itemid = CreateItem(ItemType:array[13 + i], 0.0, 0.0, 0.0);
+							SetItemExtraData(itemid, array[13 + i + 1]);
+							AddItemToContainer(gVehicleContainer[vehicleid], itemid);
+						}
 					}
 				}
 
@@ -375,22 +378,23 @@ SavePlayerVehicle(vehicleid, name[MAX_PLAYER_NAME])
 	array[8] = gVehicleColours[vehicleid][1];
 	GetVehicleDamageStatus(vehicleid, array[9], array[10], array[11], array[12]);
 
-	for(new i, j; j < CNT_MAX_SLOTS; i += 2, j++)
+	if(IsValidContainer(gVehicleContainer[vehicleid]))
 	{
-		if(IsContainerSlotUsed(gVehicleContainer[vehicleid], j))
+		for(new i, j; j < CNT_MAX_SLOTS; i += 2, j++)
 		{
-			itemid = GetContainerSlotItem(gVehicleContainer[vehicleid], j);
-			array[13 + i] = _:GetItemType(itemid);
-			array[13 + i + 1] = GetItemExtraData(itemid);
-		}
-		else
-		{
-			array[13 + i] = -1;
-			array[13 + i + 1] = 0;
+			if(IsContainerSlotUsed(gVehicleContainer[vehicleid], j))
+			{
+				itemid = GetContainerSlotItem(gVehicleContainer[vehicleid], j);
+				array[13 + i] = _:GetItemType(itemid);
+				array[13 + i + 1] = GetItemExtraData(itemid);
+			}
+			else
+			{
+				array[13 + i] = -1;
+				array[13 + i + 1] = 0;
+			}
 		}
 	}
-
-	gVehicleOwner[vehicleid] = name;
 
 	if(!isnull(gVehicleOwner[vehicleid]))
 	{
@@ -399,6 +403,8 @@ SavePlayerVehicle(vehicleid, name[MAX_PLAYER_NAME])
 		if(fexist(filename))
 			fremove(filename);
 	}
+
+	gVehicleOwner[vehicleid] = name;
 
 	for(new i; i < MAX_VEHICLES; i++)
 	{
@@ -458,6 +464,9 @@ ApplyVehicleData(vehicleid)
 		else
 			SetVehicleHealth(vehicleid, 300 + random(300));
 
+		if(VehicleFuelData[model - 400][veh_maxFuel] == 0.0)
+			SetVehicleParamsEx(vehicleid, 1, 0, 0, 0, 0, 0, 0);
+
 		chance = random(100);
 
 		if(chance < 1)
@@ -470,7 +479,7 @@ ApplyVehicleData(vehicleid)
 			gVehicleFuel[vehicleid] = VehicleFuelData[model-400][veh_maxFuel] / 8 + frandom(VehicleFuelData[model - 400][veh_maxFuel] / 4);
 
 		else
-			gVehicleFuel[vehicleid] = frandom(0.1);
+			gVehicleFuel[vehicleid] = frandom(1.0);
 
 		UpdateVehicleDamageStatus(vehicleid,
 			encode_panels(random(4), random(4), random(4), random(4), random(4), random(4), random(4)),
@@ -495,7 +504,6 @@ ApplyVehicleData(vehicleid)
 
 			for(new i = 1; i <= 4; i++)
 			{
-
 				lootindex = VehicleFuelData[model-400][veh_lootIndex];
 
 				if(random(100) < 100 / i )
@@ -526,6 +534,10 @@ ApplyVehicleData(vehicleid)
 				}
 			}
 		}
+		else
+		{
+			gVehicleContainer[vehicleid] = INVALID_CONTAINER_ID;
+		}
 	}
 
 	GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_SIZE, sx, sy, sz);
@@ -541,16 +553,19 @@ ApplyVehicleData(vehicleid)
 public OnVehicleDeath(vehicleid)
 {
 	print("OnVehicleDeath");
-	for(new i; i < CNT_MAX_SLOTS; i++)
+
+	if(IsValidContainer(gVehicleContainer[vehicleid]))
 	{
-		DestroyItem(GetContainerSlotItem(gVehicleContainer[vehicleid], i));
+		for(new i; i < CNT_MAX_SLOTS; i++)
+		{
+			DestroyItem(GetContainerSlotItem(gVehicleContainer[vehicleid], i));
+		}
+		DestroyContainer(gVehicleContainer[vehicleid]);
 	}
 
-	DestroyContainer(gVehicleContainer[vehicleid]);
 	DestroyDynamicArea(gVehicleArea[vehicleid]);
-	Iter_Remove(gVehicleIndex, vehicleid);
-
 	DestroyVehicle(vehicleid);
+	Iter_Remove(gVehicleIndex, vehicleid);
 }
 
 hook OnPlayerStateChange(playerid, newstate, oldstate)

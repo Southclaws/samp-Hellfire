@@ -64,7 +64,7 @@ new const VehicleFuelData[212][E_VEHICLE_DATA] =
 	{50.0,	31.0,	loot_CarCivilian,		12}, // 446		----	Squalo
 	{80.0,	46.0,	loot_CarCivilian,		12}, // 447		----	Seasparrow
 	{8.0,	3.0,	loot_CarCivilian,		6},  // 448		----	Pizzaboy
-	{80.0,	15.0,	loot_CarCivilian,		10}, // 449		----	Tram
+	{0.0,	0.0,	loot_CarCivilian,		10}, // 449		----	Tram
 
 	{0.0,	13.0,	loot_CarCivilian,		12}, // 450		----	Trailer
 	{50.0,	25.0,	loot_CarCivilian,		12}, // 451		----	Turismo

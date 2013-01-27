@@ -19,26 +19,26 @@
 #undef MAX_PLAYERS
 #define MAX_PLAYERS	(32)
 
-#include <YSI\y_utils>
+#include <YSI\y_utils>		// By Y_Less:				http://forum.sa-mp.com/showthread.php?p=1696956
 #include <YSI\y_va>
 #include <YSI\y_timers>
 #include <YSI\y_hooks>
 #include <YSI\y_iterate>
 
-#include <formatex>
-#include <strlib>
-#include <md-sort>
-#include <geoip>
-#include <sscanf2>
-#include <streamer>
-#include <CTime>
-#include <IniFiles>
-#include <bar>
-#include <playerbar>
-#include <rbits>
-#include <CameraMover>
-#include <FileManager>
-#include <SIF/SIF>
+#include <formatex>			// By Slice:				http://forum.sa-mp.com/showthread.php?t=313488
+#include <strlib>			// By Slice:				http://forum.sa-mp.com/showthread.php?t=362764
+#include <md-sort>			// By Slice:				http://forum.sa-mp.com/showthread.php?t=343172
+#include <geoip>			// By Totto8492:			http://forum.sa-mp.com/showthread.php?t=32509
+#include <sscanf2>			// By Y_Less:				http://forum.sa-mp.com/showthread.php?t=120356
+#include <streamer>			// By Incognito:			http://forum.sa-mp.com/showthread.php?t=102865
+#include <CTime>			// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=294054
+#include <IniFiles>			// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=262795
+#include <bar>				// By Torbido:				http://forum.sa-mp.com/showthread.php?t=113443
+#include <playerbar>		// By Torbido/Southclaw:	http://pastebin.com/ZuLPd1K6
+#include <rbits>			// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=275142
+#include <CameraMover>		// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
+#include <FileManager>		// By JaTochNietDan:		http://forum.sa-mp.com/showthread.php?t=92246
+#include <SIF/SIF>			// By Southclaw:			https://github.com/Southclaw/SIF
 
 native WP_Hash(buffer[], len, const str[]);
 
@@ -322,6 +322,7 @@ PlayerText:		ClassButtonMale		= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		ClassButtonFemale	= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		HungerBarBackground	= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		HungerBarForeground	= PlayerText:INVALID_TEXT_DRAW,
+PlayerText:		ToolTip				= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		HelpTipText			= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		VehicleNameText		= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		VehicleSpeedText	= PlayerText:INVALID_TEXT_DRAW,
@@ -479,6 +480,8 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/SSS/Clothes.pwn"
 #include "../scripts/SSS/Food.pwn"
 #include "../scripts/SSS/Tutorial.pwn"
+#include "../scripts/SSS/TipText.pwn"
+#include "../scripts/SSS/ToolTipEvents.pwn"
 
 #include "../scripts/SSS/Lvl_1.pwn"
 #include "../scripts/SSS/Lvl_2.pwn"
@@ -692,11 +695,11 @@ public OnGameModeInit()
 	DefineItemDamage(item_Sign,			23.0,	"SWORD", 		"sword_1");
 	DefineItemDamage(item_FishRod,		23.0,	"SWORD", 		"sword_1");
 	DefineItemDamage(item_Shield,		23.0,	"SWORD", 		"sword_1");
-	DefineItemDamage(item_Wrench,		23.0,	"BASEBALL", 	"Bat_Hit_1");
-	DefineItemDamage(item_Crowbar,		23.0,	"BASEBALL", 	"Bat_Hit_1");
-	DefineItemDamage(item_Hammer,		23.0,	"BASEBALL", 	"Bat_Hit_1");
+	DefineItemDamage(item_Wrench,		23.0,	"BASEBALL", 	"Bat_1");
+	DefineItemDamage(item_Crowbar,		23.0,	"BASEBALL", 	"Bat_1");
+	DefineItemDamage(item_Hammer,		23.0,	"BASEBALL", 	"Bat_1");
 	DefineItemDamage(item_Screwdriver,	23.0,	"KNIFE", 		"KNIFE_3");
-	DefineItemDamage(item_Cane,			23.0,	"BASEBALL", 	"Bat_Hit_1");
+	DefineItemDamage(item_Cane,			23.0,	"BASEBALL", 	"Bat_1");
 	DefineItemDamage(item_Rake,			23.0,	"SWORD", 		"sword_1");
 	DefineItemDamage(item_Canister1,	23.0,	"SWORD", 		"sword_1");
 	DefineItemDamage(item_Canister2,	23.0,	"SWORD", 		"sword_1");
@@ -885,64 +888,59 @@ ptask PlayerUpdate[100](playerid)
 	{
 		new
 			vehicleid = GetPlayerVehicleID(playerid),
+			model = GetVehicleModel(vehicleid),
 			Float:health;
 
-		GetVehicleHealth(vehicleid, health);
+		if(GetVehicleType(model) != VTYPE_BMX)
+		{
+			GetVehicleHealth(vehicleid, health);
+			
+			if(300.0 < health < 500.0)
+			{
+				if(v_Engine(vehicleid) && gPlayerVelocity[playerid] > 30.0)
+				{
+					if(random(100) < (50 - ((health - 400.0) / 4)))
+					{
+						if(health < 400.0)
+							v_Engine(vehicleid, 0);
 		
-		if(300.0 < health < 500.0)
-		{
-			if(v_Engine(vehicleid) && gPlayerVelocity[playerid] > 30.0)
-			{
-				if(random(100) < (50 - ((health - 400.0) / 4)))
+						SetVehicleHealth(vehicleid, health - (((200 - (health - 300.0)) / 100.0) / 2.0));
+					}
+				}
+				else
 				{
-					if(health < 400.0)
-						v_Engine(vehicleid, 0);
-	
-					SetVehicleHealth(vehicleid, health - (((200 - (health - 300.0)) / 100.0) / 2.0));
+					if(random(100) < 100 - (50 - ((health - 400.0) / 4)))
+					{
+						if(health < 400.0)
+							v_Engine(vehicleid, 1);
+					}
 				}
 			}
-			else
+			if(v_Engine(vehicleid) && VehicleFuelData[model - 400][veh_maxFuel] > 0.0)
 			{
-				if(random(100) < 100 - (50 - ((health - 400.0) / 4)))
+				if(health < 300.0 || gVehicleFuel[vehicleid] <= 0.0)
+					v_Engine(vehicleid, 0);
+
+				if(gVehicleFuel[vehicleid] > 0.0)
 				{
-					if(health < 400.0)
-						v_Engine(vehicleid, 1);
+					gVehicleFuel[vehicleid] -= ((VehicleFuelData[model - 400][veh_fuelCons] / 100) * (((gPlayerVelocity[playerid]/60)/60)/10) + 0.0001);
 				}
-			}
-		}
-		if(v_Engine(vehicleid))
-		{
-			if(health < 300.0 || gVehicleFuel[vehicleid] <= 0.0)
-				v_Engine(vehicleid, 0);
 
-			if(gVehicleFuel[vehicleid] > 0.0)
+				if(tickcount() - tick_ExitVehicle[playerid] > 3000 && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+					SetPlayerArmedWeapon(playerid, 0);
+			}
+
+			new str[64];
+			format(str, 64, "Fuel: %.3fL/%.3fL~n~Health: %f", gVehicleFuel[vehicleid], VehicleFuelData[model - 400][veh_maxFuel], health);
+			ShowMsgBox(playerid, str, 0, 160);
+
+			if(floatabs(gCurrentVelocity[playerid] - gPlayerVelocity[playerid]) > 20.0)
 			{
-				gVehicleFuel[vehicleid] -= (VehicleFuelData[GetVehicleModel(vehicleid) - 400][veh_fuelCons] / 100) * (((gPlayerVelocity[playerid]/60)/60)/10);
+				GivePlayerHP(playerid, -(floatabs(gCurrentVelocity[playerid] - gPlayerVelocity[playerid]) * 0.3));
 			}
 
-			if(tickcount() - tick_ExitVehicle[playerid] > 3000 && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
-				SetPlayerArmedWeapon(playerid, 0);
+			gCurrentVelocity[playerid] = gPlayerVelocity[playerid];
 		}
-		new str[150];
-		format(str, 150,
-			"Fuel:~n~%.2fL/%.2fL~n~\
-			v hp: %f~n~-hp/s: %f~n~\
-			eng off ch: %f~n~eng on ch: %f~n~~n~\
-			Velocity change: %f",
-			gVehicleFuel[vehicleid], VehicleFuelData[GetVehicleModel(vehicleid) - 400][veh_maxFuel],
-			health, ((200 - (health - 300.0)) / 100.0),
-			(50 - ((health - 400.0) / 4)),
-			100 - (50 - ((health - 400.0) / 4)),
-			floatabs(gCurrentVelocity[playerid] - gPlayerVelocity[playerid]));
-
-		ShowMsgBox(playerid, str, 0, 150);
-
-		if(floatabs(gCurrentVelocity[playerid] - gPlayerVelocity[playerid]) > 20.0)
-		{
-			GivePlayerHP(playerid, -(floatabs(gCurrentVelocity[playerid] - gPlayerVelocity[playerid]) * 0.3));
-		}
-
-		gCurrentVelocity[playerid] = gPlayerVelocity[playerid];
 	}
 
 	if(gScreenBoxFadeLevel[playerid] == 0)
@@ -969,15 +967,15 @@ ptask FoodUpdate[1000](playerid)
 
 	if(animidx == 43) // Sitting
 	{
-		gPlayerFP[playerid] -= 0.0001;
+		gPlayerFP[playerid] -= 0.001;
 	}
 	else if(animidx == 1159) // Crouching
 	{
-		gPlayerFP[playerid] -= 0.003;
+		gPlayerFP[playerid] -= 0.03;
 	}
 	else if(animidx == 1195)
 	{
-		gPlayerFP[playerid] -= 0.03;	
+		gPlayerFP[playerid] -= 0.3;	
 	}
 	else if(animidx == 1231) // Running
 	{
@@ -986,24 +984,24 @@ ptask FoodUpdate[1000](playerid)
 
 		if(k & KEY_WALK) // Walking
 		{
-			gPlayerFP[playerid] -= 0.001;
+			gPlayerFP[playerid] -= 0.01;
 		}
 		else if(k & KEY_SPRINT) // Sprinting
 		{
-			gPlayerFP[playerid] -= 0.012;
+			gPlayerFP[playerid] -= 0.12;
 		}
 		else if(k & KEY_JUMP) // Jump
 		{
-			gPlayerFP[playerid] -= 0.03;
+			gPlayerFP[playerid] -= 0.3;
 		}
 		else // Running
 		{
-			gPlayerFP[playerid] -= 0.008;
+			gPlayerFP[playerid] -= 0.08;
 		}
 	}
 	else // Idle
 	{
-		gPlayerFP[playerid] -= 0.0004;
+		gPlayerFP[playerid] -= 0.004;
 	}
 
 	if(gPlayerFP[playerid] > 100.0)
@@ -2069,24 +2067,6 @@ internal_OnPlayerDeath(playerid, killerid, reason)
 	return CallLocalFunction("OnDeath", "ddd", playerid, killerid, reason);
 }
 
-
-
-ShowHelpTip(playerid, text[], time = 0)
-{
-	PlayerTextDrawSetString(playerid, HelpTipText, text);
-	PlayerTextDrawShow(playerid, HelpTipText);
-
-	if(time > 0)
-		defer HideHelpTip(playerid, time);
-}
-timer HideHelpTip[time](playerid, time)
-{
-	#pragma unused time
-	PlayerTextDrawHide(playerid, HelpTipText);
-}
-
-
-
 public OnPlayerUpdate(playerid)
 {
 	if(bPlayerGameSettings[playerid] & Frozen)return 0;
@@ -2458,18 +2438,19 @@ CMD:g(playerid, params[])
 	}
 	return 1;
 }
+CMD:c(playerid, params[])
+{
+	cmd_g(playerid, params);
+	return 1;
+}
 CMD:l(playerid, params[])
 {
-	if(bPlayerGameSettings[playerid] & GlobalChat)
-	{
-		f:bPlayerGameSettings[playerid]<GlobalChat>;
-		Msg(playerid, WHITE, " >  Your text chat is now local only.");
-	}
-	else
-	{
-		t:bPlayerGameSettings[playerid]<GlobalChat>;
-		Msg(playerid, WHITE, " >  Your text chat is now global.");
-	}
+	cmd_g(playerid, params);
+	return 1;
+}
+CMD:t(playerid, params[])
+{
+	cmd_g(playerid, params);
 	return 1;
 }
 
@@ -2524,6 +2505,8 @@ PlayerSendChat(playerid, textInput[])
 			playerid,
 			TagScan(textInput));
 	}
+
+	SetPlayerChatBubble(playerid, textInput, WHITE, 20.0, 10000);
 
 	if(strlen(text) > 127)
 	{
@@ -2738,10 +2721,13 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 }
 public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 {
+	gCurrentVelocity[playerid] = 0.0;
 	return 1;
 }
 public OnPlayerExitVehicle(playerid, vehicleid)
 {
+	gCurrentVelocity[playerid] = 0.0;
+
 	if(GetVehicleModel(vehicleid) == 432)
 		HidePlayerProgressBar(playerid, TankHeatBar);
 
@@ -3017,7 +3003,14 @@ LoadPlayerTextDraws(playerid)
 
 //======================================================================Tooltips
 
-	//
+	ToolTip							=CreatePlayerTextDraw(playerid, 618.000000, 120.000000, "fixed it");
+	PlayerTextDrawAlignment			(playerid, ToolTip, 3);
+	PlayerTextDrawBackgroundColor	(playerid, ToolTip, 255);
+	PlayerTextDrawFont				(playerid, ToolTip, 1);
+	PlayerTextDrawLetterSize		(playerid, ToolTip, 0.300000, 1.499999);
+	PlayerTextDrawColor				(playerid, ToolTip, -1);
+	PlayerTextDrawSetOutline		(playerid, ToolTip, 1);
+	PlayerTextDrawSetProportional	(playerid, ToolTip, 1);
 
 
 //======================================================================Food Bar

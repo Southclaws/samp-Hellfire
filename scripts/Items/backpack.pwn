@@ -125,27 +125,31 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 public OnPlayerAddToInventory(playerid, itemid)
 {
-	if(IsPlayerInventoryFull(playerid))
+	printf("backpackid: %d", gPlayerBackpack[playerid]);
+	if(IsPlayerInventoryFull(playerid) && IsValidItem(gPlayerBackpack[playerid]))
 	{
-		new
-			containerid = GetItemExtraData(gPlayerBackpack[playerid]),
-			containername[CNT_MAX_NAME];
+		new containerid = GetItemExtraData(gPlayerBackpack[playerid]);
 
-		GetContainerName(containerid, containername);
+		if(IsValidContainer(containerid))
+		{
+			new containername[CNT_MAX_NAME];
 
-		if(AddItemToContainer(containerid, itemid))
-		{
-			new str[32];
-			format(str, 32, "Item added to %s", containername);
-			ShowMsgBox(playerid, str, 3000, 150);
-			return 1;
-		}
-		else
-		{
-			new str[32];
-			format(str, 32, "%s full", containername);
-			ShowMsgBox(playerid, str, 3000, 100);
-			return 1;
+			GetContainerName(containerid, containername);
+
+			if(AddItemToContainer(containerid, itemid, playerid))
+			{
+				new str[32];
+				format(str, 32, "Item added to %s", containername);
+				ShowMsgBox(playerid, str, 3000, 150);
+				return 1;
+			}
+			else
+			{
+				new str[32];
+				format(str, 32, "%s full", containername);
+				ShowMsgBox(playerid, str, 3000, 100);
+				return 1;
+			}
 		}
 	}
 

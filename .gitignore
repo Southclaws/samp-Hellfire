@@ -194,8 +194,8 @@ samp-server.exe
 
 
 #unwanted folders
-Resources/
 Public Server/
+Resources/
 plugins/
 pawno/
 scriptfiles/

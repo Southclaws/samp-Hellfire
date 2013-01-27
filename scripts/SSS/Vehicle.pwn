@@ -1,6 +1,9 @@
 #include <YSI\y_hooks>
 
 
+new IsAtVehicleBonnet[MAX_PLAYERS];
+
+
 hook OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 {
 	return 1;
@@ -104,25 +107,28 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				}
 				if(155.0 < angle < 205.0)
 				{
-					new
-						engine,
-						lights,
-						alarm,
-						doors,
-						bonnet,
-						boot,
-						objective;
+					if(IsValidContainer(gVehicleContainer[i]))
+					{
+						new
+							engine,
+							lights,
+							alarm,
+							doors,
+							bonnet,
+							boot,
+							objective;
 
-					GetVehicleParamsEx(i, engine, lights, alarm, doors, bonnet, boot, objective);
-					SetVehicleParamsEx(i, engine, lights, alarm, doors, bonnet, 1, objective);
+						GetVehicleParamsEx(i, engine, lights, alarm, doors, bonnet, boot, objective);
+						SetVehicleParamsEx(i, engine, lights, alarm, doors, bonnet, 1, objective);
 
-					SetPlayerPos(playerid, px, py, pz);
-					SetPlayerFacingAngle(playerid, GetAngleToPoint(px, py, vx, vy));
+						SetPlayerPos(playerid, px, py, pz);
+						SetPlayerFacingAngle(playerid, GetAngleToPoint(px, py, vx, vy));
 
-					DisplayContainerInventory(playerid, gVehicleContainer[i]);
-					gCurrentContainerVehicle[playerid] = i;
+						DisplayContainerInventory(playerid, gVehicleContainer[i]);
+						gCurrentContainerVehicle[playerid] = i;
 
-					break;
+						break;
+					}
 				}
 			}
 		}
@@ -165,11 +171,12 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 
 			if(155.0 < angle < 205.0)
 			{
-				ShowMsgBox(playerid, "Press ~k~~VEHICLE_ENTER_EXIT~ to open trunk", 3000, 100);
+				if(IsValidContainer(gVehicleContainer[i]))
+					ShowMsgBox(playerid, "Press ~k~~VEHICLE_ENTER_EXIT~ to open trunk", 3000, 100);
 			}
 			if(-25.0 < angle < 25.0 || 335.0 < angle < 385.0)
 			{
-				ShowMsgBox(playerid, "Hold ~k~~VEHICLE_ENTER_EXIT~ to repair", 3000, 100);
+				IsAtVehicleBonnet[playerid] = 1;
 			}
 		}
 	}
@@ -183,6 +190,33 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 #endif
 #define OnPlayerEnterDynamicArea veh_OnPlayerEnterDynamicArea
 forward veh_OnPlayerEnterDynamicArea(playerid, containerid);
+
+public OnPlayerLeaveDynamicArea(playerid, areaid)
+{
+	foreach(new i : gVehicleIndex)
+	{
+		if(areaid == gVehicleArea[i])
+		{
+			IsAtVehicleBonnet[playerid] = 0;
+		}
+	}
+	return CallLocalFunction("veh_OnPlayerLeaveDynamicArea", "dd", playerid, areaid);
+}
+#if defined _ALS_OnPlayerLeaveDynamicArea
+	#undef OnPlayerLeaveDynamicArea
+#else
+	#define _ALS_OnPlayerLeaveDynamicArea
+#endif
+#define OnPlayerLeaveDynamicArea veh_OnPlayerLeaveDynamicArea
+forward veh_OnPlayerLeaveDynamicArea(playerid, containerid);
+
+IsPlayerAtAnyVehicleBonnet(playerid)
+{
+	if(!(0 <= playerid < MAX_PLAYERS))
+		return 0;
+
+	return IsAtVehicleBonnet[playerid];
+}
 
 public OnPlayerCloseContainer(playerid, containerid)
 {
