@@ -89,6 +89,7 @@ public OnPlayerActivateDoor(playerid, doorid, newstate)
 
 public OnPlayerUseItemWithButton(playerid, buttonid, itemid)
 {
+	print("item with button chil");
 	if(buttonid == ch_doorBtn)
 	{
 		if(itemid == ch_fusebox)
@@ -105,6 +106,7 @@ public OnPlayerUseItemWithButton(playerid, buttonid, itemid)
 			defer ch_keypad_move();
 		}
 	}
+	print("item with button chil end");
 
     return CallLocalFunction("ch_OnPlayerUseItemWithButton", "ddd", playerid, buttonid, itemid);
 }

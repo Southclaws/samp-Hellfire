@@ -19,26 +19,27 @@
 #undef MAX_PLAYERS
 #define MAX_PLAYERS	(32)
 
-#include <YSI\y_utils>		// By Y_Less:				http://forum.sa-mp.com/showthread.php?p=1696956
+#include <YSI\y_utils>				// By Y_Less:				http://forum.sa-mp.com/showthread.php?p=1696956
 #include <YSI\y_va>
 #include <YSI\y_timers>
 #include <YSI\y_hooks>
 #include <YSI\y_iterate>
 
-#include <formatex>			// By Slice:				http://forum.sa-mp.com/showthread.php?t=313488
-#include <strlib>			// By Slice:				http://forum.sa-mp.com/showthread.php?t=362764
-#include <md-sort>			// By Slice:				http://forum.sa-mp.com/showthread.php?t=343172
-#include <geoip>			// By Totto8492:			http://forum.sa-mp.com/showthread.php?t=32509
-#include <sscanf2>			// By Y_Less:				http://forum.sa-mp.com/showthread.php?t=120356
-#include <streamer>			// By Incognito:			http://forum.sa-mp.com/showthread.php?t=102865
-#include <CTime>			// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=294054
-#include <IniFiles>			// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=262795
-#include <bar>				// By Torbido:				http://forum.sa-mp.com/showthread.php?t=113443
-#include <playerbar>		// By Torbido/Southclaw:	http://pastebin.com/ZuLPd1K6
-#include <rbits>			// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=275142
-#include <CameraMover>		// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
-#include <FileManager>		// By JaTochNietDan:		http://forum.sa-mp.com/showthread.php?t=92246
-#include <SIF/SIF>			// By Southclaw:			https://github.com/Southclaw/SIF
+#include <formatex>					// By Slice:				http://forum.sa-mp.com/showthread.php?t=313488
+#include <strlib>					// By Slice:				http://forum.sa-mp.com/showthread.php?t=362764
+#include <md-sort>					// By Slice:				http://forum.sa-mp.com/showthread.php?t=343172
+#include <geoip>					// By Totto8492:			http://forum.sa-mp.com/showthread.php?t=32509
+#include <sscanf2>					// By Y_Less:				http://forum.sa-mp.com/showthread.php?t=120356
+#include <streamer>					// By Incognito:			http://forum.sa-mp.com/showthread.php?t=102865
+#include <CTime>					// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=294054
+#include <IniFiles>					// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=262795
+#include <bar>						// By Torbido:				http://forum.sa-mp.com/showthread.php?t=113443
+#include <playerbar>				// By Torbido/Southclaw:	http://pastebin.com/ZuLPd1K6
+#include <rbits>					// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=275142
+#include <CameraMover>				// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
+#include <FileManager>				// By JaTochNietDan:		http://forum.sa-mp.com/showthread.php?t=92246
+#include <SIF/SIF>					// By Southclaw:			https://github.com/Southclaw/SIF
+
 
 native WP_Hash(buffer[], len, const str[]);
 
@@ -65,11 +66,11 @@ native WP_Hash(buffer[], len, const str[]);
 // Database Rows
 #define ROW_NAME					"name"
 #define ROW_PASS					"pass"
-#define ROW_SKIN					"skin"
 #define ROW_GEND					"gend"
 #define ROW_IPV4					"ipv4"
 #define ROW_ALIVE					"alive"
 #define ROW_SPAWN					"spawn"
+#define ROW_ISVIP					"vip"
 
 #define ROW_DATE					"date"
 #define ROW_REAS					"reason"
@@ -170,6 +171,15 @@ native WP_Hash(buffer[], len, const str[]);
 #define ATTACHSLOT_HOLD				(3)
 #define ATTACHSLOT_CUFFS			(4)
 #define ATTACHSLOT_TORCH			(5)
+#define ATTACHSLOT_HAT				(6)
+
+
+#define KEYTEXT_INTERACT			"~k~~VEHICLE_ENTER_EXIT~"
+#define KEYTEXT_PUT_AWAY			"~k~~CONVERSATION_YES~"
+#define KEYTEXT_DROP_ITEM			"~k~~CONVERSATION_NO~"
+#define KEYTEXT_INVENTORY			"~k~~GROUP_CONTROL_BWD~"
+#define KEYTEXT_ENGINE				"~k~~CONVERSATION_YES~"
+#define KEYTEXT_LIGHTS				"~k~~CONVERSATION_NO~"
 
 
 
@@ -230,13 +240,34 @@ enum e_admin_data
 	admin_Name[MAX_PLAYER_NAME],
 	admin_Level
 }
+
+
 new
 	bServerGlobalSettings,
 	gMessageOfTheDay[MAX_MOTD_LEN],
 	gAdminData[MAX_ADMIN][e_admin_data],
-	gDefaultSkinM,
-	gDefaultSkinF,
 	gTotalAdmins;
+
+new
+	skin_MainM,
+	skin_MainF,
+
+	skin_Civ1M,
+	skin_Civ2M,
+	skin_Civ3M,
+	skin_Civ4M,
+	skin_MechM,
+	skin_BikeM,
+	skin_ArmyM,
+	skin_ClawM,
+	skin_FreeM,
+
+	skin_Civ1F,
+	skin_Civ2F,
+	skin_Civ3F,
+	skin_Civ4F,
+	skin_ArmyF,
+	skin_IndiF;
 
 enum E_WEATHER_DATA
 {
@@ -339,6 +370,7 @@ PlayerBar:		ActionBar			= INVALID_PLAYER_BAR_ID,
 enum (<<= 1) // 14
 {
 		HasAccount = 1,
+		IsVip,
 		LoggedIn,
 		Gender,
 		Alive,
@@ -347,6 +379,8 @@ enum (<<= 1) // 14
 		FirstSpawn,
 		HelpTips,
 		GlobalChat,
+
+		HangingOutWindow,
 
 		RegenHP,
 		RegenAP,
@@ -464,8 +498,11 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/Items/wheel.pwn"
 #include "../scripts/Items/gascan.pwn"
 #include "../scripts/Items/flashlight.pwn"
+#include "../scripts/Items/armyhelm.pwn"
+#include "../scripts/Items/crowbar.pwn"
+#include "../scripts/Items/zorromask.pwn"
 
-//======================Gameplay Features
+//======================Data Load and Setup
 
 #include "../scripts/SSS/Spawns.pwn"
 #include "../scripts/SSS/LootData.pwn"
@@ -473,12 +510,18 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/SSS/HouseLoot.pwn"
 #include "../scripts/SSS/VehicleData.pwn"
 #include "../scripts/SSS/VehicleSpawn.pwn"
+
+//======================Gameplay Mechanics
+
 #include "../scripts/SSS/Vehicle.pwn"
 #include "../scripts/SSS/Fuel.pwn"
-
-#include "../scripts/SSS/Inventory.pwn"
-#include "../scripts/SSS/Clothes.pwn"
 #include "../scripts/SSS/Food.pwn"
+#include "../scripts/SSS/Cooking.pwn"
+#include "../scripts/SSS/Clothes.pwn"
+#include "../scripts/SSS/Hats.pwn"
+#include "../scripts/SSS/Inventory.pwn"
+#include "../scripts/SSS/SafeBox.pwn"
+
 #include "../scripts/SSS/Tutorial.pwn"
 #include "../scripts/SSS/TipText.pwn"
 #include "../scripts/SSS/ToolTipEvents.pwn"
@@ -515,7 +558,7 @@ main()
 
 	gAccounts = db_open(ACCOUNT_DATABASE);
 
-	db_free_result(db_query(gAccounts, "CREATE TABLE IF NOT EXISTS `Player` (`"#ROW_NAME"`, `"#ROW_PASS"`, `"#ROW_SKIN"`, `"#ROW_IPV4"`, `"#ROW_ALIVE"`, `"#ROW_GEND"`, `"#ROW_SPAWN"`)"));
+	db_free_result(db_query(gAccounts, "CREATE TABLE IF NOT EXISTS `Player` (`"#ROW_NAME"`, `"#ROW_PASS"`, `"#ROW_IPV4"`, `"#ROW_ALIVE"`, `"#ROW_GEND"`, `"#ROW_SPAWN"`, `"#ROW_ISVIP"`)"));
 	db_free_result(db_query(gAccounts, "CREATE TABLE IF NOT EXISTS `Bans` (`"#ROW_NAME"`, `"#ROW_IPV4"`, `"#ROW_DATE"`, `"#ROW_REAS"`, `"#ROW_BNBY"`)"));
 
 	tmpResult = db_query(gAccounts, "SELECT * FROM `Player`");
@@ -541,7 +584,6 @@ main()
 		}
 	}
 	db_free_result(tmpResult);
-
 
 
 	file_Open(SETTINGS_FILE);
@@ -584,13 +626,12 @@ main()
 
 
 
-
 public OnGameModeInit()
 {
 	print("Starting Main Game Script 'SSS' ...");
 
 	file_OS();
-	SetGameModeText("Scavenge And Survive 0.1a");
+	SetGameModeText("Scavenge And Survive [BETA]");
 	SetMapName("San Androcalypse");
 
 	EnableStuntBonusForAll(false);
@@ -639,72 +680,95 @@ public OnGameModeInit()
 		SortDeepArray(gAdminData, admin_Level, .order = SORT_DESC);
 	}
 
-	item_Medkit			= DefineItemType("Medkit",			1580,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.269091, 0.166367, 0.000000, 90.000000, 0.000000, 0.000000);
-	item_HardDrive		= DefineItemType("Hard Drive",		328,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0);
-	item_Key			= DefineItemType("Key",				327,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0);
-	item_FireworkBox	= DefineItemType("Firework Box",	3014,	ITEM_SIZE_CARRY,	0.0, 0.0, 0.0,			-0.027872, 0.145617, -0.246524, 243.789840, 347.397491, 349.931610);
-	item_FireLighter	= DefineItemType("Lighter",			327,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0);
-	item_timer			= DefineItemType("Timer Device",	19273,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0);
-	item_explosive		= DefineItemType("Explosive",		1576,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0);
-	item_timebomb		= DefineItemType("Time Bomb",		1252,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0);
-	item_battery		= DefineItemType("Battery",			2040,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0);
-	item_fusebox		= DefineItemType("Fuse Box",		2038,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0);
-	item_Beer			= DefineItemType("Beer",			1543,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.060376, 0.032063, -0.204802, 0.000000, 0.000000, 0.000000);
-	item_Sign			= DefineItemType("Sign",			19471,	ITEM_SIZE_LARGE,	0.0, 0.0, 270.0);
-	item_HealthRegen	= DefineItemType("Adrenaline",		1575,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.262021, 0.014938, 0.000000, 279.040191, 352.944946, 358.980987);
-	item_ArmourRegen	= DefineItemType("ElectroArmour",	19515,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			0.300333, -0.090105, 0.000000, 0.000000, 0.000000, 180.000000);
-	item_FishRod		= DefineItemType("Fishing Rod",		18632,	ITEM_SIZE_LARGE,	90.0, 0.0, 0.0,			0.091496, 0.019614, 0.000000, 185.619995, 354.958374, 0.000000);
-	item_Wrench			= DefineItemType("Wrench",			18633,	ITEM_SIZE_SMALL,	0.0, 90.0, 0.0,			0.084695, -0.009181, 0.152275, 98.865089, 270.085449, 0.000000);
-	item_Crowbar		= DefineItemType("Crowbar",			18634,	ITEM_SIZE_SMALL,	0.0, 90.0, 0.0,			0.066177, 0.011153, 0.038410, 97.289527, 270.962554, 1.114514);
-	item_Hammer			= DefineItemType("Hammer",			18635,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0,		0.000000, -0.008230, 0.000000, 6.428617, 0.000000, 0.000000);
-	item_Shield			= DefineItemType("Shield",			18637,	ITEM_SIZE_LARGE,	0.0, 0.0, 0.0,			-0.262389, 0.016478, -0.151046, 103.597534, 6.474381, 38.321765);
-	item_Flashlight		= DefineItemType("Flashlight",		18641,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			0.061910, 0.022700, 0.039052, 190.938354, 0.000000, 0.000000);
-	item_Taser			= DefineItemType("Taser",			18642,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			0.079878, 0.014009, 0.029525, 180.000000, 0.000000, 0.000000);
-	item_LaserPoint		= DefineItemType("Laser Pointer",	18643,	ITEM_SIZE_SMALL,	0.0, 0.0, 90.0,			0.066244, 0.010838, -0.000024, 6.443027, 287.441467, 0.000000);
-	item_Screwdriver	= DefineItemType("Screwdriver",		18644,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			0.099341, 0.021018, 0.009145, 193.644195, 0.000000, 0.000000);
-	item_MobilePhone	= DefineItemType("Mobile Phone",	18865,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.103904, -0.003697, -0.015173, 94.655189, 184.031860, 0.000000);
-	item_Pager			= DefineItemType("Pager",			18875,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.097277, 0.027625, 0.013023, 90.819244, 191.427993, 0.000000);
-	item_Rake			= DefineItemType("Rake",			18890,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			-0.002599, 0.003984, 0.026356, 190.231231, 0.222518, 271.565185);
-	item_HotDog			= DefineItemType("Hotdog",			19346,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.088718, 0.035828, 0.008570, 272.851745, 354.704772, 9.342185);
-	item_EasterEgg		= DefineItemType("Easter Egg",		19345,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.000000, 0.000000, 0.000000, 0.000000, 90.000000, 0.000000);
-	item_Cane			= DefineItemType("Cane",			19348,	ITEM_SIZE_MEDIUM,	270.0, 0.0, 0.0,		0.041865, 0.022883, -0.079726, 4.967216, 10.411237, 0.000000);
-	item_HandCuffs		= DefineItemType("Handcuffs",		19418,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0,		0.077635, 0.011612, 0.000000, 0.000000, 90.000000, 0.000000);
-	item_Bucket			= DefineItemType("Bucket",			19468,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0,			0.293691, -0.074108, 0.020810, 148.961685, 280.067260, 151.782791);
-	item_GasMask		= DefineItemType("Gas Mask",		19472,	ITEM_SIZE_SMALL,	180.0, 0.0, 0.0,		0.062216, 0.055396, 0.001138, 90.000000, 0.000000, 180.000000);
-	item_Flag			= DefineItemType("Flag",			2993,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.045789, 0.026306, -0.078802, 8.777217, 0.272155, 0.000000);
-	item_Briefcase		= DefineItemType("Briefcase",		1210,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 90.0,			0.285915, 0.078406, -0.009429, 0.000000, 270.000000, 0.000000);
-	item_Backpack		= DefineItemType("Backpack",		3026,	ITEM_SIZE_MEDIUM,	270.0, 0.0, 90.0,		0.470918, 0.150153, 0.055384, 181.319580, 7.513789, 163.436065);
-	item_Satchel		= DefineItemType("Patrol Pack",		363,	ITEM_SIZE_MEDIUM,	270.0, 0.0, 0.0,		0.052853, 0.034967, -0.177413, 0.000000, 261.397491, 349.759826);
-	item_Wheel			= DefineItemType("Wheel",			1025,	ITEM_SIZE_CARRY,	0.0, 270.0, 0.0,		-0.098016, 0.356168, -0.309851, 258.455596, 346.618103, 354.313049);
-	item_Canister1		= DefineItemType("Canister",		1008,	ITEM_SIZE_LARGE,	0.0, 0.0, 270.0,		0.303921, 0.033764, -0.105052, 0.000000, 0.000000, 0.000000);
-	item_Canister2		= DefineItemType("Canister",		1009,	ITEM_SIZE_LARGE,	0.0, 0.0, 270.0,		0.314470, 0.022019, -0.013475, 0.000000, 0.000000, 0.000000);
-	item_Canister3		= DefineItemType("Canister",		1010,	ITEM_SIZE_LARGE,	0.0, 0.0, 270.0,		0.301039, 0.077488, 0.022019, 90.000000, 0.000000, 0.000000);
-	item_MotionSense	= DefineItemType("Motion Sensor",	327,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.008151, 0.012682, -0.050635, 0.000000, 0.000000, 0.000000);
-	item_CapCase		= DefineItemType("Cap Case",		1213,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.191558, 0.000000, 0.040402, 90.000000, 0.000000, 0.000000);
-	item_CapMineBad		= DefineItemType("Bad Cap Mine",	1576,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.191558, 0.000000, 0.040402, 90.000000, 0.000000, 0.000000);
-	item_CapMine		= DefineItemType("Cap Mine",		1213,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.262021, 0.014938, 0.000000, 279.040191, 352.944946, 358.980987);
-	item_Pizza			= DefineItemType("Pizza",			1582,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0,			0.320344, 0.064041, 0.168296, 92.941909, 358.492523, 14.915378);
-	item_Burger			= DefineItemType("Burger",			2703,	ITEM_SIZE_SMALL,	-76.0, 257.0, -11.0,	0.066739, 0.041782, 0.026828, 3.703052, 3.163064, 6.946474);
-	item_BurgerBox		= DefineItemType("Burger",			2768,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.107883, 0.093265, 0.029676, 91.010627, 7.522015, 0.000000);
-	item_Taco			= DefineItemType("Taco",			2769,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.069803, 0.057707, 0.039241, 0.000000, 78.877342, 0.000000);
-	item_GasCan			= DefineItemType("Petrol Can",		1650,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0,			0.143402, 0.027548, 0.063652, 0.000000, 253.648208, 0.000000);
-	item_Clothes		= DefineItemType("Clothes",			2891,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0,			0.269091, 0.166367, 0.000000, 90.000000, 0.000000, 0.000000);
+	item_Medkit			= DefineItemType("Medkit",			1580,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	0.269091, 0.166367, 0.000000, 90.000000, 0.000000, 0.000000);
+	item_HardDrive		= DefineItemType("Hard Drive",		328,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			0.0);
+	item_Key			= DefineItemType("Key",				327,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0);
+	item_FireworkBox	= DefineItemType("Firework Box",	3014,	ITEM_SIZE_CARRY,	0.0, 0.0, 0.0,			0.1844,	-0.027872, 0.145617, -0.246524, 243.789840, 347.397491, 349.931610);
+	item_FireLighter	= DefineItemType("Lighter",			327,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0);
+	item_timer			= DefineItemType("Timer Device",	19273,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0,		0.0);
+	item_explosive		= DefineItemType("Explosive",		1576,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0);
+	item_timebomb		= DefineItemType("Time Bomb",		1252,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0,		0.0);
+	item_battery		= DefineItemType("Battery",			2040,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0,			0.082);
+	item_fusebox		= DefineItemType("Fuse Box",		2038,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0,		0.0);
+	item_Beer			= DefineItemType("Beer",			1543,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	60376, 0.032063, -0.204802, 0.000000, 0.000000, 0.000000);
+	item_Sign			= DefineItemType("Sign",			19471,	ITEM_SIZE_LARGE,	0.0, 0.0, 270.0,		0.0);
+	item_HealthRegen	= DefineItemType("Adrenaline",		1575,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	0.262021, 0.014938, 0.000000, 279.040191, 352.944946, 358.980987);
+	item_ArmourRegen	= DefineItemType("ElectroArmour",	19515,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			0.0,	0.300333, -0.090105, 0.000000, 0.000000, 0.000000, 180.000000);
+	item_FishRod		= DefineItemType("Fishing Rod",		18632,	ITEM_SIZE_LARGE,	90.0, 0.0, 0.0,			0.0,	0.091496, 0.019614, 0.000000, 185.619995, 354.958374, 0.000000);
+	item_Wrench			= DefineItemType("Wrench",			18633,	ITEM_SIZE_SMALL,	0.0, 90.0, 0.0,			0.0,	0.084695, -0.009181, 0.152275, 98.865089, 270.085449, 0.000000);
+	item_Crowbar		= DefineItemType("Crowbar",			18634,	ITEM_SIZE_SMALL,	0.0, 90.0, 0.0,			0.0,	0.066177, 0.011153, 0.038410, 97.289527, 270.962554, 1.114514);
+	item_Hammer			= DefineItemType("Hammer",			18635,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0,		0.0,	0.000000, -0.008230, 0.000000, 6.428617, 0.000000, 0.000000);
+	item_Shield			= DefineItemType("Shield",			18637,	ITEM_SIZE_LARGE,	0.0, 0.0, 0.0,			0.0,	-0.262389, 0.016478, -0.151046, 103.597534, 6.474381, 38.321765);
+	item_Flashlight		= DefineItemType("Flashlight",		18641,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			0.0,	0.061910, 0.022700, 0.039052, 190.938354, 0.000000, 0.000000);
+	item_Taser			= DefineItemType("Taser",			18642,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			0.0,	0.079878, 0.014009, 0.029525, 180.000000, 0.000000, 0.000000);
+	item_LaserPoint		= DefineItemType("Laser Pointer",	18643,	ITEM_SIZE_SMALL,	0.0, 0.0, 90.0,			0.0,	0.066244, 0.010838, -0.000024, 6.443027, 287.441467, 0.000000);
+	item_Screwdriver	= DefineItemType("Screwdriver",		18644,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			0.0,	0.099341, 0.021018, 0.009145, 193.644195, 0.000000, 0.000000);
+	item_MobilePhone	= DefineItemType("Mobile Phone",	18865,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	0.103904, -0.003697, -0.015173, 94.655189, 184.031860, 0.000000);
+	item_Pager			= DefineItemType("Pager",			18875,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	0.097277, 0.027625, 0.013023, 90.819244, 191.427993, 0.000000);
+	item_Rake			= DefineItemType("Rake",			18890,	ITEM_SIZE_SMALL,	90.0, 0.0, 0.0,			0.0,	-0.002599, 0.003984, 0.026356, 190.231231, 0.222518, 271.565185);
+	item_HotDog			= DefineItemType("Hotdog",			19346,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	0.088718, 0.035828, 0.008570, 272.851745, 354.704772, 9.342185);
+	item_EasterEgg		= DefineItemType("Easter Egg",		19345,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	0.000000, 0.000000, 0.000000, 0.000000, 90.000000, 0.000000);
+	item_Cane			= DefineItemType("Cane",			19348,	ITEM_SIZE_MEDIUM,	270.0, 0.0, 0.0,		0.0,	0.041865, 0.022883, -0.079726, 4.967216, 10.411237, 0.000000);
+	item_HandCuffs		= DefineItemType("Handcuffs",		19418,	ITEM_SIZE_SMALL,	270.0, 0.0, 0.0,		0.0,	0.077635, 0.011612, 0.000000, 0.000000, 90.000000, 0.000000);
+	item_Bucket			= DefineItemType("Bucket",			19468,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0,			0.0,	0.293691, -0.074108, 0.020810, 148.961685, 280.067260, 151.782791);
+	item_GasMask		= DefineItemType("Gas Mask",		19472,	ITEM_SIZE_SMALL,	180.0, 0.0, 0.0,		0.0,	0.062216, 0.055396, 0.001138, 90.000000, 0.000000, 180.000000);
+	item_Flag			= DefineItemType("Flag",			2993,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	0.045789, 0.026306, -0.078802, 8.777217, 0.272155, 0.000000);
+	item_Briefcase		= DefineItemType("Briefcase",		1210,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 90.0,			0.0,	0.285915, 0.078406, -0.009429, 0.000000, 270.000000, 0.000000);
+	item_Backpack		= DefineItemType("Backpack",		3026,	ITEM_SIZE_MEDIUM,	270.0, 0.0, 90.0,		0.0,	0.470918, 0.150153, 0.055384, 181.319580, 7.513789, 163.436065);
+	item_Satchel		= DefineItemType("Patrol Pack",		363,	ITEM_SIZE_MEDIUM,	270.0, 0.0, 0.0,		0.0,	0.052853, 0.034967, -0.177413, 0.000000, 261.397491, 349.759826);
+	item_Wheel			= DefineItemType("Wheel",			1079,	ITEM_SIZE_CARRY,	0.0, 0.0, 90.0,			0.436,	-0.098016, 0.356168, -0.309851, 258.455596, 346.618103, 354.313049);
+	item_Canister1		= DefineItemType("Canister",		1008,	ITEM_SIZE_LARGE,	0.0, 0.0, 270.0,		0.0,	0.303921, 0.033764, -0.105052, 0.000000, 0.000000, 0.000000);
+	item_Canister2		= DefineItemType("Canister",		1009,	ITEM_SIZE_LARGE,	0.0, 0.0, 270.0,		0.0,	0.314470, 0.022019, -0.013475, 0.000000, 0.000000, 0.000000);
+	item_Canister3		= DefineItemType("Canister",		1010,	ITEM_SIZE_LARGE,	0.0, 0.0, 270.0,		0.0,	0.301039, 0.077488, 0.022019, 90.000000, 0.000000, 0.000000);
+	item_MotionSense	= DefineItemType("Motion Sensor",	327,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	0.008151, 0.012682, -0.050635, 0.000000, 0.000000, 0.000000);
+	item_CapCase		= DefineItemType("Cap Case",		1213,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	0.191558, 0.000000, 0.040402, 90.000000, 0.000000, 0.000000);
+	item_CapMineBad		= DefineItemType("Bad Cap Mine",	1576,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	0.191558, 0.000000, 0.040402, 90.000000, 0.000000, 0.000000);
+	item_CapMine		= DefineItemType("Cap Mine",		1213,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	0.262021, 0.014938, 0.000000, 279.040191, 352.944946, 358.980987);
+	item_Pizza			= DefineItemType("Pizza",			1582,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0,			0.0,	0.320344, 0.064041, 0.168296, 92.941909, 358.492523, 14.915378);
+	item_Burger			= DefineItemType("Burger",			2703,	ITEM_SIZE_SMALL,	-76.0, 257.0, -11.0,	0.0,	0.066739, 0.041782, 0.026828, 3.703052, 3.163064, 6.946474);
+	item_BurgerBox		= DefineItemType("Burger",			2768,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	0.107883, 0.093265, 0.029676, 91.010627, 7.522015, 0.000000);
+	item_Taco			= DefineItemType("Taco",			2769,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	0.069803, 0.057707, 0.039241, 0.000000, 78.877342, 0.000000);
+	item_GasCan			= DefineItemType("Petrol Can",		1650,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0,			0.27,	0.143402, 0.027548, 0.063652, 0.000000, 253.648208, 0.000000);
+	item_Clothes		= DefineItemType("Clothes",			2891,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0,			0.0,	0.269091, 0.166367, 0.000000, 90.000000, 0.000000, 0.000000);
+	item_HelmArmy		= DefineItemType("Army Helmet",		19106,	ITEM_SIZE_MEDIUM,	345.0, 270.0, 0.0,		0.045);
+	item_SmallBox		= DefineItemType("Small Box",		3014,	ITEM_SIZE_CARRY,	0.0, 0.0, 0.0,			0.1844,	-0.027872, 0.145617, -0.246524, 243.789840, 347.397491, 349.931610);
+	item_AmmoBox1		= DefineItemType("Ammo Box",		3016,	ITEM_SIZE_CARRY,	0.0, 0.0, 0.0,			0.0,	0.081998, 0.081005, -0.195033, 247.160079, 336.014343, 347.379638);
+	item_AmmoBox2		= DefineItemType("Ammo Box",		2358,	ITEM_SIZE_CARRY,	0.0, 0.0, 0.0,			0.0,	0.114177, 0.089762, -0.173014, 247.160079, 354.746368, 79.219100);
+	item_AmmoBox3		= DefineItemType("Ammo Box",		2040,	ITEM_SIZE_CARRY,	0.0, 0.0, 0.0,			0.0,	0.114177, 0.094383, -0.174175, 252.006393, 354.746368, 167.069869);
+	item_Meat			= DefineItemType("Meat",			2804,	ITEM_SIZE_LARGE,	0.0, 0.0, 0.0,			0.0,	-0.051398, 0.017334, 0.189188, 270.495391, 353.340423, 167.069869);
+	item_DeadLeg		= DefineItemType("Leg",				2905,	ITEM_SIZE_CARRY,	0.0, 0.0, 0.0,			0.0,	0.147815, 0.052444, -0.164205, 253.163970, 358.857666, 167.069869);
+	item_DeadArm		= DefineItemType("Arm",				2907,	ITEM_SIZE_CARRY,	0.0, 0.0, 0.0,			0.0,	0.087207, 0.093263, -0.280867, 253.355865, 355.971557, 175.203552);
+	item_LongPlank		= DefineItemType("Plank",			2937,	ITEM_SIZE_CARRY,	0.0, 0.0, 0.0,			0.0,	0.141491, 0.002142, -0.190920, 248.561920, 350.667724, 175.203552);
+	item_GreenGloop		= DefineItemType("Capsule",			2976,	ITEM_SIZE_CARRY,	0.0, 0.0, 0.0,			0.0,	0.063387, 0.013771, -0.595982, 341.793945, 352.972686, 226.892105);
+	item_Capsule		= DefineItemType("Capsule",			3082,	ITEM_SIZE_CARRY,	0.0, 0.0, 0.0,			0.0,	0.096439, 0.034642, -0.313377, 341.793945, 348.492706, 240.265777);
+	item_RadioPole		= DefineItemType("Receiver",		3221,	ITEM_SIZE_LARGE,	0.0, 0.0, 0.0,			0.0,	0.081356, 0.034642, -0.167247, 0.000000, 0.000000, 240.265777);
+	item_SignShot		= DefineItemType("Sign",			3265,	ITEM_SIZE_LARGE,	0.0, 0.0, 0.0,			0.0,	0.081356, 0.034642, -0.167247, 0.000000, 0.000000, 240.265777);
+	item_Mailbox		= DefineItemType("Mailbox",			3407,	ITEM_SIZE_LARGE,	0.0, 0.0, 0.0,			0.0,	0.081356, 0.034642, -0.167247, 0.000000, 0.000000, 240.265777);
+	// item_Wood		= DefineItemType("Wood",			1463,	ITEM_SIZE_CARRY,	0.0, 0.0, 0.0,			0.0,	0.023999, 0.027236, -0.204656, 251.243942, 356.352508, 73.549652, 0.384758, 0.200000, 0.200000 ); // DYN_WOODPILE2 - wood
+	item_Pumpkin		= DefineItemType("Pumpkin",			19320,	ITEM_SIZE_CARRY,	0.0, 0.0, 0.0,			0.3,	0.105948, 0.279332, -0.253927, 246.858016, 0.000000, 0.000000);
+	item_Nailbat		= DefineItemType("Nailbat",			2045,	ITEM_SIZE_LARGE,	0.0, 0.0, 0.0);
+	item_ZorroMask		= DefineItemType("Zorro Mask",		18974,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,			0.0,	0.193932, 0.050861, 0.017257, 90.000000, 0.000000, 0.000000);
 
 
-	DefineItemDamage(item_Beer,			23.0,	"SWORD", 		"sword_1");
-	DefineItemDamage(item_Sign,			23.0,	"SWORD", 		"sword_1");
-	DefineItemDamage(item_FishRod,		23.0,	"SWORD", 		"sword_1");
-	DefineItemDamage(item_Shield,		23.0,	"SWORD", 		"sword_1");
-	DefineItemDamage(item_Wrench,		23.0,	"BASEBALL", 	"Bat_1");
-	DefineItemDamage(item_Crowbar,		23.0,	"BASEBALL", 	"Bat_1");
-	DefineItemDamage(item_Hammer,		23.0,	"BASEBALL", 	"Bat_1");
-	DefineItemDamage(item_Screwdriver,	23.0,	"KNIFE", 		"KNIFE_3");
-	DefineItemDamage(item_Cane,			23.0,	"BASEBALL", 	"Bat_1");
-	DefineItemDamage(item_Rake,			23.0,	"SWORD", 		"sword_1");
-	DefineItemDamage(item_Canister1,	23.0,	"SWORD", 		"sword_1");
-	DefineItemDamage(item_Canister2,	23.0,	"SWORD", 		"sword_1");
-	DefineItemDamage(item_Canister3,	23.0,	"SWORD", 		"sword_1");
+// 1654 dynamite
 
+/*
+	DefineAnimationSet()
+
+	DefineItemDamage(item_Beer,			9.0,	anim_Attack);
+	DefineItemDamage(item_Sign,			23.0,	anim_Attack);
+	DefineItemDamage(item_FishRod,		23.0,	anim_Attack);
+	DefineItemDamage(item_Shield,		23.0,	anim_Attack);
+	DefineItemDamage(item_Wrench,		23.0,	anim_Attack);
+	DefineItemDamage(item_Crowbar,		23.0,	anim_Attack);
+	DefineItemDamage(item_Hammer,		23.0,	anim_Attack);
+	DefineItemDamage(item_Screwdriver,	23.0,	anim_Attack);
+	DefineItemDamage(item_Cane,			23.0,	anim_Attack);
+	DefineItemDamage(item_Rake,			23.0,	anim_Attack);
+	DefineItemDamage(item_Canister1,	23.0,	anim_Attack);
+	DefineItemDamage(item_Canister2,	23.0,	anim_Attack);
+	DefineItemDamage(item_Canister3,	23.0,	anim_Attack);
+*/
 
 	DefineFoodItem(item_HotDog,			30.0);
 	DefineFoodItem(item_Pizza,			50.0);
@@ -744,30 +808,31 @@ public OnGameModeInit()
 	CreateFuelOutlet(-2410.80, 981.52, 44.48, 2.0, 100.0, float(random(100)));
 
 
-	gDefaultSkinM =	DefineSkinItem(60, "Civilian", 1, 0.0);
-	gDefaultSkinF =	DefineSkinItem(192, "Civilian", 0, 0.0);
+	skin_MainM	= DefineSkinItem(60,	"Civilian", 1, 0.0);
+	skin_MainF	= DefineSkinItem(192,	"Civilian", 0, 0.0);
 
-	DefineSkinItem(170,		"Civilian",			1, 1.0);
-	DefineSkinItem(188,		"Civilian",			1, 1.0);
-	DefineSkinItem(29,		"Civilian",			1, 1.0);
-	DefineSkinItem(206,		"Civilian",			1, 1.0);
-	DefineSkinItem(50,		"Mechanic",			1, 0.5);
-	DefineSkinItem(254,		"Biker",			1, 0.3);
-	DefineSkinItem(287,		"Military",			1, 0.2);
-	DefineSkinItem(101,		"Southclaw",		1, 0.1);
-	DefineSkinItem(156,		"Morgan Freeman",	1, 0.01);
+	skin_Civ1M	= DefineSkinItem(170,	"Civilian",			1, 1.0);
+	skin_Civ2M	= DefineSkinItem(188,	"Civilian",			1, 1.0);
+	skin_Civ3M	= DefineSkinItem(44,	"Civilian",			1, 1.0);
+	skin_Civ4M	= DefineSkinItem(206,	"Civilian",			1, 1.0);
+	skin_MechM	= DefineSkinItem(50,	"Mechanic",			1, 0.6);
+	skin_BikeM	= DefineSkinItem(254,	"Biker",			1, 0.3);
+	skin_ArmyM	= DefineSkinItem(287,	"Military",			1, 0.2);
+	skin_ClawM	= DefineSkinItem(101,	"Southclaw",		1, 0.1);
+	skin_FreeM	= DefineSkinItem(156,	"Morgan Freeman",	1, 0.01);
 
-	DefineSkinItem(65,		"Civilian",			0, 1.0);
-	DefineSkinItem(41,		"Civilian",			0, 1.0);
-	DefineSkinItem(93,		"Civilian",			0, 1.0);
-	DefineSkinItem(233,		"Civilian",			0, 1.0);
-	DefineSkinItem(193,		"Civilian",			0, 1.0);
-	DefineSkinItem(194,		"Civilian",			0, 1.0);
-	DefineSkinItem(192,		"Mechanic",			0, 0.5);
-	DefineSkinItem(191,		"Military",			0, 0.2);
-	DefineSkinItem(198,		"Cowgirl",			0, 0.1);
+	skin_Civ1F	= DefineSkinItem(65,	"Civilian",			0, 0.8);
+	skin_Civ2F	= DefineSkinItem(93,	"Civilian",			0, 0.8);
+	skin_Civ3F	= DefineSkinItem(233,	"Civilian",			0, 0.8);
+	skin_Civ4F	= DefineSkinItem(193,	"Civilian",			0, 0.8);
+	skin_ArmyF	= DefineSkinItem(191,	"Military",			0, 0.2);
+	skin_IndiF	= DefineSkinItem(131,	"Indian",			0, 0.1);
 
-
+	DefineSafeboxType("Small Box", 		item_SmallBox,		6);
+	DefineSafeboxType("Ammo Box", 		item_AmmoBox1,		6);
+	DefineSafeboxType("Ammo Box", 		item_AmmoBox2,		8);
+	DefineSafeboxType("Ammo Box", 		item_AmmoBox3,		4);
+	DefineSafeboxType("Capsule", 		item_Capsule,		4);
 
 
 	CallLocalFunction("OnLoad", "");
@@ -775,6 +840,7 @@ public OnGameModeInit()
 
 	LoadVehicles();
 	LoadTextDraws();
+	LoadSafeboxes();
 
 
 	for(new i; i < MAX_PLAYERS; i++)
@@ -798,6 +864,7 @@ RestartGamemode()
 		UnloadPlayerTextDraws(i);
 	}
 
+	SaveAllSafeboxes();
 	UnloadVehicles();
 
 	db_close(gAccounts);
@@ -861,6 +928,11 @@ task GameUpdate[1000]()
 			}
 		}
 	}
+}
+
+task GlobalAnnouncement[600000]()
+{
+	MsgAll(YELLOW, "[SERVER] >  Confused? Check out the Wiki: "#C_ORANGE"scavenge-survive.wikia.com "#C_YELLOW"or: "#C_ORANGE"empire-bay.com");
 }
 
 ptask PlayerUpdate[100](playerid)
@@ -967,13 +1039,13 @@ ptask FoodUpdate[1000](playerid)
 
 	if(animidx == 43) // Sitting
 	{
-		gPlayerFP[playerid] -= 0.001;
+		gPlayerFP[playerid] -= 0.0001;
 	}
 	else if(animidx == 1159) // Crouching
 	{
-		gPlayerFP[playerid] -= 0.03;
+		gPlayerFP[playerid] -= 0.0015;
 	}
-	else if(animidx == 1195)
+	else if(animidx == 1195) // Jumping
 	{
 		gPlayerFP[playerid] -= 0.3;	
 	}
@@ -984,41 +1056,41 @@ ptask FoodUpdate[1000](playerid)
 
 		if(k & KEY_WALK) // Walking
 		{
-			gPlayerFP[playerid] -= 0.01;
+			gPlayerFP[playerid] -= 0.005;
 		}
 		else if(k & KEY_SPRINT) // Sprinting
 		{
-			gPlayerFP[playerid] -= 0.12;
+			gPlayerFP[playerid] -= 0.06;
 		}
 		else if(k & KEY_JUMP) // Jump
 		{
-			gPlayerFP[playerid] -= 0.3;
+			gPlayerFP[playerid] -= 0.1;
 		}
 		else // Running
 		{
-			gPlayerFP[playerid] -= 0.08;
+			gPlayerFP[playerid] -= 0.04;
 		}
 	}
 	else // Idle
 	{
-		gPlayerFP[playerid] -= 0.004;
+		gPlayerFP[playerid] -= 0.002;
 	}
 
 	if(gPlayerFP[playerid] > 100.0)
 		gPlayerFP[playerid] = 100.0;
 
 	if(gPlayerFP[playerid] < 30.0)
-	{
 		SetPlayerDrunkLevel(playerid, 2000 + floatround((31.0 - gPlayerFP[playerid]) * 300.0));
-	}
+
+	else
+		SetPlayerDrunkLevel(playerid, 0);
+
 	if(gPlayerFP[playerid] < 20.0)
-	{
 		gPlayerHP[playerid] -= (20.0 - gPlayerFP[playerid]) / 10.0;
-	}
+
 	if(gPlayerFP[playerid] < 0.0)
-	{
 		gPlayerFP[playerid] = 0.0;
-	}
+
 
 	PlayerTextDrawLetterSize(playerid, HungerBarForeground, 0.500000, -(gPlayerFP[playerid] / 10.0));
 	PlayerTextDrawShow(playerid, HungerBarBackground);
@@ -1123,9 +1195,6 @@ public OnPlayerConnect(playerid)
 
 		db_get_field_assoc(tmpResult, #ROW_PASS, gPlayerData[playerid][ply_Password], MAX_PASSWORD_LEN);
 
-		db_get_field_assoc(tmpResult, #ROW_SKIN, tmpField, 4);
-		gPlayerData[playerid][ply_Skin] = strval(tmpField);
-
 		db_get_field_assoc(tmpResult, #ROW_GEND, tmpField, 2);
 
 		if(strval(tmpField) == 0)
@@ -1156,6 +1225,14 @@ public OnPlayerConnect(playerid)
 			gPlayerData[playerid][ply_posY],
 			gPlayerData[playerid][ply_posZ],
 			gPlayerData[playerid][ply_rotZ]);
+
+		db_get_field_assoc(tmpResult, #ROW_ISVIP, tmpField, 2);
+
+		if(tmpField[0] == '1')
+			t:bPlayerGameSettings[playerid]<IsVip>;
+
+		else
+			f:bPlayerGameSettings[playerid]<IsVip>;
 
 		t:bPlayerGameSettings[playerid]<HasAccount>;
 
@@ -1282,14 +1359,13 @@ CreateNewUserfile(playerid, password[])
 
 	GetFile(gPlayerName[playerid], file);
 
-	gPlayerData[playerid][ply_Skin] = SKIN_M_NORMAL;
-
 	fclose(fopen(file, io_write));
 
 	format(tmpQuery, 300,
-		"INSERT INTO `Player` (`"#ROW_NAME"`, `"#ROW_PASS"`, `"#ROW_SKIN"`, `"#ROW_IPV4"`, `"#ROW_ALIVE"`, `"#ROW_SPAWN"`) \
-		VALUES('%s', '%s', '%d', '%d', '0', '0.0, 0.0, 0.0, 0.0')",
-		gPlayerName[playerid], password, gPlayerData[playerid][ply_Skin], gPlayerData[playerid][ply_IP]);
+		"INSERT INTO `Player` (`"#ROW_NAME"`, `"#ROW_PASS"`, `"#ROW_IPV4"`, `"#ROW_ALIVE"`, `"#ROW_SPAWN"`, `"#ROW_ISVIP"`) \
+		VALUES('%s', '%s', '%d', '0', '0.0, 0.0, 0.0, 0.0', '%d')",
+		gPlayerName[playerid], password, gPlayerData[playerid][ply_IP],
+		(bPlayerGameSettings[playerid] & IsVip) ? 1 : 0);
 
 	db_free_result(db_query(gAccounts, tmpQuery));
 
@@ -1354,13 +1430,13 @@ SavePlayerData(playerid)
 		format(tmpQuery, sizeof(tmpQuery),
 			"UPDATE `Player` SET \
 			`"#ROW_ALIVE"` = '1', \
-			`"#ROW_SKIN"` = '%d', \
 			`"#ROW_GEND"` = '%d', \
-			`"#ROW_SPAWN"` = '%f %f %f %f' \
+			`"#ROW_SPAWN"` = '%f %f %f %f', \
+			`"#ROW_ISVIP"` = '%d' \
 			WHERE `"#ROW_NAME"` = '%s'",
-			GetPlayerClothes(playerid),
 			(bPlayerGameSettings[playerid] & Gender) ? 1 : 0,
 			x, y, z, a,
+			(bPlayerGameSettings[playerid] & IsVip) ? 1 : 0,
 			gPlayerName[playerid]);
 
 		SavePlayerInventory(playerid);
@@ -1370,10 +1446,11 @@ SavePlayerData(playerid)
 		format(tmpQuery, sizeof(tmpQuery),
 			"UPDATE `Player` SET \
 			`"#ROW_ALIVE"` = '0', \
-			`"#ROW_SKIN"` = '0', \
 			`"#ROW_GEND"` = '0', \
-			`"#ROW_SPAWN"` = '0.0 0.0 0.0 0.0' \
+			`"#ROW_SPAWN"` = '0.0 0.0 0.0 0.0', \
+			`"#ROW_ISVIP"` = '%d' \
 			WHERE `"#ROW_NAME"` = '%s'",
+			(bPlayerGameSettings[playerid] & IsVip) ? 1 : 0,
 			gPlayerName[playerid]);
 
 		ClearPlayerInventoryFile(playerid);
@@ -1389,7 +1466,7 @@ SavePlayerInventory(playerid)
 	new
 		filename[MAX_PLAYER_FILE],
 		File:file,
-		characterdata[3],
+		characterdata[5],
 		helditems[2],
 		inventoryitems[8];
 
@@ -1400,10 +1477,12 @@ SavePlayerInventory(playerid)
 	characterdata[0] = _:gPlayerHP[playerid];
 	characterdata[1] = _:gPlayerAP[playerid];
 	characterdata[2] = _:gPlayerFP[playerid];
+	characterdata[3] = GetPlayerClothes(playerid);
+	characterdata[4] = GetPlayerHat(playerid);
 
-	printf("SAVE: Health: %f Armour: %f", characterdata[0], characterdata[1]);
+	printf("[SAVE]: H: %f A: %f F: %f S: %d H: %d", characterdata[0], characterdata[1], characterdata[2], characterdata[3], characterdata[4]);
 
-	fblockwrite(file, characterdata, 3);
+	fblockwrite(file, characterdata, 5);
 
 	if(GetPlayerHolsteredWeapon(playerid) != 0)
 	{
@@ -1417,7 +1496,7 @@ SavePlayerInventory(playerid)
 		helditems[1] = 0;
 		fblockwrite(file, helditems, 2);
 	}
-	printf("SAVE: holster %d %d", helditems[0], helditems[1]);
+	printf("[SAVE]: holster %d %d", helditems[0], helditems[1]);
 
 	if(GetPlayerWeapon(playerid) > 0)
 	{
@@ -1440,7 +1519,7 @@ SavePlayerInventory(playerid)
 			fblockwrite(file, helditems, 2);
 		}
 	}
-	printf("SAVE: holding %d %d", helditems[0], helditems[1]);
+	printf("[SAVE]: holding %d %d", helditems[0], helditems[1]);
 
 	for(new i, j; j < 4; i += 2, j++)
 	{
@@ -1474,7 +1553,7 @@ LoadPlayerInventory(playerid)
 		filename[MAX_PLAYER_FILE],
 		File:file,
 		filepos,
-		characterdata[3],
+		characterdata[5],
 		helditems[2],
 		inventoryitems[8],
 		bagdata[17],
@@ -1490,41 +1569,38 @@ LoadPlayerInventory(playerid)
 
 	file = fopen(filename, io_read);
 
-	fblockread(file, characterdata, 3);
+	fblockread(file, characterdata, 5);
 
-	printf("LOAD: %s - Health: %f Armour: %f Food: %f", gPlayerName[playerid], characterdata[0], characterdata[1], characterdata[2]);
+	printf("[LOAD]: H: %f A: %f F: %f S: %d H: %d", characterdata[0], characterdata[1], characterdata[2], characterdata[3], characterdata[4]);
 
 	gPlayerHP[playerid] = Float:characterdata[0];
 	gPlayerAP[playerid] = Float:characterdata[1];
 	gPlayerFP[playerid] = Float:characterdata[2];
+	gPlayerData[playerid][ply_Skin] = characterdata[3];
+	SetPlayerHat(playerid, characterdata[4]);
 
 	fblockread(file, helditems, 2);
 
-	printf("LOAD: holster: %d %d", helditems[0], helditems[1]);
+	printf("[LOAD]: holster: %d %d", helditems[0], helditems[1]);
 	if(0 < helditems[0] <= WEAPON_PARACHUTE)
 	{
-		print("\tHolster valid");
 		if(helditems[1] > 0)
 		{
-			print("\tholstering weapon with ammo");
 			HolsterWeapon(playerid, helditems[0], helditems[1], 800);
 		}
 	}
 
 	fblockread(file, helditems, 2);
-	printf("LOAD: helditems: %d %d", helditems[0], helditems[1]);
+	printf("[LOAD]: helditems: %d %d", helditems[0], helditems[1]);
 	if(helditems[0] != -1)
 	{
-		print("\tHeld item [0] NOT -1");
 		if(0 < helditems[0] <= WEAPON_PARACHUTE)
 		{
-			print("\tGiving a weapon");
 			GivePlayerWeapon(playerid, helditems[0], helditems[1]);
 			gPlayerArmedWeapon[playerid] = helditems[0];
 		}
 		else
 		{
-			print("Giving an item");
 			itemid = CreateItem(ItemType:helditems[0], 0.0, 0.0, 0.0);
 			SetItemExtraData(itemid, helditems[1]);
 			GiveWorldItemToPlayer(playerid, itemid, false);
@@ -1553,8 +1629,8 @@ LoadPlayerInventory(playerid)
 		if(bagdata[0] == _:item_Satchel)
 		{
 			itemid = CreateItem(item_Satchel, 0.0, 0.0, 0.0);
-			GivePlayerBackpack(playerid, itemid);
 			containerid = GetItemExtraData(itemid);
+			GivePlayerBackpack(playerid, itemid);
 
 			for(new i = 1; i < 8; i += 2)
 			{
@@ -1570,8 +1646,9 @@ LoadPlayerInventory(playerid)
 		if(bagdata[0] == _:item_Backpack)
 		{
 			itemid = CreateItem(item_Backpack, 0.0, 0.0, 0.0);
-			GivePlayerBackpack(playerid, itemid);
 			containerid = GetItemExtraData(itemid);
+			printf("Created player backpack ContainerID: %d", containerid);
+			GivePlayerBackpack(playerid, itemid);
 
 			for(new i = 1; i < 16; i += 2)
 			{
@@ -1640,6 +1717,9 @@ ResetVariables(playerid)
 	SetPlayerSkillLevel(playerid, WEAPONSKILL_PISTOL,			100);
 	SetPlayerSkillLevel(playerid, WEAPONSKILL_SAWNOFF_SHOTGUN,	100);
 	SetPlayerSkillLevel(playerid, WEAPONSKILL_MICRO_UZI,		100);
+
+	for(new i; i < 10; i++)
+		RemovePlayerAttachedObject(playerid, i);
 }
 
 
@@ -1811,6 +1891,8 @@ public OnPlayerSpawn(playerid)
 	{
 		if(bPlayerGameSettings[playerid] & Alive)
 		{
+			LoadPlayerInventory(playerid);
+
 			if(!IsValidClothes(gPlayerData[playerid][ply_Skin]))
 				goto invalid_clothes_id_jump;
 
@@ -1824,7 +1906,6 @@ public OnPlayerSpawn(playerid)
 			SetPlayerFacingAngle(playerid, gPlayerData[playerid][ply_rotZ]);
 			SetCameraBehindPlayer(playerid);
 			TogglePlayerControllable(playerid, true);
-			LoadPlayerInventory(playerid);
 			t:bPlayerGameSettings[playerid]<Spawned>;
 
 			GangZoneShowForPlayer(playerid, MiniMapOverlay, 0x000000FF);
@@ -1906,6 +1987,11 @@ timer SetDeathCamera[50](playerid)
 
 public OnPlayerClickTextDraw(playerid, Text:clickedid)
 {
+	if(clickedid == Text:65535)
+	{
+		TextDrawShowForPlayer(playerid, MapCover1);
+		TextDrawShowForPlayer(playerid, MapCover2);
+	}
 	if(clickedid == DeathButton)
 	{
 		f:bPlayerGameSettings[playerid]<Dying>;
@@ -1924,10 +2010,10 @@ OnPlayerSelectGender(playerid)
 		tmpitem;
 
 	if(bPlayerGameSettings[playerid] & Gender)
-		SetPlayerClothes(playerid, gDefaultSkinM);
+		SetPlayerClothes(playerid, skin_MainM);
 
 	else
-		SetPlayerClothes(playerid, gDefaultSkinF);
+		SetPlayerClothes(playerid, skin_MainF);
 
 	SetPlayerPos(playerid, gSpawns[r][0], gSpawns[r][1], gSpawns[r][2]);
 	SetPlayerFacingAngle(playerid, gSpawns[r][3]);
@@ -1966,6 +2052,12 @@ OnPlayerSelectGender(playerid)
 
 	tmpitem = CreateItem(item_Wrench, gSpawns[r][0], gSpawns[r][1], gSpawns[r][2]);
 	AddItemToContainer(GetItemExtraData(backpackitem), tmpitem);
+
+	if(bPlayerGameSettings[playerid] & IsVip)
+	{
+		tmpitem = CreateItem(item_ZorroMask, gSpawns[r][0], gSpawns[r][1], gSpawns[r][2]);
+		AddItemToInventory(playerid, tmpitem);
+	}
 
 	Tutorial_Start(playerid);
 
@@ -2403,10 +2495,34 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			new Float:health;
 			GetVehicleHealth(gPlayerVehicleID[playerid], health);
 
-			if(health >= 300.0 && gVehicleFuel[gPlayerVehicleID[playerid]] > 0.0)
-				v_Engine(gPlayerVehicleID[playerid], !v_Engine(gPlayerVehicleID[playerid]));
+			if(health >= 300.0)
+			{
+				if(VehicleFuelData[GetVehicleModel(gPlayerVehicleID[playerid])-400][veh_maxFuel] > 0.0 && gVehicleFuel[gPlayerVehicleID[playerid]] > 0.0)
+					v_Engine(gPlayerVehicleID[playerid], !v_Engine(gPlayerVehicleID[playerid]));
+
+				else
+					v_Engine(gPlayerVehicleID[playerid], !v_Engine(gPlayerVehicleID[playerid]));
+			}
 		}
-		if(newkeys & KEY_NO)v_Lights(gPlayerVehicleID[playerid], !v_Lights(gPlayerVehicleID[playerid]));
+		if(newkeys & KEY_NO)
+		{
+			v_Lights(gPlayerVehicleID[playerid], !v_Lights(gPlayerVehicleID[playerid]));
+		}
+		if(newkeys & KEY_CROUCH)
+		{
+			if(GetPlayerState(playerid) == PLAYER_STATE_PASSENGER)
+			{
+				if(bPlayerGameSettings[playerid] & HangingOutWindow)
+				{
+					PutPlayerInVehicle(playerid, GetPlayerVehicleID(playerid), GetPlayerVehicleSeat(playerid));
+					f:bPlayerGameSettings[playerid]<HangingOutWindow>;
+				}
+				else
+				{
+					t:bPlayerGameSettings[playerid]<HangingOutWindow>;
+				}
+			}
+		}
 	}
 	else
 	{
@@ -2506,7 +2622,7 @@ PlayerSendChat(playerid, textInput[])
 			TagScan(textInput));
 	}
 
-	SetPlayerChatBubble(playerid, textInput, WHITE, 20.0, 10000);
+	SetPlayerChatBubble(playerid, textInput, WHITE, 40.0, 10000);
 
 	if(strlen(text) > 127)
 	{
@@ -2545,7 +2661,7 @@ PlayerSendChat(playerid, textInput[])
 
 			foreach(new i : Player)
 			{
-				if(IsPlayerInRangeOfPoint(i, 20.0, x, y, z))
+				if(IsPlayerInRangeOfPoint(i, 40.0, x, y, z))
 				{
 					SendClientMessage(i, WHITE, text);
 					SendClientMessage(i, WHITE, text2);
@@ -2573,7 +2689,7 @@ PlayerSendChat(playerid, textInput[])
 
 			foreach(new i : Player)
 			{
-				if(IsPlayerInRangeOfPoint(i, 20.0, x, y, z))
+				if(IsPlayerInRangeOfPoint(i, 40.0, x, y, z))
 				{
 					SendClientMessage(i, WHITE, text);
 				}
@@ -2790,13 +2906,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 			CreateNewUserfile(playerid, buffer);
 
-			new tmpStr[512];
-			strcat(tmpStr, HORIZONTAL_RULE);
-			strcat(tmpStr, "\n"#C_WHITE"Your new account has been created! You have "C_YELLOW"$500"C_WHITE" as a welcome gift!\n");
-			strcat(tmpStr, "Please take some time to read the "#C_BLUE"/rules"#C_WHITE" and abide by them\n");
-			strcat(tmpStr, "Enjoy your time playing on the Hellfire server :)\n");
-			strcat(tmpStr, HORIZONTAL_RULE);
-			ShowPlayerDialog(playerid, d_WelcomeMsg, DIALOG_STYLE_MSGBOX, "Welcome to "#C_RED"Hellfire Server", tmpStr, "Close", "");
+			ShowPlayerDialog(playerid, d_WelcomeMsg, DIALOG_STYLE_MSGBOX, "Welcome to "#C_RED"Hellfire Server",
+				"\n"#C_WHITE"Your new account has been created!\n\
+				If you want to know more about the game, visit the Wikia site:\n\n\
+				\t"#C_YELLOW"scavenge-survive.wikia.com\n\n\
+				"#C_WHITE"Enjoy your time playing! Remember, don't attack people without a reason!", "Close", "");
 		}
 		else
 		{

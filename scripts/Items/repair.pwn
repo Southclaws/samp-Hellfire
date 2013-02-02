@@ -16,7 +16,7 @@ hook OnPlayerConnect(playerid)
 }
 
 
-PlayerStartRepairVehicle(playerid, vehicleid)
+StartRepairingVehicle(playerid, vehicleid)
 {
 	new
 		engine,
@@ -39,13 +39,12 @@ PlayerStartRepairVehicle(playerid, vehicleid)
 	return 1;
 }
 
-PlayerStopRepairVehicle(playerid)
+StopRepairingVehicle(playerid)
 {
+	stop gPlayerFixTimer[playerid];
+
 	if(gPlayerFixTarget[playerid] == INVALID_VEHICLE_ID)
-	{
-		stop gPlayerFixTimer[playerid];
 		return 0;
-	}
 
 	new
 		engine,
@@ -59,12 +58,10 @@ PlayerStopRepairVehicle(playerid)
 	GetVehicleParamsEx(gPlayerFixTarget[playerid], engine, lights, alarm, doors, bonnet, boot, objective);
 	SetVehicleParamsEx(gPlayerFixTarget[playerid], engine, lights, alarm, doors, 0, boot, objective);
 
-	stop gPlayerFixTimer[playerid];
 	gPlayerFixTarget[playerid] = INVALID_VEHICLE_ID;
 
 	HidePlayerProgressBar(playerid, ActionBar);
 	ClearAnimations(playerid);
-
 
 	return 1;
 }
@@ -72,22 +69,22 @@ PlayerStopRepairVehicle(playerid)
 timer PlayerFixVehicleUpdate[100](playerid)
 {
 	if(!IsPlayerInVehicleArea(playerid, gPlayerFixTarget[playerid]) || !IsValidVehicle(gPlayerFixTarget[playerid]))
-		return PlayerStopRepairVehicle(playerid);
+		return StopRepairingVehicle(playerid);
 
 	if(GetItemType(GetPlayerItem(playerid)) == item_Wrench)
 	{
 		if(!(250.0 <= gPlayerFixProgress[playerid] < 450.0) && !(800.0 <= gPlayerFixProgress[playerid] < 1000.0))
-			return PlayerStopRepairVehicle(playerid);
+			return StopRepairingVehicle(playerid);
 	}
 	if(GetItemType(GetPlayerItem(playerid)) == item_Screwdriver)
 	{
 		if(!(450.0 <= gPlayerFixProgress[playerid] < 650.0))
-			return PlayerStopRepairVehicle(playerid);
+			return StopRepairingVehicle(playerid);
 	}
 	if(GetItemType(GetPlayerItem(playerid)) == item_Hammer)
 	{
 		if(!(650.0 <= gPlayerFixProgress[playerid] < 800.0))
-			return PlayerStopRepairVehicle(playerid);
+			return StopRepairingVehicle(playerid);
 	}
 
 	new

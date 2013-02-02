@@ -107,13 +107,13 @@ CreateLootSpawn(Float:x, Float:y, Float:z, size, spawnchance, lootindex)
 		if(exdata != -1)
 			SetItemExtraData(itemid, exdata);
 
-		if(tmpitem == item_Satchel || tmpitem == item_Backpack)
+		if(tmpitem == item_Satchel || tmpitem == item_Backpack || tmpitem == item_SmallBox || tmpitem == item_AmmoBox1 || tmpitem == item_AmmoBox2 || tmpitem == item_AmmoBox3 || tmpitem == item_Capsule)
 		{
 			tmpitem = GenerateLoot(lootindex, exdata);
 			itemid = CreateItem(tmpitem, 0.0, 0.0, 0.0);
 
 			if(0 < _:tmpitem <= WEAPON_PARACHUTE)
-				SetItemExtraData(itemid, (WepData[_:tmpitem][MagSize] * (random(3))) + random(WepData[_:tmpitem][MagSize]-1) + 1);
+				SetItemExtraData(itemid, (WepData[_:tmpitem][MagSize] * (random(3))) + random(WepData[_:tmpitem][MagSize]));
 
 			else
 				SetItemExtraData(itemid, exdata);

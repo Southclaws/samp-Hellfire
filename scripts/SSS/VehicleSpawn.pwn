@@ -46,6 +46,7 @@ new
 			bVehicleSettings[MAX_VEHICLES],
 Iterator:	gVehicleIndex<MAX_VEHICLES>,
 Float:		gVehicleFuel[MAX_VEHICLES],
+			gVehicleTrunkLocked[MAX_VEHICLES],
 			gVehicleArea[MAX_VEHICLES],
 			gVehicleContainer[MAX_VEHICLES],
 			gCurrentContainerVehicle[MAX_VEHICLES],
@@ -150,6 +151,9 @@ UnloadVehicles()
 	{
 		if(IsValidVehicle(i))
 		{
+			if(!isnull(gVehicleOwner[i]))
+				SavePlayerVehicle(i, gVehicleOwner[i]);
+
 			DestroyVehicle(i);
 			DestroyContainer(gVehicleContainer[i]);
 		}
@@ -445,6 +449,12 @@ ApplyVehicleData(vehicleid)
 	{
 		SetVehicleHealth(vehicleid, gPlayerVehicleData[vehicleid][pv_health]);
 
+		if(GetVehicleType(GetVehicleModel(vehicleid)) == VTYPE_BMX)
+			SetVehicleParamsEx(vehicleid, 1, 0, 0, 0, 0, 0, 0);
+
+		else
+			SetVehicleParamsEx(vehicleid, 0, 0, 0, 0, 0, 0, 0);
+
 		UpdateVehicleDamageStatus(vehicleid,
 			gPlayerVehicleData[vehicleid][pv_panels],
 			gPlayerVehicleData[vehicleid][pv_doors],
@@ -453,7 +463,12 @@ ApplyVehicleData(vehicleid)
 	}
 	else
 	{
-		new chance = random(100);
+		new
+			chance = random(100),
+			panels,
+			doors,
+			lights,
+			tires;
 
 		if(chance < 1)
 			SetVehicleHealth(vehicleid, 700 + random(300));
@@ -463,9 +478,6 @@ ApplyVehicleData(vehicleid)
 
 		else
 			SetVehicleHealth(vehicleid, 300 + random(300));
-
-		if(VehicleFuelData[model - 400][veh_maxFuel] == 0.0)
-			SetVehicleParamsEx(vehicleid, 1, 0, 0, 0, 0, 0, 0);
 
 		chance = random(100);
 
@@ -481,11 +493,31 @@ ApplyVehicleData(vehicleid)
 		else
 			gVehicleFuel[vehicleid] = frandom(1.0);
 
-		UpdateVehicleDamageStatus(vehicleid,
-			encode_panels(random(4), random(4), random(4), random(4), random(4), random(4), random(4)),
-			encode_doors(random(5), random(5), random(5), random(5), random(5), random(5)),
-			encode_lights(random(2), random(2), random(2), random(2)),
-			encode_tires(random(2), random(2), random(2), random(2)));
+
+		panels	= encode_panels(random(4), random(4), random(4), random(4), random(4), random(4), random(4));
+		doors	= encode_doors(random(5), random(5), random(5), random(5), random(5), random(5));
+		lights	= encode_lights(random(2), random(2), random(2), random(2));
+		tires	= encode_tires(random(2), random(2), random(2), random(2));
+
+		UpdateVehicleDamageStatus(vehicleid, panels, doors, lights, tires);
+
+		if(VehicleFuelData[model - 400][veh_maxFuel] == 0.0)
+		{
+			SetVehicleParamsEx(vehicleid, 1, 0, 0, 0, 0, 0, 0);
+		}
+		else
+		{
+			new locked;
+
+			if(doors == 0)
+				locked = random(2);
+
+			if(panels == 0)
+				gVehicleTrunkLocked[vehicleid] = random(2);
+
+			SetVehicleParamsEx(vehicleid, 0, random(2), !random(100), locked, random(2), random(2), 0);
+		}
+
 
 		if(VehicleFuelData[model - 400][veh_lootIndex] != -1 && 0 < VehicleFuelData[model - 400][veh_trunkSize] < CNT_MAX_SLOTS)
 		{
@@ -524,7 +556,7 @@ ApplyVehicleData(vehicleid)
 						itemid = CreateItem(itemtype, 0.0, 0.0, 0.0);
 
 						if(0 < _:itemtype <= WEAPON_PARACHUTE)
-							SetItemExtraData(itemid, (WepData[_:itemtype][MagSize] * (random(3))) + random(WepData[_:itemtype][MagSize]-1) + 1);
+							SetItemExtraData(itemid, (WepData[_:itemtype][MagSize] * (random(3))) + random(WepData[_:itemtype][MagSize]));
 
 						else
 							SetItemExtraData(itemid, exdata);
@@ -552,8 +584,6 @@ ApplyVehicleData(vehicleid)
 
 public OnVehicleDeath(vehicleid)
 {
-	print("OnVehicleDeath");
-
 	if(IsValidContainer(gVehicleContainer[vehicleid]))
 	{
 		for(new i; i < CNT_MAX_SLOTS; i++)
@@ -579,7 +609,6 @@ hook OnPlayerStateChange(playerid, newstate, oldstate)
 
 public OnPlayerAddedToContainer(playerid, containerid, itemid)
 {
-	printf("OnPlayerAddedToContainer %d %d %d", playerid, containerid, itemid);
 	if(0 <= playerid < MAX_PLAYERS)
 	{
 		if(IsValidVehicle(gCurrentContainerVehicle[playerid]))
@@ -603,7 +632,6 @@ forward veh_OnPlayerAddedToContainer(playerid, containerid, itemid);
 
 public OnPlayerTakenFromContainer(playerid, containerid, slotid)
 {
-	printf("OnPlayerTakenFromContainer %d %d %d", playerid, containerid, slotid);
 	if(IsValidVehicle(gCurrentContainerVehicle[playerid]))
 	{
 		if(IsValidVehicle(gCurrentContainerVehicle[playerid]))

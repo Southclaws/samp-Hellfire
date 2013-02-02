@@ -19,6 +19,28 @@ CMD:adminlvl(playerid, params[])
 
 //==============================================================================Player
 
+ACMD:setvip[3](playerid, params[])
+{
+	new id, toggle;
+
+	if(sscanf(params, "dd", id, toggle))
+		return Msg(playerid, YELLOW, " >  Usage: /setvip [playerid]");
+
+	if(pAdmin(id) >= pAdmin(playerid) && playerid != id)
+		return 3;
+
+	if(toggle)
+	{
+		t:bPlayerGameSettings[id]<IsVip>;
+		MsgF(playerid, YELLOW, " >  You gave VIP status to %P", id);
+	}
+	else
+	{
+		f:bPlayerGameSettings[id]<IsVip>;
+		MsgF(playerid, YELLOW, " >  You removed VIP status from %P", id);
+	}
+	return 1;
+}
 ACMD:view[3](playerid, params[])
 {
 	new id;

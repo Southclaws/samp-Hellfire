@@ -65,7 +65,9 @@ public OnPlayerUpdate(playerid)
 		else if(lr == KEY_RIGHT)angle	-= 6.0;
 		SetPlayerFacingAngle(playerid, angle);
 	}
+	SetPlayerHealth(playerid, 1000.0);
 	SetPlayerVelocity(playerid, forwd*floatsin(-angle, degrees), forwd*floatcos(-angle, degrees), hMult);
+	SetPlayerHealth(playerid, 1000.0);
 
 	return 1;
 }

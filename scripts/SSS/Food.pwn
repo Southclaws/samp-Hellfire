@@ -52,6 +52,7 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 	{
 		StopEating(playerid);
 	}
+	return 1;
 }
 
 StartEating(playerid, foodtype)
@@ -65,7 +66,12 @@ timer EatUpdate[100](playerid)
 {
 	if(food_EatProgress[playerid] == 32.0)
 	{
-		gPlayerFP[playerid] += food_Data[food_CurrentlyEating[playerid]][food_foodValue];
+		if(GetItemExtraData(GetPlayerItem(playerid)) == 0)
+			gPlayerFP[playerid] += food_Data[food_CurrentlyEating[playerid]][food_foodValue] / 4;
+
+		else
+			gPlayerFP[playerid] += food_Data[food_CurrentlyEating[playerid]][food_foodValue];
+
 		DestroyItem(GetPlayerItem(playerid));
 		StopEating(playerid);
 		return 1;

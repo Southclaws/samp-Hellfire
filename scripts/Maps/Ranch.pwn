@@ -207,6 +207,7 @@ public OnPlayerUseItemWithButton(playerid, buttonid, itemid)
 	    ShowPlayerDialog(playerid, d_NULL, DIALOG_STYLE_MSGBOX, "Door", "You have unlocked the mystery door!", "Close", "");
 	    QuarryDoorState = 1;
 	}
+
     return CallLocalFunction("int_OnPlayerUseItemWithButton", "ddd", playerid, buttonid, itemid);
 }
 #if defined _ALS_OnPlayerUseItemWithButton

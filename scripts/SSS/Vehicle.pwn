@@ -4,11 +4,6 @@
 new IsAtVehicleBonnet[MAX_PLAYERS];
 
 
-hook OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
-{
-	return 1;
-}
-
 hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
 	if(IsPlayerInAnyVehicle(playerid))
@@ -16,6 +11,11 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 	if(newkeys == 16)
 	{
+		new ItemType:itemtype = GetItemType(GetPlayerItem(playerid));
+
+		if(itemtype == item_Satchel || itemtype == item_Backpack || itemtype == item_Briefcase)
+			return 1;
+
 		foreach(new i : gVehicleIndex)
 		{
 			if(IsPlayerInDynamicArea(playerid, gVehicleArea[i]))
@@ -47,13 +47,12 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 						if(250.0 <= vehiclehealth < 450.0 || 800.0 <= vehiclehealth < 1000.0)
 						{
 							SetPlayerPos(playerid, px, py, pz);
-							PlayerStartRepairVehicle(playerid, i);
+							StartRepairingVehicle(playerid, i);
 							break;
 						}
 						else
 						{
 							ShowMsgBox(playerid, "You need another tool", 3000, 100);
-							SetPlayerPos(playerid, px, py, pz);
 						}
 					}	
 					else if(GetItemType(GetPlayerItem(playerid)) == item_Screwdriver)
@@ -61,13 +60,12 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 						if(450.0 <= vehiclehealth < 650.0)
 						{
 							SetPlayerPos(playerid, px, py, pz);
-							PlayerStartRepairVehicle(playerid, i);
+							StartRepairingVehicle(playerid, i);
 							break;
 						}
 						else
 						{
 							ShowMsgBox(playerid, "You need another tool", 3000, 100);
-							SetPlayerPos(playerid, px, py, pz);
 						}
 					}	
 					else if(GetItemType(GetPlayerItem(playerid)) == item_Hammer)
@@ -75,13 +73,12 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 						if(650.0 <= vehiclehealth < 800.0)
 						{
 							SetPlayerPos(playerid, px, py, pz);
-							PlayerStartRepairVehicle(playerid, i);
+							StartRepairingVehicle(playerid, i);
 							break;
 						}
 						else
 						{
 							ShowMsgBox(playerid, "You need another tool", 3000, 100);
-							SetPlayerPos(playerid, px, py, pz);
 						}
 					}
 					else if(GetItemType(GetPlayerItem(playerid)) == item_Wheel)
@@ -94,49 +91,63 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 					}
 					else
 					{
-						if(GetVehicleModel(i) == 449)
-						{
-							PutPlayerInVehicle(playerid, i, 0);
-						}
-						else
-						{
-							ShowMsgBox(playerid, "You don't have the right tool", 3000, 100);
-							SetPlayerPos(playerid, px, py, pz);
-						}
+						ShowMsgBox(playerid, "You don't have the right tool", 3000, 100);
 					}
 				}
 				if(155.0 < angle < 205.0)
 				{
 					if(IsValidContainer(gVehicleContainer[i]))
 					{
-						new
-							engine,
-							lights,
-							alarm,
-							doors,
-							bonnet,
-							boot,
-							objective;
+						if(gVehicleTrunkLocked[i])
+						{
+							if(GetItemType(GetPlayerItem(playerid)) == item_Crowbar)
+							{
+								StartBreakingVehicleLock(playerid, i, 1);
+							}
+						}
+						else
+						{
+							new
+								engine,
+								lights,
+								alarm,
+								doors,
+								bonnet,
+								boot,
+								objective;
 
-						GetVehicleParamsEx(i, engine, lights, alarm, doors, bonnet, boot, objective);
-						SetVehicleParamsEx(i, engine, lights, alarm, doors, bonnet, 1, objective);
+							GetVehicleParamsEx(i, engine, lights, alarm, doors, bonnet, boot, objective);
+							SetVehicleParamsEx(i, engine, lights, alarm, doors, bonnet, 1, objective);
 
-						SetPlayerPos(playerid, px, py, pz);
-						SetPlayerFacingAngle(playerid, GetAngleToPoint(px, py, vx, vy));
+							SetPlayerPos(playerid, px, py, pz);
+							SetPlayerFacingAngle(playerid, GetAngleToPoint(px, py, vx, vy));
 
-						DisplayContainerInventory(playerid, gVehicleContainer[i]);
-						gCurrentContainerVehicle[playerid] = i;
+							DisplayContainerInventory(playerid, gVehicleContainer[i]);
+							gCurrentContainerVehicle[playerid] = i;
 
-						break;
+							break;
+						}
+					}
+				}
+				if(225.0 < angle < 315.0)
+				{
+					if(GetVehicleModel(i) == 449)
+					{
+						PutPlayerInVehicle(playerid, i, 0);
+					}
+					if(GetItemType(GetPlayerItem(playerid)) == item_Crowbar)
+					{
+						StartBreakingVehicleLock(playerid, i, 0);
 					}
 				}
 			}
 		}
-		if(oldkeys == 16)
-		{
-			PlayerStopRepairVehicle(playerid);
-			StopRefuellingVehicle(playerid);
-		}
+	}
+	if(oldkeys == 16)
+	{
+		StopRepairingVehicle(playerid);
+		StopRefuellingVehicle(playerid);
+		StopBreakingVehicleLock(playerid);
 	}
 
 	return 1;
@@ -276,5 +287,21 @@ SetVehicleFuel(vehicleid, Float:fuel)
 	if(gVehicleFuel[vehicleid] > VehicleFuelData[GetVehicleModel(vehicleid) - 400][veh_maxFuel])
 		gVehicleFuel[vehicleid] = VehicleFuelData[GetVehicleModel(vehicleid) - 400][veh_maxFuel];
 
+	return 1;
+}
+
+IsVehicleTrunkLocked(vehicleid)
+{
+	if(!IsValidVehicle(vehicleid))
+		return 0;
+
+	return gVehicleTrunkLocked[vehicleid];
+}
+SetVehicleTrunkLock(vehicleid, toggle)
+{
+	if(!IsValidVehicle(vehicleid))
+		return 0;
+
+	gVehicleTrunkLocked[vehicleid] = toggle;
 	return 1;
 }

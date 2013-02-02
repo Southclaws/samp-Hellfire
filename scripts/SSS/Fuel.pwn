@@ -20,7 +20,14 @@ new
 			fuel_Data[MAX_FUEL_LOCATIONS][E_FUEL_DATA],
 Iterator:	fuel_Index<MAX_FUEL_LOCATIONS>,
 Timer:		fuel_RefuelTimer[MAX_PLAYERS],
-			fuel_CurrentFuelOutlet[MAX_PLAYERS];
+			fuel_CurrentFuelOutlet[MAX_PLAYERS],
+			fuel_CurrentlyRefuelling[MAX_PLAYERS];
+
+
+hook OnPlayerConnect(playerid)
+{
+	fuel_CurrentlyRefuelling[playerid] = -1;
+}
 
 
 stock CreateFuelOutlet(Float:x, Float:y, Float:z, Float:areasize, Float:capacity, Float:startamount)
@@ -119,6 +126,7 @@ StartRefuellingFuelCan(playerid, outletid)
 
 	CancelPlayerMovement(playerid);
 	SetPlayerProgressBarMaxValue(playerid, ActionBar, FUEL_CAN_CAPACITY);
+	SetPlayerProgressBarValue(playerid, ActionBar, 0.0);
 	ShowPlayerProgressBar(playerid, ActionBar);
 
 	stop fuel_RefuelTimer[playerid];
@@ -178,19 +186,27 @@ StartRefuellingVehicle(playerid, vehicleid)
 	CancelPlayerMovement(playerid);
 	ApplyAnimation(playerid, "PED", "DRIVE_BOAT", 4.0, 1, 0, 0, 0, 0);
 	SetPlayerProgressBarMaxValue(playerid, ActionBar, GetVehicleFuelCapacity(vehicleid));
+	SetPlayerProgressBarValue(playerid, ActionBar, 0.0);
 	ShowPlayerProgressBar(playerid, ActionBar);
 
 	stop fuel_RefuelTimer[playerid];
 	fuel_RefuelTimer[playerid] = repeat RefuelVehicleUpdate(playerid, vehicleid);
+	fuel_CurrentlyRefuelling[playerid] = vehicleid;
 
 	return 1;
 }
 StopRefuellingVehicle(playerid)
 {
+	stop fuel_RefuelTimer[playerid];
+
+	if(!IsValidVehicle(fuel_CurrentlyRefuelling[playerid]))
+		return 0;
+
 	HidePlayerProgressBar(playerid, ActionBar);
 	ClearAnimations(playerid);
+	fuel_CurrentlyRefuelling[playerid] = -1;
 
-	stop fuel_RefuelTimer[playerid];
+	return 1;
 }
 
 timer RefuelVehicleUpdate[500](playerid, vehicleid)

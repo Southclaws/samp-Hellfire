@@ -5,7 +5,6 @@ new stock
 	ItemType:item_fusebox		= INVALID_ITEM_TYPE, // required for some crafting
 
 	ItemType:item_FishRod		= INVALID_ITEM_TYPE, // fishing?
-	ItemType:item_Crowbar		= INVALID_ITEM_TYPE, // open jammed doors or locked crates
 	ItemType:item_Taser			= INVALID_ITEM_TYPE, // stuns players (needs anim, or just other hand)
 	ItemType:item_LaserPoint	= INVALID_ITEM_TYPE, // combine with explosives to make trip mine
 	ItemType:item_MobilePhone	= INVALID_ITEM_TYPE, // remote detonator? communication?
@@ -22,10 +21,23 @@ new stock
 	ItemType:item_Canister1		= INVALID_ITEM_TYPE,
 	ItemType:item_Canister2		= INVALID_ITEM_TYPE,
 	ItemType:item_Canister3		= INVALID_ITEM_TYPE,
-
 	ItemType:item_Clothes		= INVALID_ITEM_TYPE,
 	ItemType:item_Pizza			= INVALID_ITEM_TYPE,
-	ItemType:item_Burger		= INVALID_ITEM_TYPE,	
-	ItemType:item_BurgerBox		= INVALID_ITEM_TYPE,	
-	ItemType:item_Taco			= INVALID_ITEM_TYPE;
-
+	ItemType:item_Burger		= INVALID_ITEM_TYPE,
+	ItemType:item_BurgerBox		= INVALID_ITEM_TYPE,
+	ItemType:item_Taco			= INVALID_ITEM_TYPE,
+	ItemType:item_SmallBox		= INVALID_ITEM_TYPE,
+	ItemType:item_AmmoBox1		= INVALID_ITEM_TYPE,
+	ItemType:item_AmmoBox2		= INVALID_ITEM_TYPE,
+	ItemType:item_AmmoBox3		= INVALID_ITEM_TYPE,
+	ItemType:item_Meat			= INVALID_ITEM_TYPE,
+	ItemType:item_DeadLeg		= INVALID_ITEM_TYPE,
+	ItemType:item_DeadArm		= INVALID_ITEM_TYPE,
+	ItemType:item_LongPlank		= INVALID_ITEM_TYPE,
+	ItemType:item_GreenGloop	= INVALID_ITEM_TYPE,
+	ItemType:item_Capsule		= INVALID_ITEM_TYPE,
+	ItemType:item_RadioPole		= INVALID_ITEM_TYPE,
+	ItemType:item_SignShot		= INVALID_ITEM_TYPE,
+	ItemType:item_Mailbox		= INVALID_ITEM_TYPE,
+	ItemType:item_Pumpkin		= INVALID_ITEM_TYPE,
+	ItemType:item_Nailbat		= INVALID_ITEM_TYPE;

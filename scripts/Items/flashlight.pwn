@@ -20,3 +20,33 @@ public OnPlayerUseItem(playerid, itemid)
 #endif
 #define OnPlayerUseItem lite_OnPlayerUseItem
 forward lite_OnPlayerUseItem(playerid, itemid);
+
+public OnItemRemovedFromPlayer(playerid, itemid)
+{
+	if(GetItemType(itemid) == item_Flashlight)
+		RemovePlayerAttachedObject(playerid, ATTACHSLOT_TORCH);
+
+	return CallLocalFunction("lite_OnItemRemovedFromPlayer", "dd", playerid, itemid);
+}
+#if defined _ALS_OnItemRemovedFromPlayer
+	#undef OnItemRemovedFromPlayer
+#else
+	#define _ALS_OnItemRemovedFromPlayer
+#endif
+#define OnItemRemovedFromPlayer lite_OnItemRemovedFromPlayer
+forward lite_OnItemRemovedFromPlayer(playerid, itemid);
+
+public OnPlayerDropItem(playerid, itemid)
+{
+	if(GetItemType(itemid) == item_Flashlight)
+		RemovePlayerAttachedObject(playerid, ATTACHSLOT_TORCH);
+
+	return CallLocalFunction("lite_OnPlayerDropItem", "dd", playerid, itemid);
+}
+#if defined _ALS_OnPlayerDropItem
+	#undef OnPlayerDropItem
+#else
+	#define _ALS_OnPlayerDropItem
+#endif
+#define OnPlayerDropItem lite_OnPlayerDropItem
+forward lite_OnPlayerDropItem(playerid, itemid);

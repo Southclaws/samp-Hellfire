@@ -55,11 +55,11 @@ public OnItemCreate(itemid)
 {
 	if(GetItemType(itemid) == item_Backpack)
 	{
-		SetItemExtraData(itemid, CreateContainer("Backpack", 8, .virtual = 1));
+		SetItemExtraData(itemid, CreateContainer("Backpack", 8, .virtual = 1, .max_med = 4, .max_large = 2, .max_carry = 0));
 	}
 	if(GetItemType(itemid) == item_Satchel)
 	{
-		SetItemExtraData(itemid, CreateContainer("Patrol Pack", 4, .virtual = 1));
+		SetItemExtraData(itemid, CreateContainer("Patrol Pack", 4, .virtual = 1, .max_med = 2, .max_large = 1, .max_carry = 0));
 	}
 
 	return CallLocalFunction("pack_OnItemCreate", "d", itemid);
@@ -125,19 +125,22 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 public OnPlayerAddToInventory(playerid, itemid)
 {
-	printf("backpackid: %d", gPlayerBackpack[playerid]);
+	print("OnPlayerAddToInventory");
 	if(IsPlayerInventoryFull(playerid) && IsValidItem(gPlayerBackpack[playerid]))
 	{
+		print("inv full, valid item");
 		new containerid = GetItemExtraData(gPlayerBackpack[playerid]);
 
 		if(IsValidContainer(containerid))
 		{
+			print("valid cont");
 			new containername[CNT_MAX_NAME];
 
 			GetContainerName(containerid, containername);
 
 			if(AddItemToContainer(containerid, itemid, playerid))
 			{
+				print("added");
 				new str[32];
 				format(str, 32, "Item added to %s", containername);
 				ShowMsgBox(playerid, str, 3000, 150);
@@ -145,6 +148,7 @@ public OnPlayerAddToInventory(playerid, itemid)
 			}
 			else
 			{
+				print("not added");
 				new str[32];
 				format(str, 32, "%s full", containername);
 				ShowMsgBox(playerid, str, 3000, 100);

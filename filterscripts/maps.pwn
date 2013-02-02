@@ -11,92 +11,19 @@
 #include <foreach>
 #include <colours>
 #include <FileManager>
-#define msg SendClientMessage
 
 #define MAX_MATERIAL_SIZE	14
 #define MAX_MATERIAL_LEN	8
 
-#define MAX_DATA_OBJ		(16)
-#define OBJ_EVENT_MOV		(0)
-#define OBJ_EVENT_CRT		(1)
-#define OBJ_EVENT_DEL		(2)
 
-#define MAX_MAPS			(100)				// Total amount of map files that can be loaded to cache
-#define INDEX_FILE			"Maps/mapindex.txt"	// Index file location (This doesn't affect the map file location)
+stock Float:Distance(Float:x1,Float:y1,Float:z1,Float:x2,Float:y2,Float:z2)
+	return floatpower((floatpower((x1-x2),2)+floatpower((y1-y2),2)+floatpower((z1-z2),2)), 0.5);
 
-#define strcpy(%0,%1)		strcat((%0[0] = '\0', %0), %1)
 
-//#include "../scripts/Releases/Button/Button.pwn"
-
-forward CloseDoor(objectid, playerid);
-forward togcont(playerid);
-
-enum E_MOV_DATA
+LoadMap(filename[])
 {
-	Float:mov_posX,
-	Float:mov_posY,
-	Float:mov_posZ,
-	Float:mov_Speed,
-	mov_Time,
-	Float:mov_rotX,
-	Float:mov_rotY,
-	Float:mov_rotZ
-}
-enum E_BTN_DATA
-{
-    btn_ID,
-    btn_valid,
-	btn_objID,
-	btn_dataID,
-	Float:btn_posX,
-	Float:btn_posY,
-	Float:btn_posZ,
-	btn_msg[128]
-}
-enum E_ZON_DATA
-{
-	zon_ID,
-	zon_valid,
-	zon_objID,
-	zon_dataID,
-	Float:zon_maxX,
-	Float:zon_minX,
-	Float:zon_maxY,
-	Float:zon_minY,
-	zon_Msg[128]
-}
-/*
-new
-	objEventType[MAX_DATA_OBJ],
-	// Events
-	tmpMovIdx,
-	objMovData[MAX_DATA_OBJ][E_MOV_DATA],
-	// Triggers
-	trgBtnIdx,
-	trgBtnData[MAX_DATA_OBJ][E_BTN_DATA],
-	trgZonIdx,
-	trgZonData[MAX_DATA_OBJ][E_ZON_DATA];
-*/
-
-new
-	lv_HouseGate,
-	lv_CastleGates[10],
-	sf_LoadingBayDoor,
-	des_WhShutter[5],
-	des_FenceGate,
-	
-	obj_GlobalID;
-
-
-stock Float:Distance(Float:x1,Float:y1,Float:z1,Float:x2,Float:y2,Float:z2)return floatpower((floatpower((x1-x2),2)+floatpower((y1-y2),2)+floatpower((z1-z2),2)), 0.5);
-// Load an individual map file (used to load each map in index)
-LoadMap(mapfile[])
-{
-	new filename[100];
-	format(filename, 100, "Maps/%s", mapfile);
-
 	new
-		File:F=fopen(filename, io_read),
+		File:F = fopen(filename, io_read),
 		loadedmeta,
 		str[192],
 		
@@ -143,7 +70,8 @@ LoadMap(mapfile[])
 			"512x512"
 	    };
 
-	if(!fexist(filename))return printf("ERROR: file: \"%s\" NOT FOUND", filename);
+	if(!fexist(filename))
+		return printf("ERROR: file: \"%s\" NOT FOUND", filename);
 
 	while(fread(F, str))
 	{
@@ -155,12 +83,14 @@ LoadMap(mapfile[])
 
 			if(line > 1)
 			{
-				printf("ERROR: Map file '%s' metadata must be defined on first line", filename);
-				break;
+				world = -1;
+				interior = -1;
+				streamdist = 350;
+
+				printf("ERROR: Map file '%s' metadata must be defined on first line. Defaults loaded.", filename);
 			}
 		}
-		if(!sscanf(str, "p<(>{s[20]}p<,>dfffffp<)>f{s[4]}",
-			modelid, data[0], data[1], data[2], data[3], data[4], data[5]))
+		if(!sscanf(str, "p<(>{s[20]}p<,>dfffffp<)>f{s[4]}", modelid, data[0], data[1], data[2], data[3], data[4], data[5]))
 		{
 			/*
 			//For finding missing objects
@@ -169,10 +99,8 @@ LoadMap(mapfile[])
 			*/
 
 			tmpObjID = CreateDynamicObject(modelid, data[0], data[1], data[2], data[3], data[4], data[5], world, interior, _, streamdist);
-			obj_GlobalID++;
 		}
-		else if(!sscanf(str, "'objtxt(' p<\">{s[1]}s[32]p<,>{s[1]} ds[32]p<\">{s[1]}s[32]p<,>{s[1]}ddddp<)>d",
-			tmpObjText, tmpObjIdx, tmpObjRes, tmpObjFont, tmpObjFontSize, tmpObjBold, tmpObjFontCol, tmpObjBackCol, tmpObjAlign))
+		else if(!sscanf(str, "'objtxt(' p<\">{s[1]}s[32]p<,>{s[1]} ds[32]p<\">{s[1]}s[32]p<,>{s[1]}ddddp<)>d", tmpObjText, tmpObjIdx, tmpObjRes, tmpObjFont, tmpObjFontSize, tmpObjBold, tmpObjFontCol, tmpObjBackCol, tmpObjAlign))
 		{
 		    new len = strlen(tmpObjText);
 
@@ -195,81 +123,54 @@ LoadMap(mapfile[])
 
 			SetDynamicObjectMaterialText(tmpObjID, tmpObjIdx, tmpObjText, tmpObjRes, tmpObjFont, tmpObjFontSize, tmpObjBold, tmpObjFontCol, tmpObjBackCol, tmpObjAlign);
 		}
-		else if(!sscanf(str, "'objmat('p<,>dd p<\">{s[1]}s[32]p<,>{s[1]} p<\">{s[1]}s[32]p<,>{s[1]} p<)>d",
-								tmpObjIdx, tmpObjMod, tmpObjTxd, tmpObjTex, tmpObjMatCol))
+		else if(!sscanf(str, "'objmat('p<,>dd p<\">{s[1]}s[32]p<,>{s[1]} p<\">{s[1]}s[32]p<,>{s[1]} p<)>d", tmpObjIdx, tmpObjMod, tmpObjTxd, tmpObjTex, tmpObjMatCol))
 		{
 			SetDynamicObjectMaterial(tmpObjID, tmpObjIdx, tmpObjMod, tmpObjTxd, tmpObjTex, tmpObjMatCol);
 		}
 	}
 	fclose(F);
 
-/*
-	I think this is a means of converting
-	new File:tmpF = fopen(INDEX_FILE, io_append), tmpStr[100];
-	format(tmpStr, 100, "%s, %d, %d, %f\r\n", mapfile, world, interior, dist);
-	fwrite(tmpF, tmpStr);
-	fclose(tmpF);
-*/
-
 	return line;
 }
 // Load maps from index
-LoadAllMaps()
+LoadMapsFromFolder(folder[])
 {
 	new
-		dir:dHandle1 = dir_open("./scriptfiles/Maps/"),
-		dir:dHandle2,
-		item1[40],
-		item2[40],
+		foldername[256],
+		dir:dirhandle,
+		item[64],
 		type,
-		tmpdir[128],
-		tmpfilename[128];
+		filename[256];
 
-	while(dir_list(dHandle1, item1, type))
+	format(foldername, sizeof(foldername), "./scriptfiles/%s/", folder);
+	dirhandle = dir_open(foldername);
+
+	while(dir_list(dirhandle, item, type))
 	{
-		if(type == FM_DIR && strcmp(item1, "..") && strcmp(item1, ".") && strcmp(item1, "_"))
+		if(type == FM_DIR && strcmp(item, "..") && strcmp(item, ".") && strcmp(item, "_"))
 		{
-			tmpdir = "./scriptfiles/Maps/";
-			strcat(tmpdir, item1);
-			strcat(tmpdir, "/");
-
-			dHandle2 = dir_open(tmpdir);
-
-			while(dir_list(dHandle2, item2, type))
-			{
-				if(type == FM_FILE)
-				{
-				    tmpfilename[0] = EOS;
-					strcat(tmpfilename, item1);
-					strcat(tmpfilename, "/");
-					strcat(tmpfilename, item2);
-					LoadMap(tmpfilename);
-				}
-			}
-
-			dir_close(dHandle2);
+			filename[0] = EOS;
+			format(filename, sizeof(filename), "%s/%s", folder, item);
+			LoadMapsFromFolder(filename);
+		}
+		if(type == FM_FILE)
+		{
+			filename[0] = EOS;
+			format(filename, sizeof(filename), "%s/%s", folder, item);
+			LoadMap(filename);
 		}
 	}
 
-	dir_close(dHandle1);
+	dir_close(dirhandle);
 }
-
-#define FREEROAM_WORLD		(0)
-#define DEATHMATCH_WORLD	(1)
-#define RACE_WORLD			(2)
-#define ABD_WORLD			(3)
-
 
 public OnFilterScriptInit()
 {
 	print("\n---------------------------");
 	print(" Object Placement Script Loaded");
 
-    LoadAllMaps();
-
-	// These load all the little extras like objects with key IDs (for use with MoveDynamicObject etc)
+    LoadMapsFromFolder("Maps");
 	LoadObjects();
-
 
 	print("  ----  Object Data  ----  ");
 	printf("   %d\t- Total Objects", CountDynamicObjects());
@@ -285,211 +186,17 @@ public OnPlayerSpawn(playerid)
 	RemoveObjects(playerid);
 }
 
-public togcont(playerid)TogglePlayerControllable(playerid, 1);
-#define Cmd(%1) if(!strcmp(cmd,%1,true,strlen(%1))&&cmd[strlen(%1)+1]==EOS)
-
-
-new
-	Boxes[1000][1000],
-	Float:BOX_OFFSET = 1.4,
-	MAX_BOXES = 20;
-
-
-public OnPlayerCommandText(playerid, cmdtext[])
-{
-	new cmd[30], params[100];
-	sscanf(cmdtext, "s[30]s[100]", cmd, params);
-	
-
-	Cmd("/makeboxes")
-	{
-		for(new x;x<MAX_BOXES;x++)
-		{
-			for(new y;y<MAX_BOXES;y++)
-			{
-				Boxes[x][y] = CreateDynamicObject(1224, (x*BOX_OFFSET), (y*BOX_OFFSET), 10.00,   0.00, 0.00, 0.00, .streamdistance = 1000.0);
-			}
-		}
-		return 1;
-	}
-	Cmd("/resetboxes")
-	{
-		for(new x;x<MAX_BOXES;x++)
-		{
-			for(new y;y<MAX_BOXES;y++)
-			{
-				SetDynamicObjectPos(Boxes[x][y], (x*BOX_OFFSET), (y*BOX_OFFSET), 10.00);
-			}
-		}
-	}
-	Cmd("/destroyboxes")
-	{
-		for(new x;x<MAX_BOXES;x++)
-		{
-			for(new y;y<MAX_BOXES;y++)
-			{
-				DestroyDynamicObject(Boxes[x][y]);
-			}
-		}
-		return 1;
-	}
-	Cmd("/setoffset")
-	{
-	    BOX_OFFSET = floatstr(params);
-		for(new x;x<MAX_BOXES;x++)
-		{
-			for(new y;y<MAX_BOXES;y++)
-			{
-				SetDynamicObjectPos(Boxes[x][y], (x*BOX_OFFSET), (y*BOX_OFFSET), 10.00);
-			}
-		}
-	    return 1;
-	}
-	Cmd("/setmaxbox")
-	{
-	    MAX_BOXES = strval(params);
-	    return 1;
-	}
-
-	Cmd("/camtest1")
-	{
-	    SetPlayerPos(playerid, 2523.975, -1749.962, 57.202);
-	    TogglePlayerControllable(playerid, false);
-	    InterpolateCameraPos(playerid, 2523.975, -1749.962, 57.202, 2277.878, -1313.666, 57.202, 40000, CAMERA_MOVE);
-		InterpolateCameraLookAt(playerid, 2523.755, -1749.572, 56.3075, 2277.658, -1313.276, 56.3075, 40000, CAMERA_MOVE);
-		return 1;
-	}
-	Cmd("/camtest2")
-	{
-	    SetPlayerPos(playerid, 2523.975, -1749.962, 57.202);
-	    TogglePlayerControllable(playerid, false);
-	    InterpolateCameraPos(playerid, 2523.9, -1749.9, 57.2, 2277.8, -1313.6, 57.2, 40000, CAMERA_MOVE);
-		InterpolateCameraLookAt(playerid, 2523.7, -1749.5, 56.3, 2277.6, -1313.2, 56.3, 40000, CAMERA_MOVE);
-		return 1;
-	}
-
 // Debug CMDs
-	Cmd("/visob")		{printf("objects: %d", Streamer_CountVisibleItems(playerid, 0));return 1;}
-	Cmd("/reob")		{Streamer_Update(playerid);return 1;}
-	Cmd("/deadtown")	{SetPlayerPos(playerid, 1391.92, -1343.16, 352.33);return 1;}
-	Cmd("/oilrig")		{SetPlayerPos(playerid, -1151.0, 117.0, 2571.0);return 1;}
-	Cmd("/dmap")		{SetPlayerPos(playerid,1211.0, -2706.0, 1183.0);return 1;}
-	Cmd("/rmap")		{SetPlayerPos(playerid, -521.0, -3643.0, 7.0);return 1;}
-	Cmd("/wtf")			{SetPlayerPos(playerid, 2590.675781, 1210.633057, 864.794373);return 1;}
-	Cmd("/skything")	{SetPlayerPos(playerid, 1766.1723632813, -2223.7202148438, 2897.2895507813);return 1;}
-	
-
-	//Warehouse des_WhShutters
-    Cmd("/shutup")
-	{
-        MoveDynamicObject(des_WhShutter[0], -1481.880737, 2611.466553, 58.833641, 5.0);
-        MoveDynamicObject(des_WhShutter[1], -1485.840820, 2615.600098, 58.983650, 5.0);
-        MoveDynamicObject(des_WhShutter[2], -1485.797974, 2623.722412, 58.916321, 5.0);
-        MoveDynamicObject(des_WhShutter[3], -1485.812622, 2631.457275, 58.908646, 5.0);
-        MoveDynamicObject(des_WhShutter[4], -1485.790649, 2639.139404, 58.833641, 5.0);
-        return 1;
-    }
-    Cmd("/shutdn")
-	{
-        MoveDynamicObject(des_WhShutter[0], -1481.880737, 2611.466553, 55.0, 5.0);
-        MoveDynamicObject(des_WhShutter[1], -1485.840820, 2615.600098, 55.0, 5.0);
-        MoveDynamicObject(des_WhShutter[2], -1485.797974, 2623.722412, 55.0, 5.0);
-        MoveDynamicObject(des_WhShutter[3], -1485.812622, 2631.457275, 55.0, 5.0);
-        MoveDynamicObject(des_WhShutter[4], -1485.790649, 2639.139404, 55.0, 5.0);
-        return 1;
-    }
-	Cmd("/shutter")
-	{
-	    new dir, sht;
-	    if(sscanf(params, "dd", dir, sht))return msg(playerid, YELLOW, "/shutter [up/down-1/0] [des_WhShutter]");
-		if(sht==1)
-		{
-        	if(dir)MoveDynamicObject(des_WhShutter[0], -1481.880737, 2611.466553, 58.833641, 5.0);
-        	else MoveDynamicObject(des_WhShutter[0], -1481.880737, 2611.466553, 55.0, 5.0);
-		}
-		else if(sht==2)
-		{
-		    if(dir)MoveDynamicObject(des_WhShutter[1], -1485.840820, 2615.600098, 58.983650, 5.0);
-		    else MoveDynamicObject(des_WhShutter[1], -1485.840820, 2615.600098, 55.0, 5.0);
-		}
-		else if(sht==3)
-		{
-		    if(dir)MoveDynamicObject(des_WhShutter[2], -1485.797974, 2623.722412, 58.916321, 5.0);
-		    else MoveDynamicObject(des_WhShutter[2], -1485.797974, 2623.722412, 55.0, 5.0);
-		}
-		else if(sht==4)
-		{
-		    if(dir)MoveDynamicObject(des_WhShutter[3], -1485.812622, 2631.457275, 58.908646, 5.0);
-		    else MoveDynamicObject(des_WhShutter[3], -1485.812622, 2631.457275, 55.0, 5.0);
-		}
-		else if(sht==5)
-		{
-		    if(dir)MoveDynamicObject(des_WhShutter[4], -1485.790649, 2639.139404, 58.833641, 5.0);
-		    else MoveDynamicObject(des_WhShutter[4], -1485.790649, 2639.139404, 55.0, 5.0);
-		}
-		return 1;
-    }
-    return 0;
+CMD:visob(playerid, params[])
+{
+	printf("objects: %d", Streamer_CountVisibleItems(playerid, 0));
+	return 1;
 }
 
-public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
+CMD:reob(playerid, params[])
 {
-	if( ( (newkeys & KEY_CROUCH) && (IsPlayerInAnyVehicle(playerid)) ) || ( (newkeys == 16) && (!IsPlayerInAnyVehicle(playerid))) )
-	{
-	    if(IsPlayerInRangeOfPoint(playerid, 5.0, 2737.464600, 1188.553833, 6.932312) && IsPlayerAdmin(playerid))
-	    {
-            MoveDynamicObject(lv_HouseGate, 2740.464600, 1193.553833, 6.932312, 3.5);
-            SetTimerEx("CloseDoor", 5000, false, "dd", lv_HouseGate, playerid);
-	    }
-	    if(IsPlayerInRangeOfPoint(playerid, 5.0, -1979.001953, 500.077972, 30.033659))
-	    {
-            MoveDynamicObject(sf_LoadingBayDoor, -1979.001953, 500.077972, 22.033659, 5);
-            SetTimerEx("CloseDoor", 5000, false, "dd", sf_LoadingBayDoor);
-		}
-	    if(IsPlayerInRangeOfPoint(playerid, 30.0, 2105.195557, 1156.502930, 10) && IsPlayerAdmin(playerid))
-	    {
-			for(new i;i<10;i++)MoveDynamicObject(lv_CastleGates[i], 2089.163330, 1164.322021, 0.0, 3.5);
-            SetTimerEx("CloseDoor", 5000, false, "dd", lv_CastleGates[0]);
-		}
-	    if(IsPlayerInRangeOfPoint(playerid, 15.0, -29.601196289063, 2514.2014160156, 9.0))
-	    {
-			MoveDynamicObject(des_FenceGate, -29.601196289063, 2514.2014160156, 10.0, 3.0);
-			SetTimerEx("CloseDoor", 5000, false, "dd", des_FenceGate, playerid);
-		}
-	}
-}
-/*
-OnButtonPress(playerid, buttonid)
-{
-	for(new b;b<MAX_DATA_OBJ;b++)
-	{
-		if(buttonid == trgBtnData[b][btn_ID] && trgBtnData[b][btn_valid])
-		{
-		    new
-				tmpDataID = trgBtnData[b][btn_dataID];
-
-		    if(objEventType[tmpDataID] == OBJ_EVENT_MOV)
-		    {
-		        MoveDynamicObject(trgBtnData[b][btn_objID],
-					objMovData[tmpDataID][mov_posX], objMovData[tmpDataID][mov_posY], objMovData[tmpDataID][mov_posZ],
-					objMovData[tmpDataID][mov_Speed]);
-		    }
-		    if(objEventType[tmpDataID] == OBJ_EVENT_DEL)
-		    {
-		        DestroyDynamicObject(trgBtnData[b][btn_objID]);
-		    }
-
-		    break;
-		}
-	}
-}
-*/
-public CloseDoor(objectid, playerid)
-{
-	if(objectid==lv_CastleGates[0])for(new i;i<10;i++)MoveDynamicObject(lv_CastleGates[i], 2089.163330, 1164.322021, 12.270172, 3.5);
-	if(objectid==lv_HouseGate)MoveDynamicObject(lv_HouseGate, 2737.464600, 1188.553833, 6.932312, 3.5);
-	if(objectid==sf_LoadingBayDoor)MoveDynamicObject(sf_LoadingBayDoor,-1979.022339, 500.082306, 30.091356, 5);
-	if(objectid==des_FenceGate)MoveDynamicObject(des_FenceGate,-29.601196289063, 2514.2014160156, 18.257766723633, 3.0);
+	Streamer_Update(playerid);
+	return 1;
 }
 
 CMD:removeobjects(playerid, params[])
@@ -497,6 +204,7 @@ CMD:removeobjects(playerid, params[])
     RemoveObjects(playerid);
     return 1;
 }
+
 RemoveObjects(playerid)
 {
 //	Mall
@@ -566,55 +274,16 @@ RemoveObjects(playerid)
     RemoveBuildingForPlayer(playerid, 3443, 0.0, 0.0, 0.0, 10000.0); // LV house
     RemoveBuildingForPlayer(playerid, 3548, 0.0, 0.0, 0.0, 10000.0); // LV house LOD
 }
+
 LoadObjects()
 {
-//====================================================================San Fierro
-    sf_LoadingBayDoor=CreateDynamicObject(16773, -1979.022339, 500.082306, 30.091356, 0.0000, 0.0000, 179.6223);
-
-//==========================================================Las Venturas Hangout
-    lv_CastleGates[0]=CreateDynamicObject(9625, 2089.163330, 1164.322021, 12.270172, 0.0000, 0.0000, 332.2660);
-    lv_CastleGates[1]=CreateDynamicObject(5856, 2099.919922, 1168.348755, 12.653652, 0.0000, 0.0000, 62.3434);
-    lv_CastleGates[2]=CreateDynamicObject(5856, 2103.648682, 1166.409912, 12.661411, 0.0000, 0.0000, 62.3434);
-    lv_CastleGates[3]=CreateDynamicObject(5856, 2091.960449, 1152.877808, 12.653029, 0.0000, 0.0000, 62.3434);
-    lv_CastleGates[4]=CreateDynamicObject(5856, 2095.686768, 1150.917358, 12.654610, 0.0000, 0.0000, 62.3434);
-    lv_CastleGates[5]=CreateDynamicObject(5856, 2091.583984, 1169.010376, 11.826485, 0.0000, 0.0000, 333.2028);
-    lv_CastleGates[6]=CreateDynamicObject(5856, 2086.585938, 1159.357056, 11.826485, 0.0000, 0.0000, 333.2028);
-    lv_CastleGates[7]=CreateDynamicObject(5856, 2103.661865, 1153.614502, 12.652547, 0.0000, 0.0000, 331.4839);
-    lv_CastleGates[8]=CreateDynamicObject(5856, 2106.245361, 1158.361206, 12.653348, 0.0000, 0.0000, 331.4839);
-    lv_CastleGates[9]=CreateDynamicObject(5856, 2105.195557, 1156.502930, 12.617244, 0.0000, 0.0000, 331.4839);
-
-//==================================================================El Quebrados
-    des_WhShutter[0]=CreateDynamicObject(974, -1481.880737, 2611.466553, 58.833641, 0.0000, 0.0000, 0.0000);
-    des_WhShutter[1]=CreateDynamicObject(974, -1485.840820, 2615.600098, 58.983650, 0.0000, 0.0000, 90.2408);
-    des_WhShutter[2]=CreateDynamicObject(974, -1485.797974, 2623.722412, 58.916321, 0.0000, 0.0000, 90.2408);
-    des_WhShutter[3]=CreateDynamicObject(974, -1485.812622, 2631.457275, 58.908646, 0.0000, 0.0000, 90.2408);
-    des_WhShutter[4]=CreateDynamicObject(974, -1485.790649, 2639.139404, 58.833641, 0.0000, 0.0000, 90.2408);
-
-	CreateDynamicObject(19312, 191.14, 1870.04, 21.48,   0.00, 0.00, 0.00); // A51 fence
-
-//==================================================================Miscelaneous
-	//carpark
-    CreateDynamicObject(1523, 2272.010254, 1515.215820, 41.803089, 0.0000, 0.0000, 91.1003);
-    CreateDynamicObject(1634, 2345.872070, 1685.359985, 19.194153, 0.0000, 0.0000, 0.0000);
-    CreateDynamicObject(1634, 2349.341064, 1750.759766, 19.587948, 0.0000, 0.0000, 0.0000);
-    CreateDynamicObject(1633, 2343.739990, 1548.405029, 36.781563, 0.0000, 0.0000, 177.0440);
-    CreateDynamicObject(979, 2277.393066, 1518.464844, 42.435520, 0.0000, 0.0000, 269.7591);
-    CreateDynamicObject(3458, 2299.685059, 1423.145630, 43.341843, 0.0000, 0.0000, 269.7591);
-    CreateDynamicObject(1503, 2299.534424, 1450.143066, 42.214432, 0.0000, 0.0000, 181.3413);
-    CreateDynamicObject(1503, 2301.102295, 1450.268555, 42.189430, 0.0000, 0.0000, 181.3413);
-    CreateDynamicObject(12978, 2351.704834, 1504.643799, 42.211891, 0.0000, 0.0000, 0.0000);
-    CreateDynamicObject(13027, 2351.771484, 1504.643433, 45.035313, 0.0000, 0.0000, 179.6223);
-    CreateDynamicObject(11292, 2270.467773, 1518.181641, 43.279629, 0.0000, 0.0000, 89.3814);
-    CreateDynamicObject(1633, 2348.532227, 1598.486816, 36.856567, 0.0000, 0.0000, 0.0000);
-	//plane
-    CreateDynamicObject(14548, 2590.675781, 1210.633057, 864.794373, 0.0000, 0.0000, 0.0000);
-    CreateDynamicObject(14553, 2590.717041, 1206.893188, 865.002930, 0.0000, 0.0000, 0.0000);
-
-	des_FenceGate=CreateDynamicObject(980, -29.6011, 2514.2014, 18.2577, 0, 0, 270.6756, ABD_WORLD);
+	// A69 Fence
+	CreateDynamicObject(19312, 191.14, 1870.04, 21.48,   0.00, 0.00, 0.00);
 
 	// Main mall mesh, interior areas
 	CreateDynamicObject(19322, 1117.580, -1490.01, 32.72,   0.00, 0.00, 0.00);
 	CreateDynamicObject(19323, 1117.580, -1490.01, 32.72,   0.00, 0.00, 0.00);
+
 	// Mall windows
     CreateDynamicObject(19325, 1155.40, -1434.89, 16.49,   0.00, 0.00, 0.30);
 	CreateDynamicObject(19325, 1155.37, -1445.41, 16.31,   0.00, 0.00, 0.00);
@@ -782,72 +451,4 @@ LoadObjects()
 	CreateDynamicObject(1995, 1177.71, -1439.63, 14.79,   0.00, 0.00, 0.00);
 	CreateDynamicObject(1994, 1176.73, -1439.63, 14.79,   0.00, 0.00, 0.06);
 	CreateDynamicObject(1993, 1177.83, -1444.15, 14.79,   0.00, 0.00, 179.46);
-
-
-	
-	SetDynamicObjectMaterial(
-		CreateDynamicObject(19477, -1126.344726, 2814.151318, 117.255874, 0.000000, 0.000000, 150.196517),
-		0, 3942, "bistro", "mp_snow", 0);
-
-	
-	SetDynamicObjectMaterial(
-		CreateDynamicObject(19477, -1124.963623, 2816.560986, 117.255874, 0.000000, 0.000000, 150.196517),
-		0, 3942, "bistro", "mp_snow", 0);
-
-	
-	SetDynamicObjectMaterial(
-		CreateDynamicObject(19477, -1123.582519, 2818.990654, 117.255874, 0.000000, 0.000000, 150.176528),
-		0, 3942, "bistro", "mp_snow", 0);
-
-	
-	SetDynamicObjectMaterial(
-		CreateDynamicObject(19477, -1122.200683, 2821.390322, 117.255874, 0.000000, 0.000000, 150.166534),
-		0, 3942, "bistro", "mp_snow", 0);
-
-
-
-	
-	SetDynamicObjectMaterial(
-		CreateDynamicObject(19477, -1126.344726, 2814.151318, 118.656173, 0.000000, 0.000000, 150.196517),
-		0, 3942, "bistro", "mp_snow", 0);
-
-	
-	SetDynamicObjectMaterial(
-		CreateDynamicObject(19477, -1124.963623, 2816.560986, 118.656173, 0.000000, 0.000000, 150.196517),
-		0, 3942, "bistro", "mp_snow", 0);
-
-	
-	SetDynamicObjectMaterial(
-		CreateDynamicObject(19477, -1123.582519, 2818.990654, 118.656173, 0.000000, 0.000000, 150.176528),
-		0, 3942, "bistro", "mp_snow", 0);
-
-	
-	SetDynamicObjectMaterial(
-		CreateDynamicObject(19477, -1122.200683, 2821.30322, 118.656173, 0.000000, 0.000000, 150.166534),
-		0, 3942, "bistro", "mp_snow", 0);
-
-
-
-	SetDynamicObjectMaterial(
-		CreateDynamicObject(19477, -1126.344726, 2814.151318, 119.856430, 0.000000, 0.000000, 150.196517),
-		0, 3942, "bistro", "mp_snow", 0);
-	
-	SetDynamicObjectMaterial(
-		CreateDynamicObject(19477, -1124.963623, 2816.560986, 119.856430, 0.000000, 0.000000, 150.196517),
-		0, 3942, "bistro", "mp_snow", 0);
-	
-	SetDynamicObjectMaterial(
-		CreateDynamicObject(19477, -1123.582519, 2818.990654, 119.856430, 0.000000, 0.000000, 150.176528),
-		0, 3942, "bistro", "mp_snow", 0);
-	
-	SetDynamicObjectMaterial(
-		CreateDynamicObject(19477, -1122.200683, 2821.390322, 119.856430, 0.000000, 0.000000, 150.166534),
-		0, 3942, "bistro", "mp_snow", 0);
-
-
-	SetDynamicObjectMaterialText(
-		CreateDynamicObject(19479, -1124.256469, 2817.783935, 118.796203, 0.000000, 0.000000, 330.226501),
-		0, "DERELICT", OBJECT_MATERIAL_SIZE_512x256, "Tahoma", 72, 1, -16777216, 0, 1);
-
 }
-

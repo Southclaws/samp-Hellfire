@@ -99,11 +99,12 @@ UpdatePlayerGear(playerid, show = 1)
 		itemid;
 
 
-	itemid = INVALID_ITEM_ID;
-	if(IsValidItem(itemid))
+	itemid = _:GetItemTypeFromHat(GetPlayerHat(playerid));
+	if(IsValidItemType(ItemType:itemid))
 	{
-		PlayerTextDrawSetString(playerid, GearSlot_Head[UI_ELEMENT_ITEM], "none");
-		PlayerTextDrawSetPreviewModel(playerid, GearSlot_Head[UI_ELEMENT_TILE], 23);
+		GetItemTypeName(ItemType:itemid, tmp);
+		PlayerTextDrawSetString(playerid, GearSlot_Head[UI_ELEMENT_ITEM], tmp);
+		PlayerTextDrawSetPreviewModel(playerid, GearSlot_Head[UI_ELEMENT_TILE], GetItemTypeModel(ItemType:itemid));
 		PlayerTextDrawSetPreviewRot(playerid, GearSlot_Head[UI_ELEMENT_TILE], -45.0, 0.0, -45.0, 1.0);
 	}
 	else
@@ -315,7 +316,49 @@ hook OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 {
 	if(playertextid == GearSlot_Head[UI_ELEMENT_TILE])
 	{
-		Msg(playerid, YELLOW, "Head");
+		new hatid = GetPlayerHat(playerid);
+
+		if(IsValidHat(hatid))
+		{
+			new
+				containerid = GetPlayerCurrentContainer(playerid),
+				itemid;
+			if(IsValidContainer(containerid))
+			{
+				if(IsContainerFull(containerid))
+				{
+					new str[CNT_MAX_NAME + 6];
+					GetContainerName(containerid, str);
+					strcat(str, " full");
+					ShowMsgBox(playerid, str, 3000, 150);
+					return 1;
+				}
+
+				RemovePlayerHat(playerid);
+
+				itemid = CreateItem(GetItemTypeFromHat(hatid), 0.0, 0.0, 0.0);
+				AddItemToContainer(containerid, itemid);
+				UpdatePlayerGear(playerid);
+				DisplayContainerInventory(playerid, containerid);
+			}
+			else
+			{
+				if(IsPlayerInventoryFull(playerid))
+				{
+					ShowMsgBox(playerid, "Inventory full", 3000, 150);
+					return 1;
+				}
+
+				RemovePlayerHat(playerid);
+
+				itemid = CreateItem(GetItemTypeFromHat(hatid), 0.0, 0.0, 0.0);
+				AddItemToInventory(playerid, itemid);
+				UpdatePlayerGear(playerid);
+				DisplayPlayerInventory(playerid);
+
+				ShowMsgBox(playerid, "Item added to inventory", 3000, 150);
+			}
+		}
 	}
 	if(playertextid == GearSlot_Hand[UI_ELEMENT_TILE])
 	{
@@ -475,3 +518,23 @@ hook OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 	}
 	return 1;
 }
+
+public OnPlayerPickUpItem(playerid, itemid)
+{
+	if(GetItemType(itemid) == ItemType:35)
+	{
+		if(GetItemExtraData(itemid) > 2)
+		{
+			SetItemExtraData(itemid, 2);
+		}
+	}
+
+	return CallLocalFunction("inv_OnPlayerPickUpItem", "dd", playerid, itemid);
+}
+#if defined _ALS_OnPlayerPickUpItem
+	#undef OnPlayerPickUpItem
+#else
+	#define _ALS_OnPlayerPickUpItem
+#endif
+#define OnPlayerPickUpItem inv_OnPlayerPickUpItem
+forward inv_OnPlayerPickUpItem(playerid, itemid);

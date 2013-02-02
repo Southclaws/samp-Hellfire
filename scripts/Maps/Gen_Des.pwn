@@ -34,3 +34,67 @@ public OnLoad()
 forward gendes_OnLoad();
 
 
+#endinput
+
+	des_FenceGate=CreateDynamicObject(980, -29.6011, 2514.2014, 18.2577, 0, 0, 270.6756, ABD_WORLD);
+
+
+    des_WhShutter[0]=CreateDynamicObject(974, -1481.880737, 2611.466553, 58.833641, 0.0000, 0.0000, 0.0000);
+    des_WhShutter[1]=CreateDynamicObject(974, -1485.840820, 2615.600098, 58.983650, 0.0000, 0.0000, 90.2408);
+    des_WhShutter[2]=CreateDynamicObject(974, -1485.797974, 2623.722412, 58.916321, 0.0000, 0.0000, 90.2408);
+    des_WhShutter[3]=CreateDynamicObject(974, -1485.812622, 2631.457275, 58.908646, 0.0000, 0.0000, 90.2408);
+    des_WhShutter[4]=CreateDynamicObject(974, -1485.790649, 2639.139404, 58.833641, 0.0000, 0.0000, 90.2408);
+
+	//Warehouse des_WhShutters
+    Cmd("/shutup")
+	{
+        MoveDynamicObject(des_WhShutter[0], -1481.880737, 2611.466553, 58.833641, 5.0);
+        MoveDynamicObject(des_WhShutter[1], -1485.840820, 2615.600098, 58.983650, 5.0);
+        MoveDynamicObject(des_WhShutter[2], -1485.797974, 2623.722412, 58.916321, 5.0);
+        MoveDynamicObject(des_WhShutter[3], -1485.812622, 2631.457275, 58.908646, 5.0);
+        MoveDynamicObject(des_WhShutter[4], -1485.790649, 2639.139404, 58.833641, 5.0);
+        return 1;
+    }
+    Cmd("/shutdn")
+	{
+        MoveDynamicObject(des_WhShutter[0], -1481.880737, 2611.466553, 55.0, 5.0);
+        MoveDynamicObject(des_WhShutter[1], -1485.840820, 2615.600098, 55.0, 5.0);
+        MoveDynamicObject(des_WhShutter[2], -1485.797974, 2623.722412, 55.0, 5.0);
+        MoveDynamicObject(des_WhShutter[3], -1485.812622, 2631.457275, 55.0, 5.0);
+        MoveDynamicObject(des_WhShutter[4], -1485.790649, 2639.139404, 55.0, 5.0);
+        return 1;
+    }
+	Cmd("/shutter")
+	{
+	    new dir, sht;
+	    if(sscanf(params, "dd", dir, sht))return msg(playerid, YELLOW, "/shutter [up/down-1/0] [des_WhShutter]");
+		if(sht==1)
+		{
+        	if(dir)MoveDynamicObject(des_WhShutter[0], -1481.880737, 2611.466553, 58.833641, 5.0);
+        	else MoveDynamicObject(des_WhShutter[0], -1481.880737, 2611.466553, 55.0, 5.0);
+		}
+		else if(sht==2)
+		{
+		    if(dir)MoveDynamicObject(des_WhShutter[1], -1485.840820, 2615.600098, 58.983650, 5.0);
+		    else MoveDynamicObject(des_WhShutter[1], -1485.840820, 2615.600098, 55.0, 5.0);
+		}
+		else if(sht==3)
+		{
+		    if(dir)MoveDynamicObject(des_WhShutter[2], -1485.797974, 2623.722412, 58.916321, 5.0);
+		    else MoveDynamicObject(des_WhShutter[2], -1485.797974, 2623.722412, 55.0, 5.0);
+		}
+		else if(sht==4)
+		{
+		    if(dir)MoveDynamicObject(des_WhShutter[3], -1485.812622, 2631.457275, 58.908646, 5.0);
+		    else MoveDynamicObject(des_WhShutter[3], -1485.812622, 2631.457275, 55.0, 5.0);
+		}
+		else if(sht==5)
+		{
+		    if(dir)MoveDynamicObject(des_WhShutter[4], -1485.790649, 2639.139404, 58.833641, 5.0);
+		    else MoveDynamicObject(des_WhShutter[4], -1485.790649, 2639.139404, 55.0, 5.0);
+		}
+		return 1;
+    }
+    return 0;
+}
+

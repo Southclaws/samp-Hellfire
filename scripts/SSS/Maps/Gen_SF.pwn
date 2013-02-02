@@ -129,6 +129,12 @@ District_Housing1()
 }
 District_Housing2()
 {
+	LinkTP(
+		CreateButton(-2578.1204, 1144.8810, 40.3989, "Press F to enter"),
+		CreateButton(-2587.5229, 1162.4547, 55.5876, "Press F to enter"));
+
+	CreateBbq(-2701.1328, 845.7422, 70.3828, 171.0);
+
 	CreateZipline(
 		-2628.34, 778.85, 54.44,
 		-2671.98, 726.87, 38.19);
