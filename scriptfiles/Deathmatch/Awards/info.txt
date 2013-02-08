@@ -1,0 +1,43 @@
+AwardName, amount, type
+
+types:
+	-weps (m4, m9, ak47, etc)
+	-wep categries (sidearm, mainarm, equipment
+	-wep types (rifle, ar, mp, pistol, explosive)
+	ctfCap - flag captures (ctf)
+	cqsCap - cp captures (cqst)
+	adCap - a/d captures (a/d)
+	defKill - defence kills (a/d, cqst)
+	attKill - offence kills (a/d, cqst)
+	flag carrier defence (ctf)
+	flag carrier kill (ctf)
+	ammo boxes used by others
+	health boxes used by others
+	friendly repairs
+	assists
+	avenges
+	life-savers
+	
+
+
+weps
+	(m4, m9, ak47, etc)
+wep categries
+	(sidearm, mainarm, equipment, etc)
+wep types
+	(rifle, ar, mp, pistol, explosive, etc)
+ctfCap	- flag captures (ctf)
+cqsCap	- cp captures (cqst)
+adCap	- a/d captures (a/d)
+defKill	- defence kills (a/d, cqst)
+attKill	- offence kills (a/d, cqst)
+flgCDef	- flag carrier defence (ctf)
+flgCKil	- flag carrier kill (ctf)
+supAmmo	- ammo boxes used by others
+supMeds	- health boxes used by others
+supHeal	- friendly revives
+supRepr	- friendly repairs
+ktAst	- assists
+ktAvg	- avenges
+ktSav	- life-savers
+	

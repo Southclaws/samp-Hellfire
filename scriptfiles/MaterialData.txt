@@ -1,0 +1,60 @@
+Snow, 3942, bistro, mp_snow
+Flagstone, 3942, bistro, ahoodfence2
+Grass, 3908, libertyfar, Grass_128HV
+Grass 2, 3903, libertyhi, Grass
+Clear water, 3953, rczero_track, waterclear256
+Grey rocks, 3933, weemap, rocktb128
+Dirty sand, 4242, seabed, des_dirt1
+Dirty sand 2, 4242, seabed, sw_sand
+Dunes on the desert (Sahara), 16008, des_n, des_ripplsand
+Flagstone 2 (LS lighthouse), 13734, hillcliff_lahills, cobbles_kb_256
+Red rocks (from desert), 16503, desert, des_redrock1
+Wood floor 2 (brighter), 16407, des_airfieldhus, btdeck256
+Yellow stripes (on the floor), 16102, des_cen, sm_conc_hatch
+Roof with dark grey colour, 16021, des_geyser, shingles1
+Wall with rocks (looks nice), 16016, des_n, ranchwall1
+Cracked ground, 16571, des_se1, des_crackeddirt1
+Grey rocks, 18752, Volcano, rocktb128
+Lava, 18752, Volcano, lavalake
+Ground under the lava, 18752, Volcano, redgravel
+Red rocks (from desert), 16503, desert, des_redrock1
+Wood floor 2 (brighter), 16407, des_airfieldhus, btdeck256
+Yellow stripes (on the floor), 16102, des_cen, sm_conc_hatch
+Roof with dark grey colour, 16021, des_geyser, shingles1
+Wall with rocks (looks nice), 16016, des_n, ranchwall1
+Cracked ground, 16571, des_se1, des_crackeddirt1
+Dance Floor, 19128, dancefloors, dancefloor1
+Camo Net, 2068, cj_ammo_net, CJ_cammonet
+White, 18646, matcolours, white
+Red, 18646, matcolours, red
+Blue, 18646, matcolours, blue
+Orange, 18646, matcolours, orange
+Green, 18646, matcolours, green
+Metal Plate, 964, cj_crate_will, CJ_FLIGHT_CASE
+Stop Sign, 967, cj_barr_set_1, Stop2_64
+Black and Yellow stripes, 7981, vgsairport02, chevronYB_64
+Red and White stripes, 7981, vgsairport02, redwhite_stripe
+Black and Yellow mesh, 7980, vegasairprtland, gridchev_64HV
+Yellow and White stripes, 7980, vegasairprtland, chevron64HVa
+Red Rectangles, 6866, vgncnstrct1, Circus_gls_05
+Red and White stripes, 1281, benches, trafficcone
+Large Mesh Glass, 6295, lawland2, lightglass
+Wood Planks, 6295, lawland2, boardwalk2_la
+Police Line, 12938, sw_apartments, sw_policeline
+Wigwam Motel - Wall, 16004, des_teepee, des_wigwam
+Wigwam Motel - Door, 16004, des_teepee, des_wigwamdoor
+Concrete with Dust, 16004, des_teepee, des_dustconc
+Grey Roof, 16005, des_stownmain2, sanruf
+Red Wooden Planks, 16005, des_stownmain2, des_redslats
+Light Purple Color, 16005, des_stownmain2, duskyred_64
+Old Wooden Planks, 16005, des_stownmain2, des_ghotwood1
+Wall 1 (Green), 16005, des_stownmain2, ws_green_wall1
+Door 1 (Blue), 16005, des_stownmain2, alleydoor3
+Wall 2 (Normal), 16005, des_stownmain2, newall4-4
+Wall 3 (Normal), 16005, des_stownmain2, crencouwall1
+Black Color, 16005, des_stownmain2, black32
+Cynder Blocks, 5016, ground3_las, ws_bigstones
+"Jesus Saves", 5016, ground3_las, mural01_LA
+White Wall w/ windows, 5033, union_las, lasunion98
+Yellow+Grey Diagonal Stripes, 5033, union_las, ws_carparkwall2
+Runway Tarmac, 8172, vgssland01, ws_runwaytarmac

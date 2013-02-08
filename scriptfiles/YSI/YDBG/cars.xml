@@ -1,0 +1,34 @@
+<XML>
+  <vehicle>
+    <model>541</model>
+    <position>-2602.636474, 1333.700683, 6.664731, 6.503520</position>
+  </vehicle>
+  <vehicle>
+    <model>487</model>
+    <position>-2857.634033, 1056.927490, 32.674591, 201.162582</position>
+  </vehicle>
+  <vehicle>
+    <model>522</model>
+    <position>-2617.390625, 1371.067626, 6.650462, 93.330657</position>
+  </vehicle>
+  <vehicle>
+    <model>522</model>
+    <position>-2618.309082, 1376.997680, 6.696407, 266.120056</position>
+  </vehicle>
+  <vehicle>
+    <model>522</model>
+    <position>-2626.076416, 1378.970092, 6.709179, 353.081176</position>
+  </vehicle>
+  <vehicle>
+    <model>522</model>
+    <position>-2636.473388, 1378.285522, 6.714774, 178.009857</position>
+  </vehicle>
+  <vehicle>
+    <model>522</model>
+    <position>-2645.686035, 1373.960693, 6.735986, 359.526702</position>
+  </vehicle>
+  <vehicle>
+    <model>522</model>
+    <position>-2646.569335, 1347.740356, 6.741244, 272.026184</position>
+  </vehicle>
+</XML>

@@ -1,0 +1,170 @@
+wp0, 100, Fists Star
+wp1, 100, Knife Star
+wp2, 100, Colt 45 Star
+wp3, 100, Colt 45SD Star
+wp4, 100, Desert Eagle Star
+wp5, 100, Shotgun Star
+wp6, 100, Sawn-off Star
+wp7, 100, Spas-12 Star
+wp8, 100, Mac10 Star
+wp9, 100, Tec9 Star
+wp10, 100, MP5 Star
+wp11, 100, AK47 Star
+wp12, 100, M4 Star
+wp13, 100, Rifle Star
+wp14, 100, Sniper Star
+wp15, 100, RPG Star
+wp16, 100, Flamer Star
+wp17, 100, Minigun Star
+
+wp0, 250, Fists Badge
+wp1, 250, Knife Badge
+wp2, 250, Colt 45 Badge
+wp3, 250, Colt 45SD Badge
+wp4, 250, Desert Eagle Badge
+wp5, 250, Shotgun Badge
+wp6, 250, Sawn-off Badge
+wp7, 250, Spas-12 Badge
+wp8, 250, Mac10 Badge
+wp9, 250, Tec9 Badge
+wp10, 250, MP5 Badge
+wp11, 250, AK47 Badge
+wp12, 250, M4 Badge
+wp13, 250, Rifle Badge
+wp14, 250, Sniper Badge
+wp15, 250, RPG Badge
+wp16, 250, Flamer Badge
+wp17, 250, Minigun Badge
+
+wp0, 500, Fists Medal
+wp1, 500, Knife Medal
+wp2, 500, Colt 45 Medal
+wp3, 500, Colt 45SD Medal
+wp4, 500, Desert Eagle Medal
+wp5, 500, Shotgun Medal
+wp6, 500, Sawn-off Medal
+wp7, 500, Spas-12 Medal
+wp8, 500, Mac10 Medal
+wp9, 500, Tec9 Medal
+wp10, 500, MP5 Medal
+wp11, 500, AK47 Medal
+wp12, 500, M4 Medal
+wp13, 500, Rifle Medal
+wp14, 500, Sniper Medal
+wp15, 500, RPG Medal
+wp16, 500, Flamer Medal
+wp17, 500, Minigun Medal
+
+wp0, 1000, Fists Mastery
+wp1, 1000, Knife Mastery
+wp2, 1000, Colt 45 Mastery
+wp3, 1000, Colt 45SD Mastery
+wp4, 1000, Desert Eagle Mastery
+wp5, 1000, Shotgun Mastery
+wp6, 1000, Sawn-off Mastery
+wp7, 1000, Spas-12 Mastery
+wp8, 1000, Mac10 Mastery
+wp9, 1000, Tec9 Mastery
+wp10, 1000, MP5 Mastery
+wp11, 1000, AK47 Mastery
+wp12, 1000, M4 Mastery
+wp13, 1000, Rifle Mastery
+wp14, 1000, Sniper Mastery
+wp15, 1000, RPG Mastery
+wp16, 1000, Flamer Mastery
+wp17, 1000, Minigun Mastery
+
+
+wt0, 100, Weapon_TYP_awd0
+wt1, 100, Weapon_TYP_awd1
+wt2, 100, Weapon_TYP_awd2
+wt3, 100, Weapon_TYP_awd3
+
+wg0, 100, Weapon_GRP_awd0
+wg1, 100, Weapon_GRP_awd1
+wg2, 100, Weapon_GRP_awd2
+wg3, 100, Weapon_GRP_awd3
+wg4, 100, Weapon_GRP_awd4
+
+
+objAd, 50, Base Capture Star
+objCf, 50, Flag Capture Star
+objCq, 50, Post Capture Star
+
+objAd, 100, Base Capture Badge
+objCf, 100, Flag Capture Badge
+objCq, 100, Post Capture Badge
+
+objAd, 200, Base Capture Medal
+objCf, 200, Flag Capture Medal
+objCq, 200, Post Capture Medal
+
+objAd, 300, Base Capture Mastery
+objCf, 300, Flag Capture Mastery
+objCq, 300, Post Capture Mastery
+
+
+supAmmo, 50, Supplier Star
+supMeds, 50, Medkit Star
+supHeal, 50, Resurrection Star
+supRepr, 50, Toolkit Star
+
+supAmmo, 100, Supplier Badge
+supMeds, 100, Medkit Badge
+supHeal, 100, Resurrection Badge
+supRepr, 100, Toolkit Badge
+
+supAmmo, 200, Supplier Medal
+supMeds, 200, Medkit Medal
+supHeal, 200, Resurrection Medal
+supRepr, 200, Toolkit Medal
+
+supAmmo, 300, Supplier Mastery
+supMeds, 300, Medkit Mastery
+supHeal, 300, Resurrection Mastery
+supRepr, 300, Toolkit Mastery
+
+
+ktAdDk, 50, Base Defender Star
+ktAdAk, 50, Base Attacker Star
+ktCtDk, 50, Flag Defender Star
+ktCtAk, 50, Flag Attacker Star
+ktCqDk, 50, Post Defender Star
+ktCqAk, 50, Post Attacker Star
+ktAst, 50, Teamplay Star
+ktAvg, 50, Avenger Star
+ktRev, 50, Vengeance Star
+ktSav, 50, Life Saver Star
+
+ktAdDk, 100, Base Defender Badge
+ktAdAk, 100, Base Attacker Badge
+ktCtDk, 100, Flag Defender Badge
+ktCtAk, 100, Flag Attacker Badge
+ktCqDk, 100, Post Defender Badge
+ktCqAk, 100, Post Attacker Badge
+ktAst, 100, Teamplay Badge
+ktAvg, 100, Avenger Badge
+ktRev, 100, Vengeance Badge
+ktSav, 100, Life Saver Badge
+
+ktAdDk, 200, Base Defender Medal
+ktAdAk, 200, Base Attacker Medal
+ktCtDk, 200, Flag Defender Medal
+ktCtAk, 200, Flag Attacker Medal
+ktCqDk, 200, Post Defender Medal
+ktCqAk, 200, Post Attacker Medal
+ktAst, 200, Teamplay Medal
+ktAvg, 200, Avenger Medal
+ktRev, 200, Vengeance Medal
+ktSav, 200, Life Saver Medal
+
+ktAdDk, 300, Base Defender Mastery
+ktAdAk, 300, Base Attacker Mastery
+ktCtDk, 300, Flag Defender Mastery
+ktCtAk, 300, Flag Attacker Mastery
+ktCqDk, 300, Post Defender Mastery
+ktCqAk, 300, Post Attacker Mastery
+ktAst, 300, Teamplay Mastery
+ktAvg, 300, Avenger Mastery
+ktRev, 300, Vengeance Mastery
+ktSav, 300, Life Saver Mastery

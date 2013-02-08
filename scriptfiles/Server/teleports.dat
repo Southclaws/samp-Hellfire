@@ -1,0 +1,70 @@
+category:Places
+{
+	ls,				Los Santos,					1186.8282,	-1324.1444,	13.5591,	0.0,	0
+	sf,				San Fierro,					-1986.2489,	288.5100,	34.2673,	0.0,	0
+	lv,				Las Venturas,				2032.2878,	1342.8140,	10.8203,	0.0,	0
+	bay,			Bayside,					-2466.1269,	2242.1489,	4.7899,		0.0,	0
+	sd,				Summer Drive,				2079.84204,	2704.86962,	10.78,		0.0,	0
+	lsair,			LS Airport, 				2056.7532,	-2620.5632,	13.5469,	0.0,	0
+	sfair,			SF Airport, 				-1225.1724,	45.7877,	14.1339,	0.0,	0
+	lvair,			LV Airport, 				1324.4420,	1485.6570,	10.8203,	0.0,	0
+	aa,				Abandonned Airstrip,		413.1822,	2520.4240,	19.1476,	0.0,	0
+	area69,			Area 69,					229.6838,	1920.7359,	17.6406,	0.0,	0
+	airbase,		Area 69 Airfield,			291.6556,	2035.5938,	17.6406,	0.0,	0
+	ch,				Mount Chilliad,				-2315.4626,	-1667.9355,	482.9564,	0.0,	0
+	qu,				Hunter Quarry,				826.0663,	850.5839,	11.7055,	0.0,	0
+	ear,			The Big Ear,          		-292.0604,	1535.9839,	75.5625,	0.0,	0
+	carpark,		LV Car Park,				2273.1213,	1508.4877,	42.8203,	0.0,	0
+}
+
+category:Races
+{
+	race1,			LV Circit race,				2086.2029,	864.8795,	6.8716,		0.0,	0
+	race2,			Coast Road race,			-189.9003,	244.9968,	12.2681,	0.0,	0
+	race3,			LS Circit race,				2172.3770,	318.3593,	33.1021,	0.0,	0
+	rally1,			Woodland Rally,				-567.8081,	-188.6419,	78.4063,	0.0,	0
+	rally2,			Riverside Rally,			1556.1964,	33.4867,	24.1641,	0.0,	0
+	drag1,			Bridge 1 drag race,			-2694.4155,	1228.3242,	55.5697,	0.0,	0
+	drag2,			Bridge 2 drag race,			-1121.5398,	1119.5364,	37.8678,	0.0,	0
+	drag3,			Tunnel drag race,			-891.5397,	-1115.5581,	98.9609,	0.0,	0
+}
+
+category:Drifts
+{
+	drift1,			The Big Ear drift road,		-292.0604,	1535.9839,	75.5625,	0.0,	0
+	drift2,			Country Drift,				-2418.5100,	-594.7469,	132.7144,	0.0,	0
+	drift3,			Montgomery Hill,			-780.7125,	-1735.8167,	96.0833,	0.0,	0
+}
+
+category:Jumps
+{
+	bigjump1,		LV stuntpark north jump,	1488.7493,	2762.3332,	716.8652,	0.0,	1
+	bigjump2,		LV stuntpark south jump,	1468.4252,	166.1907,	779.6299,	0.0,	1
+	hugejump,		The Huge Jump,				-1309.0759,	3662.8618,	4005.0,		0.0,	1
+	halfjump,		Halfway down Huge Jump,		-1274.1927,	1049.4258,	1138.1747,	0.0,	1
+}
+
+category:Tuning
+{
+	modls,			LS Transfender,				1041.3477,	-1031.3226,	31.8685,	0.0,	0
+	modlv,			LV Transfender,				2395.5994,	1036.2928,	10.8203,	0.0,	0
+	modsf,			SF Transfender,				-1937.5045,	227.4620,	34.1563,	0.0,	0
+	waa,			Wheel Arch Angels,			-2706.4019,	239.1864,	4.1797,		0.0,	0
+	loco,			Loco-Low-Co,				2643.8112,	-2031.6405,	13.3148,	0.0,	0
+}
+
+category:Random
+{
+	thing1,			some random thing,			3231.5654,	296.7467,	10.3464,	0.0,	0
+	thing2,			another random thing,		-2886.1199,	2555.3694,	262.7934,	0.0,	0
+	thing3,			the third random thing,		-2824.2800,	2174.8635,	177.1884,	0.0,	0
+	probe,			Li'l Probe Inn,				-84.7142,	1372.0991,	10.2737,	0.0,	0
+	farm,			LS Farm,					-1110.9705,	-1004.5992,	133.2802,	0.0,	0
+	bridge1,		San Fierro Bridge 1,		-2680.0869,	1595.0314,	217.2739,	0.0,	0
+	bridge2,		San Fierro Bridge 2,		-1267.0668,	965.4189,	133.0514,	0.0,	0
+	cliff1,			North Face Cliff,			-2569.2708,	2901.4063,	96.6526,	0.0,	0
+	cliff2,			North Face Cliff,			-2029.9653,	2967.0586,	57.1802,	0.0,	0
+	cliff3,			North Face Cliff,			-1773.7783,	2930.8472,	56.5827,	0.0,	0
+	cliff4,			North Face Cliff,			-1504.2698,	2974.6489,	42.4324,	0.0,	0
+}
+

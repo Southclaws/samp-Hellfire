@@ -1,0 +1,32 @@
+[data]
+NMC_CITY
+type = -1 ; Use textdraws
+style = message1
+
+NMC_ROLE
+type = -1
+style = message1
+
+NMC_SKIN
+type = -1
+style = message1
+
+NMC_LV
+type = -1
+style = message2
+
+NMC_SF
+type = -1
+style = message2
+
+NMC_LS
+type = -1
+style = message2
+
+NMC_COP
+type = -1
+style = message3
+
+NMC_CIV
+type = -1
+style = message3

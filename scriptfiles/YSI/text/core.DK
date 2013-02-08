@@ -1,0 +1,156 @@
+; core.DK
+;
+; Danish translation by TheAlpha from #sa-mp.scripting
+; Huge appreciation and thanks for him
+;
+; Dansk oversætning af TheAlpha fra #sa-mp.scripting Channel
+; Tusind tak til ham
+;
+; Feel free to remove this, I have no imagination for an advert o_O
+;
+; Du må gerne fjerne dette, jeg har ingen fantasi til en reklame o_O
+
+[ysi_properties]
+YSI_PROP_NAME = Ejendom: "%s" Pris: $%d Belønning: $%d
+YSI_PROP_BUY = Skriv "/%n" for at købe
+YSI_PROP_OWN = Du ejer allerede den her ejendom
+YSI_PROP_YOURS = Denne her ejendom er ejet af dig
+YSI_PROP_OUT = "%s" Er blevet købt af %s (%d)
+YSI_PROP_OWNER = Den her ejendom er ejet af %s (%d)
+YSI_PROP_BOUGHT = Du har købt "%s" for $%d
+YSI_PROP_NOT = Du er ikke ved en gyldig ejendom
+YSI_PROP_CP = Du er ikke ved et ejendoms checkpoint
+YSI_PROP_AFFORD = Du har ikke råd til denne ejendom
+YSI_PROP_EARNT = Du har tjent $%d fra dine ejendomme
+YSI_PROP_SELL = Skriv "/%n %d" for at sælge den her ejendom
+; Du kan undgå parametrene, men kun i rækkefølgen fra slutningen
+; YSI_PROP_SELL = Skriv "/%n %d" for at sælge den her ejendom for $%d
+
+YSI_BUY_HELP_1 = Tillader dig at købe en ejendom - de giver
+YSI_BUY_HELP_2 = dig penge med tiden og kan være meget profitable.
+YSI_BUY_HELP_3 = du skal være ved et gyldigt checkpoint for at bruge denne kommando
+YSI_BUY_HELP_4 = men du vil blive informeret hvis du ikke er det
+
+YSI_SELL_HELP_1 = Sælger en ejendom du ejer.  Dette kan være
+YSI_SELL_HELP_2 = til en pris mindre end det du købte den for.
+YSI_SELL_HELP_3 = Du skal indtaste et ID fra en ejendom du ejer
+YSI_SELL_HELP_4 = men du behøves ikke at være ved ejendommen
+YSI_SELL_NO_ID = Du skal indtaste et gyldigt ejendoms ID
+YSI_SELL_CANT = Du kan ikke sælge den ejendom
+YSI_SELL_OWNER = Du ejer ikke denne ejendom
+YSI_SELL_SOLD = Ejendom solgt for $%d
+
+YSI_FORBIDDEN = Du går nu ind i et begrænset område
+YSI_FORBIDDEN_2 = Advarsel, du går nu ind på %s
+
+YSI_LIST_MULTI = "%s": %d ejere
+YSI_LIST_FORM = "%s": ejer "%s"
+YSI_LIST_PAGES = Brug "/%n <side>" hvor <side> er 1 - %d som skal vises
+YSI_LIST_MORE = Mere end 8 ejendomme fundet
+
+YSI_BANK_NAME = Velkommen til %s banken
+YSI_BANK_WELCOME = Velkommen til banken
+YSI_BANK_HELP1 = Skriv "/%n <mændge>" for at indsætte penge
+YSI_BANK_HELP2 = Skriv "/%n <mændge>" for at trække penge
+YSI_BANK_HELP3 = Skriv "/%n" for at se dit indestående beløb
+YSI_BANK_BALANCE = Dit indestående beløb er $%d
+YSI_BANK_NOT = Du er ikke ved en bank
+YSI_BANK_CP = Du skal være i et bank checkpoint
+YSI_BANK_HELP_1 = Tillader dig at indsætte penge på din konto
+YSI_BANK_HELP_2 = Du skal have de nødvændige penge for at indsætte
+YSI_BANK_HELP_3 = det krævede beløb og være ved en bank
+YSI_BANK_HELP_4 = Brug: "/%n <amount>"
+YSI_BANK_BANKED = $%d indsat, nyt indestående beløb $%d
+YSI_BANK_INSUFFICIENT = Du har ikke nok penge til overførslen
+
+YSI_BAL_HELP = Viser det indestående beløb på din bank konto
+
+YSI_WITH_HELP1 = Tillader dig at hæve penge fra din konto
+YSI_WITH_HELP2 = Du skal have nok penge til at trække
+YSI_WITH_HELP3 = det krævede beløb og være ved en bank
+YSI_WITH_HELP4 = Brug: "/%n <amount>"
+YSI_WITHDREW = $%d trukket, nyt indestående beløb $%d
+
+YSI_TELS_NAME = Teleporteret til %s
+YSI_TELS_TELE = Teleporteret
+YSI_TELS_MONEY = Du har ikke nok penge, du skal have $%d for at teleportere
+
+YSI_AMMU_NO_MONEY = Du har ikke råd til det våben
+
+[ysi_race]
+YSI_RACE_COUNTDOWN = %d
+YSI_RACE_GO = KØR KØR KØR!!!
+
+[ysi_text]
+YSI_TEXT_NOT_FOUND = Tekst streng "%s" ikke fundet
+
+[ysi_commands]
+YSI_COMM_BLEVEL = Du kan ikke bruge denne kommando
+YSI_COMM_LIST = "/%s"
+YSI_COMM_PAGES = Brug "/%n <side>" hvor <side> er 1 - %d som skal vises
+YSI_COMM_MORE = Mere end 8 kommandoer fundet
+
+YSI_COMM_HELP_1 = Viser en liste over kommandoer i scriptet
+YSI_COMM_HELP_2 = Hvis der er mere end 8 er der flere side
+YSI_COMM_HELP_3 = Kommandoer er vist med præfikser og eventuelle alternative navne
+
+[ysi_langs]
+
+YSI_LANGS_HELP1 = Uden parametre viser en liste over sprog
+YSI_LANGS_HELP2 = Med et parameter vælges det valgte sprog
+YSI_LANGS_DISP = Sprog %d: %s (%s)
+YSI_LANGS_MORE = Skriv "/%n" for igen at vise flere sprog
+YSI_LANGS_SET = Skriv "/%n <id>" for at vælge et sprog
+YSI_LANGS_DONE = Sprog sat til %d (%s)
+YSI_LANGS_INV = Ugyldigt sprog
+
+[ysi_help]
+
+YSI_HELP_HELP1 = Viser hjælp til scriptet eller en kommando.
+YSI_HELP_HELP2 = Skriv "/%n" for script hjælp, "/%n <kommando>"
+YSI_HELP_HELP3 = for kommando hjælp eller "/%n" for en liste over kommandoer
+YSI_HELP_NOTF = Ukendt funktion, ingen hjælp tilgængelig.
+
+YSI_HELP_1 = <dit script navn her>
+YSI_HELP_2 = af <dit navn her>
+YSI_HELP_3 = Baseret på YSI af Alex "Y_Less" Cole
+YSI_HELP_4 = Ændre denne tekst i core.EN i din
+YSI_HELP_5 = scriptfiles/YSI mappe (standard).
+
+YSI_HELP_6 = Lad linjer stå blanke hvis du ikke har brug for 10 linjer og de vil blive ignoreret.
+YSI_HELP_7 = ; Denne linje vil ikke vises i chatboksen da den er blank (; betyder kommentar)
+YSI_HELP_8 =
+
+; Denne linje er den eneste som kan indeholde %n dataen for kommandoerne
+YSI_HELP_9 = Skriv: "/%n" for kommandoer og "/%n <kommando>"
+YSI_HELP_10 = for hjælp til en specifik kommando (inklusiv denne)
+
+[ysi_players]
+
+YSI_LOGIN_HELP_1 = Tillader dig at logge ind i bruger systemet
+YSI_LOGIN_HELP_2 = ved brug af det kodeord du registerede med.  
+YSI_LOGIN_HELP_3 = "/%n" for registrering eller "/%n" for at gå ind i en gruppe.
+
+YSI_REGISTER_HELP_1 = Tillader dig at registere dit navn på serveren
+YSI_REGISTER_HELP_2 = Brug "/%n <kodeord>" for at registrere med et kodeord
+YSI_REGISTER_HELP_3 = "/%n <kodeord>" for at logge ind med det samme kodeord for at
+YSI_REGISTER_HELP_4 = gendanne dine tidligere gemte stats og indstillinger.
+
+YSI_GROUP_HELP_1 = Tillader dig at tilføje dit nuværende navn til en anden
+YSI_GROUP_HELP_2 = navne gruppe så de to navne deler de samme
+YSI_GROUP_HELP_3 = stats.  Brug "/%n <navn> <kodeord>" hvor <navn> er et
+YSI_GROUP_HELP_4 = eksisterende registreret navn og <kodeord> er dets
+YSI_GROUP_HELP_5 = kodeord til at gå sammen med det navn.
+
+YSI_NSGROUP_PARAMS = Brug: "/%n <registreret navn> <navn's kodeord>"
+
+YSI_REG_TAKEN = Beklager, dette navn er allerede registeret.
+YSI_LOGIN_WRONG = Forkert kodeord.
+YSI_LOGIN_INDERR = Indeks læse fejl, prøv venligst igen.
+YSI_LOGIN_LOGIN = Logget ind!
+YSI_LOGIN_NOTF = Brugernavn ikke fundet
+YSI_LOGIN_NOLOAD = Fejl ved åbning af datafil.
+YSI_LOGIN_FAILED = Login nægtet.
+YSI_ADDU_INDER1 = Tilføj bruger fil fejl 1.
+YSI_ADDU_INDER2 = Tilføj bruger fil fejl 2.
+YSI_ADDU_SUCC = Registrering lykkedes.

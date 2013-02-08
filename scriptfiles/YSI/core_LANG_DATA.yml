@@ -1,0 +1,137 @@
+<YML>
+  <group name="ysi_groups">
+    <entry colour="X11_RED" style="client" name="YSI_CONGRP_INVALID" />
+    <entry colour="X11_RED" style="client" name="YSI_CONGRP_ASSIGNED" />
+    <entry colour="X11_RED" style="client" name="YSI_GROUP_LIST_ASS" />
+    <entry colour="X11_RED" style="client" name="YSI_GROUP_LIST_MORE" />
+    <entry colour="X11_RED" style="client" name="YSI_GROUP_LIST_PAGES" />
+    <entry colour="X11_RED" style="client" name="YSI_GROUP_LIST_TEMP" />
+    <entry colour="X11_RED" style="client" name="YSI_GROUP_LIST_NAME" />
+    <entry colour="X11_RED" style="client" name="YSI_CONGRP_HELP_6" />
+    <entry colour="X11_RED" style="client" name="YSI_CONGRP_HELP_5" />
+    <entry colour="X11_RED" style="client" name="YSI_CONGRP_HELP_4" />
+    <entry colour="X11_RED" style="client" name="YSI_CONGRP_HELP_3" />
+    <entry colour="X11_RED" style="client" name="YSI_CONGRP_HELP_2" />
+    <entry colour="X11_RED" style="client" name="YSI_CONGRP_HELP_1" />
+  </group>
+  <group name="ysi_players">
+    <entry colour="X11_RED" style="client" name="YSI_LOGIN_LENGTH" />
+    <entry colour="X11_RED" style="client" name="YSI_LOGIN_ENTER" />
+    <entry colour="X11_RED" style="client" name="YSI_ADDU_SUCC" />
+    <entry colour="X11_RED" style="client" name="YSI_ADDU_INDER2" />
+    <entry colour="X11_RED" style="client" name="YSI_ADDU_INDER1" />
+    <entry colour="X11_RED" style="client" name="YSI_LOGIN_FAILED" />
+    <entry colour="X11_RED" style="client" name="YSI_LOGIN_NOLOAD" />
+    <entry colour="X11_RED" style="client" name="YSI_LOGIN_NOTF" />
+    <entry colour="X11_RED" style="client" name="YSI_LOGIN_LOGIN" />
+    <entry colour="X11_RED" style="client" name="YSI_LOGIN_INDERR" />
+    <entry colour="X11_RED" style="client" name="YSI_LOGIN_WRONG" />
+    <entry colour="X11_RED" style="client" name="YSI_REG_TAKEN" />
+    <entry colour="X11_RED" style="client" name="YSI_NSGROUP_PARAMS" />
+    <entry colour="X11_RED" style="client" name="YSI_GROUP_HELP" />
+    <entry colour="X11_RED" style="client" name="YSI_REGISTER_HELP" />
+    <entry colour="X11_RED" style="client" name="YSI_LOGIN_HELP" />
+    <entry colour="X11_RED" style="client" name="YSI_LOGIN_ALREADY" />
+  </group>
+  <group name="ysi_help">
+    <entry colour="X11_RED" style="print" name="YSI_HELP" />
+    <entry colour="X11_RED" style="client" name="YSI_HELP_NOTF" />
+    <entry colour="X11_RED" style="client" name="YSI_HELP_HELP" />
+  </group>
+  <group name="ysi_langs">
+    <entry colour="X11_RED" style="client" name="YSI_LANGS_INV" />
+    <entry colour="X11_RED" style="client" name="YSI_LANGS_DONE" />
+    <entry colour="X11_RED" style="client" name="YSI_LANGS_SET" />
+    <entry colour="X11_RED" style="client" name="YSI_LANGS_MORE" />
+    <entry colour="X11_RED" style="client" name="YSI_LANGS_DISP" />
+    <entry colour="X11_RED" style="client" name="YSI_LANGS_HELP" />
+  </group>
+  <group name="ysi_commands">
+    <entry colour="X11_RED" style="client" name="YSI_COMM_HELP" />
+    <entry colour="X11_RED" style="client" name="YSI_COMM_MORE" />
+    <entry colour="X11_RED" style="client" name="YSI_COMM_PAGES" />
+    <entry colour="X11_RED" style="client" name="YSI_COMM_LIST" />
+    <entry colour="X11_RED" style="client" name="YSI_COMM_BLEVEL" />
+  </group>
+  <group name="ysi_text">
+    <entry colour="X11_RED" style="client" name="YSI_TEXT_NOT_FOUND" />
+  </group>
+  <group name="ysi_race">
+    <entry colour="X11_RED" style="client" name="YSI_RACE_GO" />
+    <entry colour="X11_RED" style="client" name="YSI_RACE_COUNTDOWN" />
+  </group>
+  <group name="ysi_properties">
+    <entry colour="X11_RED" style="client" name="YSI_LIST_NONE" />
+    <entry colour="X11_RED" style="client" name="YSI_LIST_HELP_3" />
+    <entry colour="X11_RED" style="client" name="YSI_LIST_HELP_2" />
+    <entry colour="X11_RED" style="client" name="YSI_LIST_HELP_1" />
+    <entry colour="X11_RED" style="client" name="YSI_AMMU_NO_MONEY" />
+    <entry colour="X11_RED" style="client" name="YSI_TELS_MONEY" />
+    <entry colour="X11_RED" style="client" name="YSI_TELS_TELE" />
+    <entry colour="X11_RED" style="client" name="YSI_TELS_NAME" />
+    <entry colour="X11_RED" style="client" name="YSI_WITHDREW" />
+    <entry colour="X11_RED" style="client" name="YSI_WITH_HELP4" />
+    <entry colour="X11_RED" style="client" name="YSI_WITH_HELP3" />
+    <entry colour="X11_RED" style="client" name="YSI_WITH_HELP2" />
+    <entry colour="X11_RED" style="client" name="YSI_WITH_HELP1" />
+    <entry colour="X11_RED" style="client" name="YSI_BAL_HELP" />
+    <entry colour="X11_RED" style="client" name="YSI_BANK_INSUFFICIENT" />
+    <entry colour="X11_RED" style="client" name="YSI_BANK_BANKED" />
+    <entry colour="X11_RED" style="client" name="YSI_BANK_HELP_4" />
+    <entry colour="X11_RED" style="client" name="YSI_BANK_HELP_3" />
+    <entry colour="X11_RED" style="client" name="YSI_BANK_HELP_2" />
+    <entry colour="X11_RED" style="client" name="YSI_BANK_HELP_1" />
+    <entry colour="X11_RED" style="client" name="YSI_BANK_CP" />
+    <entry colour="X11_RED" style="client" name="YSI_BANK_NOT" />
+    <entry colour="X11_RED" style="client" name="YSI_BANK_BALANCE" />
+    <entry colour="X11_RED" style="client" name="YSI_BANK_HELP3" />
+    <entry colour="X11_RED" style="client" name="YSI_BANK_HELP2" />
+    <entry colour="X11_RED" style="client" name="YSI_BANK_HELP1" />
+    <entry colour="X11_RED" style="client" name="YSI_BANK_WELCOME" />
+    <entry colour="X11_RED" style="client" name="YSI_BANK_NAME" />
+    <entry colour="X11_RED" style="client" name="YSI_LIST_MORE" />
+    <entry colour="X11_RED" style="client" name="YSI_LIST_PAGES" />
+    <entry colour="X11_RED" style="client" name="YSI_LIST_FORM" />
+    <entry colour="X11_RED" style="client" name="YSI_LIST_MULTI" />
+    <entry colour="X11_RED" style="client" name="YSI_FORBIDDEN_2" />
+    <entry colour="X11_RED" style="client" name="YSI_FORBIDDEN" />
+    <entry colour="X11_RED" style="client" name="YSI_SELL_SOLD" />
+    <entry colour="X11_RED" style="client" name="YSI_SELL_OWNER" />
+    <entry colour="X11_RED" style="client" name="YSI_SELL_CANT" />
+    <entry colour="X11_RED" style="client" name="YSI_SELL_NO_ID" />
+    <entry colour="X11_RED" style="client" name="YSI_SELL_HELP_4" />
+    <entry colour="X11_RED" style="client" name="YSI_SELL_HELP_3" />
+    <entry colour="X11_RED" style="client" name="YSI_SELL_HELP_2" />
+    <entry colour="X11_RED" style="client" name="YSI_SELL_HELP_1" />
+    <entry colour="X11_RED" style="client" name="YSI_EXIT_NEAR" />
+    <entry colour="X11_RED" style="client" name="YSI_EXIT_NOT_IN" />
+    <entry colour="X11_RED" style="client" name="YSI_EXIT_HELP_1" />
+    <entry colour="X11_RED" style="client" name="YSI_ENTER_NO_HOUSE" />
+    <entry colour="X11_RED" style="client" name="YSI_ENTER_NOT_YOURS" />
+    <entry colour="X11_RED" style="client" name="YSI_ENTER_HELP_2" />
+    <entry colour="X11_RED" style="client" name="YSI_ENTER_HELP_1" />
+    <entry colour="X11_RED" style="client" name="YSI_BUY_HELP_4" />
+    <entry colour="X11_RED" style="client" name="YSI_BUY_HELP_3" />
+    <entry colour="X11_RED" style="client" name="YSI_BUY_HELP_2" />
+    <entry colour="X11_RED" style="client" name="YSI_BUY_HELP_1" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_ENTER" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_MAX_HOUSE" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_MAX" />
+    <entry colour="X11_RED" style="Draw" name="YSI_PROP_ANN" textdraw="YSI_0001" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_SELL" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_EARNT" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_AFFORD" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_CP" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_NOT" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_HOUSE_OWNED" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_BOUGHT_HOUSE" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_BOUGHT" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_OWNER" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_OUT" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_YOURS" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_OWN" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_BUY" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_BUY_HOUSE" />
+    <entry colour="X11_RED" style="client" name="YSI_PROP_NAME" />
+  </group>
+</YML>

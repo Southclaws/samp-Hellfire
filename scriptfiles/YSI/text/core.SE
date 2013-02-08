@@ -1,0 +1,168 @@
+; core.SE
+;
+; Swedish translation by Felle from #sa-mp
+;
+; Svensk översättning av Felle från #sa-mp
+; 
+; If you need Felle, come to #Felle at irc.gtanet.com
+; or by email: lundin.felix@gmail.com
+;
+; Om du söker Felle, gå till #Felle på irc.gtanet.com
+; eller maila på: lundin.felix@gmail.com
+
+[ysi_properties]
+
+YSI_PROP_NAME = Fastighet: "%s" Pris: $%d Inkomst: $%d
+YSI_PROP_BUY = Skriv "/%n" för att köpa
+YSI_PROP_OWN = Du äger redan denna fastighet
+YSI_PROP_YOURS = Den här fastigheten ägs av dig
+YSI_PROP_OUT = "%s" har blivit köpt av %s (%d)
+YSI_PROP_OWNER = Den här fastigheten ägs av %s (%d)
+YSI_PROP_BOUGHT = Du har köpt "%s" för $%d
+YSI_PROP_NOT = Du är inte en godkänd fastighet
+YSI_PROP_CP = Du är inte vid en checkpoint
+YSI_PROP_AFFORD = Du har inte råd att köpa denna fastighet
+YSI_PROP_EARNT = Du tjänade $%d från dina fastigheter
+YSI_PROP_SELL = Skriv "/%n %d" för att sälja denna fastighet
+YSI_PROP_ANN = %s köpte %s
+; Du kan sakna flera parameter, men bara i ordning från slutet
+; YSI_PROP_SELL = Skriv "/%n %d" för att sälja denna fastighet för $%d
+
+YSI_BUY_HELP_1 = Låter dig köpa en fastighet - dessa tjänar
+YSI_BUY_HELP_2 = pengar till dig och kan gå med vinst.
+YSI_BUY_HELP_3 = Du måste befinna dig i en giltig fastighet för att kunna använda detta kommando.
+YSI_BUY_HELP_4 = men du kommer att bli tillsagd om du inte gör det
+
+YSI_SELL_HELP_1 = Säljer en fastighet du äger. Det kan vara för
+YSI_SELL_HELP_2 = ett lägre pris än vad du köpte den för.
+YSI_SELL_HELP_3 = Du måste skriva ett id från en fastighet du äger
+YSI_SELL_HELP_4 = men du måste inte vara vid fastigheten
+YSI_SELL_NO_ID = Du måste skriva ett giltigt fastighets-id.
+YSI_SELL_CANT = Du kan inte sälja den fastigheten
+YSI_SELL_OWNER = Du äger inte denna fastigheten
+YSI_SELL_SOLD = Fastigheten såld för $%d
+
+YSI_FORBIDDEN = Du är på väg in i ett begränsat område
+YSI_FORBIDDEN_2 = Varning, du är på väg in i %s
+
+YSI_LIST_MULTI = "%s": %d ägare
+YSI_LIST_FORM = "%s": ägare "%s"
+YSI_LIST_PAGES = Använd "/%n <sida>" då <sida> är 1 - %d att lista
+YSI_LIST_MORE = Mer än 8 fastigheter funna
+
+YSI_BANK_NAME = Välkommen till '%s' banken. 
+YSI_BANK_WELCOME = Välkommen till banken
+YSI_BANK_HELP1 = Skriv "/%n <summa>" för att sätta in pengar
+YSI_BANK_HELP2 = Skriv "/%n <summa>" för att ta ut pengar
+YSI_BANK_HELP3 = Skriv "/%n" närsomhelst för att se din innestående summa
+YSI_BANK_BALANCE = Din nuvarande summa är $%d
+YSI_BANK_NOT = Du är inte i en bank
+YSI_BANK_CP = Du måste vara i en bank-checkpoint
+YSI_BANK_HELP_1 = Tillåter dig att sätta in pengar på ditt bankkonto
+YSI_BANK_HELP_2 = Du måste ha tillräckligt mycket pengar för att sätta in
+YSI_BANK_HELP_3 = rätt belopp och du måste vara vid en bank
+YSI_BANK_HELP_4 = Använd: "/%n <summa>"
+YSI_BANK_BANKED = $%d insatt, ny summa: $%d
+YSI_BANK_INSUFFICIENT = Ej tillräckligt mycket pengar för insättning
+
+YSI_BAL_HELP = Visar dina nuvarande tillgångar på banken
+
+YSI_WITH_HELP1 = Låter dig ta ut pengar pengar från ditt bankkonto
+YSI_WITH_HELP2 = Du måste ha tillräckligt mycket pengar,
+YSI_WITH_HELP3 = rätt belopp och måste vara vid en bank
+YSI_WITH_HELP4 = Använd: "/%n <summa>"
+YSI_WITHDREW = $%d uttaget, ny summa: $%d
+
+YSI_TELS_NAME = Teleporterade till %s
+YSI_TELS_TELE = Teleporterad
+YSI_TELS_MONEY = Ej tillräckligt med pengar, du behöver $%d för att teleportera
+
+YSI_AMMU_NO_MONEY = Du har inte råd med det vapnet
+
+YSI_LIST_HELP_1 = Visar en lista på fastigheter och deras ägare
+YSI_LIST_HELP_2 = Om det är mer än 8 fastigheter blir det
+YSI_LIST_HELP_3 = flera sidor med fastigheter
+YSI_LIST_NONE = Inga fastigheter funna
+
+[ysi_race]
+
+YSI_RACE_COUNTDOWN = %d
+YSI_RACE_GO = KÖR KÖR KÖR!!!
+
+[ysi_text]
+
+YSI_TEXT_NOT_FOUND = Text-del "%s" ej funnen
+
+[ysi_commands]
+
+YSI_COMM_BLEVEL = Du kan ej använda detta kommando
+YSI_COMM_LIST = "/%s"
+YSI_COMM_PAGES = Använd "/%n <sida>" då <sida> är 1 - %d att lista
+YSI_COMM_MORE = Mer än 8 kommandos funna
+
+YSI_COMM_HELP_1 = Visar en lista på kommandos för detta skript
+YSI_COMM_HELP_2 = Om det finns mer än 8 blir det flera sidor
+YSI_COMM_HELP_3 = Kommandon är visade med prefix och alternativa namn
+
+[ysi_langs]
+
+YSI_LANGS_HELP1 = Utan parameter visar en lista över språk
+YSI_LANGS_HELP2 = Med en parameter sätter ditt språk till det önskade språket
+YSI_LANGS_DISP = Språk %d: %s (%s)
+YSI_LANGS_MORE = Skriv "/%n" för att igen visa mer språk
+YSI_LANGS_SET = Skriv "/%n <id>" för att bestämma ett språk
+YSI_LANGS_DONE = Språk bestämt till %d (%s)
+YSI_LANGS_INV = Ogiltigt språk
+
+[ysi_help]
+
+YSI_HELP_HELP1 = Visar hjälp om skript eller kommandon.
+YSI_HELP_HELP2 = Skriv "/%n" för skript help, "/%n <command>"
+YSI_HELP_HELP3 = för kommando-hjälp "/%n" för en lista på kommandon
+YSI_HELP_NOTF = Okänd funktion, ingen hjälp finns.
+
+YSI_HELP_1 = <Ditt skript namn här>
+YSI_HELP_2 = av <ditt namn här>
+YSI_HELP_3 = baserat på Alex "Y_Less" Cole
+YSI_HELP_4 = Ändra denna text i core.SE i din
+YSI_HELP_5 = scriptfiles/YSI mapp (standard).
+
+YSI_HELP_6 = Lämna rader tomma om du inte behöver 10 rader så blir de ignorerade.
+YSI_HELP_7 = ; Denna rad kommer inte visas i chatboxen då den är tom (; betyder kommentar)
+YSI_HELP_8 = 
+
+; Den här raden är den enda rad som kan innehålla %n data för kommandon
+YSI_HELP_9 = Skriv: "/%n" för kommandon "/%n <command>"
+YSI_HELP_10 = för hjälp om ett specifikt kommando (inkluderar den här)
+
+[ysi_players]
+
+YSI_LOGIN_HELP_1 = Låter dig logga in på användar systemet
+YSI_LOGIN_HELP_2 = om du använder det lösenord du registrerade dig med. Använd
+YSI_LOGIN_HELP_3 = "/%n" för att registrera dig eller "/%n" för att joina en grupp
+
+YSI_REGISTER_HELP_1 = Låter dig registrera ditt namn på servern
+YSI_REGISTER_HELP_2 = Använd "/%n <lösenord>" för att registrera dig med ett lösenord
+YSI_REGISTER_HELP_3 = "/%n <lösenord>" för att logga in med samma lösenord för att
+YSI_REGISTER_HELP_4 = ha kvar samma saker som sist du spelade.
+
+YSI_GROUP_HELP_1 = Tillåter dig att adda ditt namn till en annan
+YSI_GROUP_HELP_2 = namngrupp så att de två namnen delar på samma
+YSI_GROUP_HELP_3 = statistik.  use "/%n <namn> <lösenord>" då <namn> är en
+YSI_GROUP_HELP_4 = existerande registrerad medlem <lösenord> är dens
+YSI_GROUP_HELP_5 = lösenord för att joina det namnet.
+
+YSI_NSGROUP_PARAMS = Använd: "/%n <registrerat namn> <namn lösenord>"
+
+YSI_REG_TAKEN = Tyvärr, detta namn är redan registrerat.
+YSI_LOGIN_WRONG = Fel lösenord.
+YSI_LOGIN_INDERR = Index fel, vänligen försök igen.
+YSI_LOGIN_LOGIN = Inloggad!
+YSI_LOGIN_NOTF = Namnet kunde ej hittas
+YSI_LOGIN_NOLOAD = Fel när datafilen öppnades.
+YSI_LOGIN_FAILED = Inloggning nekad.
+YSI_ADDU_INDER1 = Adda användare fil fel 1.
+YSI_ADDU_INDER2 = Adda användare fíl fel 2.
+YSI_ADDU_SUCC = Registreringen lyckades.
+YSI_LOGIN_ENTER = Du måste skriva ett lösenord
+YSI_LOGIN_LENGTH = Ditt lösenord måste vara minst 6 tecken långt

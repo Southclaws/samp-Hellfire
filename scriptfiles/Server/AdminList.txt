@@ -1,0 +1,8 @@
+[HLF]Cagatay=4
+Patrik356b=4
+[HLF]Defiance=2
+Kevin=4
+[HLF]KikaRz=2
+[HLF]Southclaw=4
+[HLF]Lexi=1
+Fusez=1

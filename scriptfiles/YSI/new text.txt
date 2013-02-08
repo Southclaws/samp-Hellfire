@@ -1,0 +1,28 @@
+YSI_PROP_ANN = %s bought %s
+YSI_LOGIN_ENTER = You must enter a password.
+YSI_LOGIN_LENGTH = You must enter a password at least 6 characters long.
+YSI_PROP_MAX = You cannot buy any more properties.
+YSI_PROP_BUY_HOUSE = Type "/%n" to buy this house for $%d
+YSI_PROP_MAX_HOUSE = You cannot buy any more houses.
+
+
+YSI_ENTER_HELP_1 = Lets you into one of your houses
+YSI_ENTER_HELP_2 = Type this outside to get in
+YSI_ENTER_NOT_YOURS = You cannot enter properties you don't own
+YSI_ENTER_NO_HOUSE = There is no house here to enter
+
+
+[ysi_groups]
+YSI_CONGRP_HELP_1 = Usage: "/%n <playerid> <group> <add>" OR:
+YSI_CONGRP_HELP_2 = "/%n <page>"
+YSI_CONGRP_HELP_3 = First option to assign a player to a group
+YSI_CONGRP_HELP_4 = Second option to view the list of groups
+YSI_CONGRP_HELP_5 = If add is 1 they will be added to the specified
+YSI_CONGRP_HELP_6 = group, otherwise they'll be removed.
+YSI_GROUP_LIST_NAME = Group %d: "%s"
+YSI_GROUP_LIST_TEMP = Group %d: <unnamed temp group>
+YSI_GROUP_LIST_PAGES = Use "/%n <page>" where <page> is 1 - %d to list
+YSI_GROUP_LIST_MORE = More than 8 groups found
+YSI_GROUP_LIST_ASS = Or "/%n <playerid> <group> <set>" to assign a group
+YSI_CONGRP_ASSIGNED = Player %d's group assigned
+YSI_CONGRP_INVALID = Invalid playerid or groupid

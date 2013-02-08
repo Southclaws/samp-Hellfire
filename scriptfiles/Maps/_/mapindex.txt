@@ -1,0 +1,73 @@
+Gen/Farm Place.txt,		0, 0, 350
+Gen/Oil Rig.txt,		-1, 0, 350
+Gen/Treehouse.txt,		-1, 0, 350
+Gen/Defiance Bar Int.txt,	-1, 18, 350
+Gen/Defiance Bar Ext.txt,	-1, 0, 350
+Gen/SF Hideout.txt,		0, 0, 350
+Gen/SF Hideout 2.txt,		0, 0, 350
+Gen/Hangout.txt,		0, 0, 350
+Gen/Airbase.txt,		0, 0, 350
+Gen/Shipwreck.txt,		0, 0, 350
+Gen/LsShopInt.txt,		0, 0, 350
+Gen/LsShopExt.txt,		0, 0, 350
+Gen/Blueberry.txt,		0, 0, 350
+Gen/KikaHouse.txt,		0, 0, 350
+
+Houses/LS.txt,			-1, 0, 350
+Houses/SF.txt,			-1, 0, 350
+Houses/LV.txt,			-1, 0, 350
+
+Stunt/Bigjump 1.txt,		0, 0, 350
+Stunt/LV Park.txt,		0, 0, 350
+Stunt/Hugejump.txt,		0, 0, 350
+
+Race/Long Run.txt,		2, 0, 350
+Race/BigEar.txt,		2, 0, 350
+
+Test/Bounty Hunter.txt,		5, 0, 350
+Test/Broken City.txt,		5, 0, 350
+Test/Dead City.txt,		5, 0, 350
+Test/Stunt City.txt,		5, 0, 350
+Test/Trainyard 2.txt,		5, 0, 350
+Test/Island Base.txt,		5, 0, 350
+Test/Jokers Dune Map.txt,	5, 0, 350
+Test/The Rig.txt,		5, 0, 350
+Test/Waterbase.txt,		5, 0, 350
+Test/Drughouse.txt,		5, 0, 350
+Test/MilitiaForest.txt,		5, 0, 350
+Test/Nuketown.txt,		5, 0, 350
+Test/Backstreets.txt,		5, 0, 350
+Test/Industrial Yard.txt,	5, 0, 350
+
+ABD/QuarryEnt.txt,		0, 0, 350
+ABD/Fort Metro.txt,		4, 0, 350
+ABD/Fort Southclaw.txt,		4, 0, 350
+ABD/Fort Defiance.txt,		4, 0, 350
+ABD/Fort Cagatay.txt,		4, 0, 350
+ABD/Fort Myst.txt,		4, 0, 350
+ABD/City Beta.txt,		4, 0, 350
+ABD/Blockaids.txt,		4, 0, 350
+ABD/Bone Underground.txt,	4, 0, 350
+ABD/Random Trash.txt,		4, 0, 350
+ABD/Quarry Cave.txt,		4, 0, 350
+ABD/Cave 2.txt,			4, 0, 350
+ABD/Cave 3.txt,			4, 0, 350
+ABD/Fence Area.txt,		4, 0, 350
+ABD/ForestBridge.txt,		4, 0, 350
+ABD/Rivet.txt,			4, 0, 350
+ABD/Brokenfac.txt,		4, 0, 350
+ABD/Carsoncave.txt,		4, 0, 350
+ABD/ChilRadio.txt,		4, 0, 350
+
+Parkour/LS.txt,			3, 0, 350
+Parkour/LV.txt,			3, 0, 350
+Parkour/SF.txt,			3, 0, 350
+Parkour/LasC.txt,		3, 0, 350
+Parkour/Hillside.txt,		3, 0, 350
+Parkour/Junkyard.txt,		3, 0, 350
+
+Derby/City Centre.txt,		3, 0, 350
+
+PRD/LV West Back Alley.map,	3, 0, 350
+PRD/SF Alley.map,		3, 0, 350
+

@@ -1,0 +1,164 @@
+; core.DE
+;
+; German translation by breadfish from #sa-mp.scripting
+; Huge appreciation and thanks for him
+;
+; Deutsche Übersetzung von breadfish aus dem #sa-mp.scripting Channel
+; Große Anerkennung und Dank an ihn
+;
+; Visit gta-action.com and play on sa-mp server: 85.114.135.162:7777 ;)
+;
+; Besucht gta-action.com und unsern sa-mp server: 85.114.135.162:7777 ;)
+ 
+[ysi_properties]
+YSI_PROP_NAME = Immobilie: "%s" Kostet: $%d Verdienst: $%d
+YSI_PROP_BUY = "/%n"um die Immobilie zu kaufen
+YSI_PROP_OWN = Du besizt diese Immobilie bereits
+YSI_PROP_YOURS = Diese Immobilie gehört  dir
+YSI_PROP_OUT = "%s"wurde von %s (%d) gekauft
+YSI_PROP_OWNER = Diese Immobilie gehört %s (%d)
+YSI_PROP_BOUGHT = Du hast "%s" für $%d gekauft
+YSI_PROP_NOT = Du bist bei keiner Immobilie
+YSI_PROP_CP = Du bist in keinem Immobilien-Checkpoint
+YSI_PROP_AFFORD = Du kannst dir die Immobilie nicht leisten
+YSI_PROP_EARNT = Du hast $%d von all deinen Immobilien verdient
+YSI_PROP_SELL = Gib "/%n %d" ein um diese Immobilie zu verkaufen
+; Du kannst auch Variablen (%n/%d) weglassen, aber nur in der Reihenfolge Rechts nach Links
+; YSI_PROP_SELL = Gib "/%n %d" ein um diese Immobilie für $%d zu verkaufen
+ 
+YSI_BUY_HELP_1 = Damit kannst du Immobilien kaufen - mit diesen
+YSI_BUY_HELP_2 = kannst du in bestimmten Zeitabständen Geld verdienen.
+YSI_BUY_HELP_3 = Du musst bei einer Immobilien sein um diesen Befehl zu benutzen,
+YSI_BUY_HELP_4 = wenn du es nicht bist wird dir das aber mitgeteilt.
+ 
+YSI_SELL_HELP_1 = Verkauft eine deiner Immobilien. Der Verkaufspreis kann niedriger
+YSI_SELL_HELP_2 = sein als der Preis sein, für den du die Immobilie gekauft hast.
+YSI_SELL_HELP_3 = Du musst die ID der Immobilie angeben, die du verkaufen willst.
+YSI_SELL_HELP_4 = Um eine Immobile zu verkaufen musst du dich nicht neben ihr befinden.
+YSI_SELL_NO_ID = Du mussteine gültige Immobilien-ID angeben
+YSI_SELL_CANT = Du kannst diese Immobilie nicht verkaufen
+YSI_SELL_OWNER = Dir gehört diese Immobilie nicht
+YSI_SELL_SOLD = Du hast die Immobilie für $%d verkauft
+ 
+YSI_FORBIDDEN = Du betrittst ein Sperrgebiet
+YSI_FORBIDDEN_2 = Warnung, du betrittst %s
+ 
+YSI_LIST_MULTI = "%s": %d Besitzer
+YSI_LIST_FORM = "%s": Besitzer: "%s"
+YSI_LIST_PAGES = Gib "/%n <seite>" ein - <seite> steht für eine Seite zwischen 1 und %d
+YSI_LIST_MORE = Mehr als 8 Immobilien gefunden
+ 
+YSI_BANK_NAME = Willkommen bei der %s-Bank
+YSI_BANK_WELCOME = Willkommen bei der Bank
+YSI_BANK_HELP1 = Gib "/%n <Betrag>" ein um geld einzuzahn
+YSI_BANK_HELP2 = Gib "/%n <Betrag>" ein um Geld abzuheben
+YSI_BANK_HELP3 = Deinen Kontostand kannst du jederzeit mit "/%n" abrufen
+YSI_BANK_BALANCE = Dein Kontostand beträgt: $%d
+YSI_BANK_NOT = Du bist in keiner Bank
+YSI_BANK_CP = Du bist in keinem Bank-Checkpoint
+YSI_BANK_HELP_1 = Damit kannst du Geld in dein Konto einzahlen.
+YSI_BANK_HELP_2 = Um Geld einzuzahlen, musst du den Geldbetrag
+YSI_BANK_HELP_3 = den du einzahlen möchtest bei dir haben.
+YSI_BANK_HELP_4 = Verwendung: "/%n <Betrag>"
+YSI_BANK_BANKED = Du hast $%d eingezahlt, neuer Kontostand: $%d
+YSI_BANK_INSUFFICIENT = Du hast zu wenig Geld für diese Aktion
+ 
+YSI_BAL_HELP = Zeigt deinen aktuellen Kontostand
+ 
+YSI_WITH_HELP1 = Damit kannst du Geld von deinem Konto abheben.
+YSI_WITH_HELP2 = Um Geld abzuheben, muss auf deinem Konto
+YSI_WITH_HELP3 = genügend Geld vorhanden sein.
+YSI_WITH_HELP4 = Verwendung: "/%n <amount>"
+YSI_WITHDREW = Du hast $%d abgehoben, neuer Kontostand $%d
+ 
+YSI_TELS_NAME = Du wurdest zu %s teleportiert
+YSI_TELS_TELE = Du wurdest teleportiert
+YSI_TELS_MONEY = Du hast zu wenig Geld, du benötigst $%d um zu teleportieren
+ 
+YSI_AMMU_NO_MONEY = Du kannst dir diese Waffe nicht leisten
+ 
+YSI_LIST_HELP_1 = Zeigt dir eine liste aller Immobilien und deren Besitzer
+YSI_LIST_HELP_2 = Gibt es mehr als 8 Immobilien, dann werden diese auf
+YSI_LIST_HELP_3 = mehreren Seiten aufgelistet.
+YSI_LIST_NONE = Keine Immobilien gefunden
+ 
+[ysi_race]
+ 
+YSI_RACE_COUNTDOWN = %d
+YSI_RACE_GO = Los Los Los!!!
+ 
+[ysi_text]
+ 
+YSI_TEXT_NOT_FOUND = Text "%s" nicht gefunden
+ 
+[ysi_commands]
+ 
+YSI_COMM_BLEVEL = Du kannst diesen befehl nicht benutzen
+YSI_COMM_LIST = "/%s"
+YSI_COMM_PAGES = Gib "/%n <seite>" ein - <seite> steht für eine Seite zwischen 1 und %d
+YSI_COMM_MORE = Mehr als 8 Befehle gefunden
+ 
+YSI_COMM_HELP_1 = Zeigt eine Liste  der gültigen befehle in diesem Script
+YSI_COMM_HELP_2 = Gibt es mehr als 8 Befehle, dann werden diese auf mehreren Seiten aufgelistet.
+YSI_COMM_HELP_3 = Befehle werden mit Präfix und alternativen Namen angezeigt.
+ 
+[ysi_langs]
+ 
+YSI_LANGS_HELP1 = Ohne Parameter wird eine Liste der verfügbaren Sprachen angezeigt
+YSI_LANGS_HELP2 = Mit einem Parameter wird die angegeben Sprache ausgewählt
+YSI_LANGS_DISP = Sprache %d: %s (%s)
+YSI_LANGS_MORE = Gib "/%n" ein um weitere Sprachen anzuzeigen
+YSI_LANGS_SET = Gib "/%n <id>" ein um die Sprache auszuwählen
+YSI_LANGS_DONE = Sprache %d (%s) ausgewählt
+YSI_LANGS_INV = Ungültige Sprachangabe
+ 
+[ysi_help]
+ 
+YSI_HELP_HELP1 = Zeigt Hilfe für das Script oder einen befehl an.
+YSI_HELP_HELP2 = Gib "/%n" ein für die Scripthilfe, "/%n <Befehl>" für Hilfe
+YSI_HELP_HELP3 = zu einem Befehl, oder "/%n" für eine Liste aller Befehle.
+YSI_HELP_NOTF = Unbekannter Befehl, keine Hilfe gefunden.
+ 
+YSI_HELP_1 = <Dein Scriptname>
+YSI_HELP_2 = by <Dein Name>
+YSI_HELP_3 = basiert auf YSI von Alex "Y_Less" Cole
+YSI_HELP_4 = Ändere diesen Text in der Datei core.DE im Ordner
+YSI_HELP_5 = scriptfiles/YSI (standard).
+ 
+YSI_HELP_6 = Falls du keine 10 zeilen brauchst, lass die überflüssigen Zeilen enfach frei.
+YSI_HELP_7 = ; Diese Zeile wird nicht in der Chatbox angezeigt, weil sie leer ist (; bedeutet Kommentar)
+YSI_HELP_8 =
+ 
+; Das ist die EINZIGE zeile die %n efür Befehle enthalten kann!
+YSI_HELP_9 = Gib "/%n" für befehle und "/%n <Befehl>"
+YSI_HELP_10 = für Hilfe zu einem bestimmen Befehl ein (auch für diesen)
+
+[ysi_players]
+ 
+YSI_LOGIN_HELP_1 = Damit kannst du dich in das Benutzersystem einloggen.
+YSI_LOGIN_HELP_2 = Gib das Kennwort ein, das du eingegeben hast als du dich
+YSI_LOGIN_HELP_3 = registriert hast. Gib "/%n" ein um  dich zu registrieren.
+ 
+YSI_REGISTER_HELP_1 = Damit kannst du dich mit deinem  Namen auf dem server registrieren.
+YSI_REGISTER_HELP_2 = Gib "/%n <Kennwort>" ein um dich zu registrieren und
+YSI_REGISTER_HELP_3 = "/%n <Kennwort>" um dich  mit demselben Kennwort einzuloggen,
+YSI_REGISTER_HELP_4 = um deine gespeicherten Status und Einstellungen zu laden.
+ 
+YSI_GROUP_HELP_1 = Damit kannst du deinen aktuellen Namen einer anderen
+YSI_GROUP_HELP_2 = Namen-Gruppe hinzufügen, damit sich die beiden Namen den selben
+YSI_GROUP_HELP_3 = Status teilen. Gib "/%n <Name> <Kennwort>" ein - <Name> ist ein
+YSI_GROUP_HELP_4 = auf diesem Server registrierter Benutzer und <Kennwort> ist das Kennwort
+YSI_GROUP_HELP_5 = mit dem sich dieser Benutzer anmeldet.
+ 
+YSI_NSGROUP_PARAMS = Verwendung: "/%n <registrierter Benutzer> <Kennwort für den Benutzer>"
+ 
+YSI_REG_TAKEN = Sorry, dieser name ist bereits vergeben.
+YSI_LOGIN_WRONG = Falsches kennwort.
+YSI_LOGIN_INDERR = Lesefehler. Bitte Versuch es nochmal
+YSI_LOGIN_LOGIN = Erfolgreich eingeloggt!
+YSI_LOGIN_NOTF = Benutzername nicht gefunden
+YSI_LOGIN_NOLOAD = Fehler beim Öffnen der datei.
+YSI_LOGIN_FAILED = Login fehlgeschlagen.
+YSI_ADDU_INDER1 = Fehler beim Hinzufügen des Benutzers 1.
+YSI_ADDU_INDER2 = Fehler beim Hinzufügen des Benutzers 2.
+YSI_ADDU_SUCC = Erfolgreich registriert.
