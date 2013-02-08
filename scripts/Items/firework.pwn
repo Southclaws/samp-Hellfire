@@ -61,7 +61,7 @@ CreateFireworkProjectile(model,
 
 	fwk_Data[id][fwk_object] = CreateDynamicObject(model, x, y, z, rx, ry, rz);
 	MoveDynamicObject(fwk_Data[id][fwk_object],
-	    x += ( distance * floatsin(rotation, degrees) * floatcos(elevation + (random(20)-10), degrees) ),
+		x += ( distance * floatsin(rotation, degrees) * floatcos(elevation + (random(20)-10), degrees) ),
 		y += ( distance * floatcos(rotation, degrees) * floatcos(elevation + (random(20)-10), degrees) ),
 		z += ( distance * floatsin(elevation + (random(20)-10), degrees) ),
 		20.0, rx, ry, z);
@@ -90,19 +90,19 @@ public OnPlayerUseItemWithItem(playerid, itemid, withitemid)
 {
 	if(GetItemType(itemid) == item_FireLighter && GetItemType(withitemid) == item_FireworkBox)
 	{
-	    if(tickcount() - fwk_CooldownTick > 3000)
-	    {
+		if(tickcount() - fwk_CooldownTick > 3000)
+		{
 			ApplyAnimation(playerid, "BOMBER", "BOM_PLANT_IN", 5.0, 0, 0, 0, 0, 450);
 			defer FireworkLaunch(withitemid);
 			fwk_CooldownTick = tickcount();
 		}
 	}
-    return CallLocalFunction("fwk_OnPlayerUseItemWithItem", "ddd", playerid, itemid, withitemid);
+	return CallLocalFunction("fwk_OnPlayerUseItemWithItem", "ddd", playerid, itemid, withitemid);
 }
 #if defined _ALS_OnPlayerUseItemWithItem
-    #undef OnPlayerUseItemWithItem
+	#undef OnPlayerUseItemWithItem
 #else
-    #define _ALS_OnPlayerUseItemWithItem
+	#define _ALS_OnPlayerUseItemWithItem
 #endif
 #define OnPlayerUseItemWithItem fwk_OnPlayerUseItemWithItem
 forward fwk_OnPlayerUseItemWithItem(playerid, itemid, withitemid);
@@ -130,10 +130,10 @@ public OnDynamicObjectMoved(objectid)
 	{
 		if(objectid == fwk_Data[i][fwk_object])
 		{
-		    new
-		        Float:x,
-		        Float:y,
-		        Float:z,
+			new
+				Float:x,
+				Float:y,
+				Float:z,
 				sequence,
 				index,
 				extype,
@@ -153,7 +153,7 @@ public OnDynamicObjectMoved(objectid)
 
 			extype = fwk_ExplosionSequences[sequence][index];
 
-		    if(extype == -1)
+			if(extype == -1)
 			{
 				i = DestroyFireworkProjectile(i);
 				return 0;
@@ -166,8 +166,8 @@ public OnDynamicObjectMoved(objectid)
 			
 			angoffset = random((360/fwk_ExplosionTypes[extype][fwk_spread]));
 
-		    for(new j; j < fwk_ExplosionTypes[extype][fwk_spread]; j++)
-		    {
+			for(new j; j < fwk_ExplosionTypes[extype][fwk_spread]; j++)
+			{
 				CreateFireworkProjectile(fwk_ExplosionTypes[extype][fwk_model][random(maxmodels)],
 					x, y, z, 90.0, 0.0, 0.0,
 					j * (360/fwk_ExplosionTypes[extype][fwk_spread])+angoffset,
@@ -177,12 +177,12 @@ public OnDynamicObjectMoved(objectid)
 			}
 		}
 	}
-    return CallLocalFunction("fwk_OnDynamicObjectMoved", "d", objectid);
+	return CallLocalFunction("fwk_OnDynamicObjectMoved", "d", objectid);
 }
 #if defined _ALS_OnDynamicObjectMoved
-    #undef OnDynamicObjectMoved
+	#undef OnDynamicObjectMoved
 #else
-    #define _ALS_OnDynamicObjectMoved
+	#define _ALS_OnDynamicObjectMoved
 #endif
 #define OnDynamicObjectMoved fwk_OnDynamicObjectMoved
 forward fwk_OnDynamicObjectMoved(objectid);
@@ -193,9 +193,9 @@ forward fwk_OnDynamicObjectMoved(objectid);
 CMD:addfirework(playerid, params[])
 {
 	new
-	    Float:x,
-	    Float:y,
-	    Float:z,
+		Float:x,
+		Float:y,
+		Float:z,
 		Float:r;
 
 	GetPlayerPos(playerid, x, y, z);

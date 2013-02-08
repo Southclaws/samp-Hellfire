@@ -26,7 +26,7 @@
 #include <zcmd>		// If you don't have ZCMD, get it, don't go asking me to make a strcmp version!
 
 
-#define DIALOG_INDEX			(600)		// Default dialog index to start dialog IDs from
+#define DIALOG_INDEX			(10000)		// Default dialog index to start dialog IDs from
 #define ANIM_SAVE_FILE			"SavedAnimations.txt"
 #define MOUSE_HOVER_COLOUR      0xFFFF00FF	// Yellow
 

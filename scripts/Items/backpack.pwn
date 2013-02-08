@@ -46,6 +46,17 @@ stock GetPlayerBackpackItem(playerid)
 	return gPlayerBackpack[playerid];
 }
 
+stock IsItemTypeBag(ItemType:itemtype)
+{
+	if(!IsValidItemType(itemtype))
+		return 0;
+
+	if(itemtype == item_Satchel || itemtype == item_Backpack)
+		return 1;
+
+	return 0;
+}
+
 hook OnPlayerConnect(playerid)
 {
 	gPlayerBackpack[playerid] = INVALID_ITEM_ID;
@@ -108,6 +119,37 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				gTakingOffBag[playerid] = true;
 			}
 		}
+		if(newkeys & KEY_YES)
+		{
+			if(IsPlayerInventoryFull(playerid))
+			{
+				new
+					itemid = GetPlayerItem(playerid),
+					containerid = GetItemExtraData(gPlayerBackpack[playerid]);
+
+				if(IsValidContainer(containerid) && IsValidItem(itemid))
+				{
+					new containername[CNT_MAX_NAME];
+
+					GetContainerName(containerid, containername);
+
+					if(AddItemToContainer(containerid, itemid, playerid))
+					{
+						new str[32];
+						format(str, 32, "Item added to %s", containername);
+						ShowMsgBox(playerid, str, 3000, 150);
+						return 1;
+					}
+					else
+					{
+						new str[32];
+						format(str, 32, "%s full", containername);
+						ShowMsgBox(playerid, str, 3000, 100);
+						return 1;
+					}
+				}
+			}
+		}
 	}
 	else
 	{
@@ -122,50 +164,6 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 	return 1;
 }
-
-public OnPlayerAddToInventory(playerid, itemid)
-{
-	print("OnPlayerAddToInventory");
-	if(IsPlayerInventoryFull(playerid) && IsValidItem(gPlayerBackpack[playerid]))
-	{
-		print("inv full, valid item");
-		new containerid = GetItemExtraData(gPlayerBackpack[playerid]);
-
-		if(IsValidContainer(containerid))
-		{
-			print("valid cont");
-			new containername[CNT_MAX_NAME];
-
-			GetContainerName(containerid, containername);
-
-			if(AddItemToContainer(containerid, itemid, playerid))
-			{
-				print("added");
-				new str[32];
-				format(str, 32, "Item added to %s", containername);
-				ShowMsgBox(playerid, str, 3000, 150);
-				return 1;
-			}
-			else
-			{
-				print("not added");
-				new str[32];
-				format(str, 32, "%s full", containername);
-				ShowMsgBox(playerid, str, 3000, 100);
-				return 1;
-			}
-		}
-	}
-
-	return CallLocalFunction("pack_OnPlayerAddToInventory", "dd", playerid, itemid);
-}
-#if defined _ALS_OnPlayerAddToInventory
-	#undef OnPlayerAddToInventory
-#else
-	#define _ALS_OnPlayerAddToInventory
-#endif
-#define OnPlayerAddToInventory pack_OnPlayerAddToInventory
-forward pack_OnPlayerAddToInventory(playerid, itemid);
 
 public OnPlayerDropItem(playerid, itemid)
 {
@@ -211,6 +209,7 @@ forward pack_OnPlayerGiveItem(playerid, targetid, itemid);
 
 public OnPlayerViewInventoryOpt(playerid)
 {
+	print("OnPlayerViewInventoryOpt");
 	if(IsValidItem(gPlayerBackpack[playerid]) && !IsValidContainer(GetPlayerCurrentContainer(playerid)))
 	{
 		pack_InventoryOptionID[playerid] = AddInventoryOption(playerid, "Move to bag");
@@ -224,10 +223,11 @@ public OnPlayerViewInventoryOpt(playerid)
 	#define _ALS_OnPlayerViewInventoryOpt
 #endif
 #define OnPlayerViewInventoryOpt pack_PlayerViewInventoryOpt
-forward OnPlayerViewInventoryOpt(playerid);
+forward pack_PlayerViewInventoryOpt(playerid);
 
 public OnPlayerSelectInventoryOpt(playerid, option)
 {
+	print("OnPlayerSelectInventoryOpt");
 	if(IsValidItem(gPlayerBackpack[playerid]))
 	{
 		if(option == pack_InventoryOptionID[playerid])
@@ -274,5 +274,80 @@ public OnPlayerSelectInventoryOpt(playerid, option)
 	#define _ALS_OnPlayerSelectInventoryOpt
 #endif
 #define OnPlayerSelectInventoryOpt pack_PlayerSelectInventoryOpt
-forward OnPlayerSelectInventoryOpt(playerid, option);
+forward pack_PlayerSelectInventoryOpt(playerid, option);
+
+public OnPlayerViewContainerOpt(playerid, containerid)
+{
+	print("OnPlayerViewContainerOpt");
+	if(IsValidItem(gPlayerBackpack[playerid]) && containerid != GetItemExtraData(gPlayerBackpack[playerid]))
+	{
+		pack_InventoryOptionID[playerid] = AddContainerOption(playerid, "Move to bag");
+	}
+
+	return CallLocalFunction("pack_OnPlayerViewContainerOpt", "dd", playerid, containerid);
+}
+#if defined _ALS_OnPlayerViewContainerOpt
+	#undef OnPlayerViewContainerOpt
+#else
+	#define _ALS_OnPlayerViewContainerOpt
+#endif
+#define OnPlayerViewContainerOpt pack_OnPlayerViewContainerOpt
+forward pack_OnPlayerViewContainerOpt(playerid, containerid);
+
+public OnPlayerSelectContainerOpt(playerid, containerid, option)
+{
+	if(IsValidItem(gPlayerBackpack[playerid]))
+	{
+		if(option == pack_InventoryOptionID[playerid])
+		{
+			new
+				bagcontainerid,
+				slot,
+				itemid;
+
+			bagcontainerid = GetItemExtraData(gPlayerBackpack[playerid]);
+			slot = GetPlayerContainerSlot(playerid);
+			itemid = GetContainerSlotItem(containerid, slot);
+
+			if(!IsValidItem(itemid))
+			{
+				DisplayContainerInventory(playerid, containerid);
+				return 0;
+			}
+
+			if(IsContainerFull(bagcontainerid))
+			{
+				new
+					str[CNT_MAX_NAME + 6],
+					name[CNT_MAX_NAME];
+
+				GetContainerName(bagcontainerid, name);
+				format(str, sizeof(str), "%s full", name);
+				ShowMsgBox(playerid, str, 3000, 100);
+				DisplayContainerInventory(playerid, containerid);
+				return 0;
+			}
+
+			if(!WillItemTypeFitInContainer(bagcontainerid, GetItemType(itemid)))
+			{
+				ShowMsgBox(playerid, "Item won't fit", 3000, 140);
+				DisplayContainerInventory(playerid, containerid);
+				return 0;
+			}
+
+			RemoveItemFromContainer(containerid, slot);
+			AddItemToContainer(bagcontainerid, itemid, playerid);
+			DisplayContainerInventory(playerid, containerid);
+		}
+	}
+
+	return CallLocalFunction("pack_OnPlayerSelectContainerOpt", "ddd", playerid, containerid, option);
+}
+#if defined _ALS_OnPlayerSelectContainerOpt
+	#undef OnPlayerSelectContainerOpt
+#else
+	#define _ALS_OnPlayerSelectContainerOpt
+#endif
+#define OnPlayerSelectContainerOpt pack_OnPlayerSelectContainerOpt
+forward pack_OnPlayerSelectContainerOpt(playerid, containerid, option);
 

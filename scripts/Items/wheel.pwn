@@ -17,38 +17,59 @@ ShowTireList(playerid, vehicleid)
 
 	GetVehicleDamageStatus(vehicleid, panels, doors, lights, tires);
 
-	gTireData[playerid][0] = tires & 0b0001;
-	gTireData[playerid][1] = tires & 0b0010;
-	gTireData[playerid][2] = tires & 0b0100;
-	gTireData[playerid][3] = tires & 0b1000;
+	if(GetVehicleType(GetVehicleModel(vehicleid)) == VTYPE_BIKE)
+	{
+		gTireData[playerid][0] = tires & 0b0001;
+		gTireData[playerid][1] = tires & 0b0010;
 
-	if(gTireData[playerid][0]) // backright
-		strcat(str, "{FF0000}Back Right\n");
+		if(gTireData[playerid][0]) // back
+			strcat(str, "{FF0000}Back\n");
 
+		else
+			strcat(str, "{FFFFFF}Back\n");
+
+
+		if(gTireData[playerid][1]) // front
+			strcat(str, "{FF0000}Front\n");
+
+		else
+			strcat(str, "{FFFFFF}Front\n");
+	}
 	else
-		strcat(str, "{FFFFFF}Back Right\n");
+	{
+		gTireData[playerid][0] = tires & 0b0001;
+		gTireData[playerid][1] = tires & 0b0010;
+		gTireData[playerid][2] = tires & 0b0100;
+		gTireData[playerid][3] = tires & 0b1000;
+
+		if(gTireData[playerid][0]) // backright
+			strcat(str, "{FF0000}Back Right\n");
+
+		else
+			strcat(str, "{FFFFFF}Back Right\n");
 
 
-	if(gTireData[playerid][1]) // frontright
-		strcat(str, "{FF0000}Front Right\n");
+		if(gTireData[playerid][1]) // frontright
+			strcat(str, "{FF0000}Front Right\n");
 
-	else
-		strcat(str, "{FFFFFF}Front Right\n");
-
-
-	if(gTireData[playerid][2]) // backleft
-		strcat(str, "{FF0000}Back Left\n");
-
-	else
-		strcat(str, "{FFFFFF}Back Left\n");
+		else
+			strcat(str, "{FFFFFF}Front Right\n");
 
 
-	if(gTireData[playerid][3]) // frontleft
-		strcat(str, "{FF0000}Front Left\n");
+		if(gTireData[playerid][2]) // backleft
+			strcat(str, "{FF0000}Back Left\n");
 
-	else
-		strcat(str, "{FFFFFF}Front Left\n");
+		else
+			strcat(str, "{FFFFFF}Back Left\n");
 
+
+		if(gTireData[playerid][3]) // frontleft
+			strcat(str, "{FF0000}Front Left\n");
+
+		else
+			strcat(str, "{FFFFFF}Front Left\n");
+
+	}
 	gCurrentWheelFixVehicle[playerid] = vehicleid;
 
 	ShowPlayerDialog(playerid, d_Tires, DIALOG_STYLE_LIST, "Tires", str, "Fix", "Cancel");

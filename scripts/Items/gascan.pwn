@@ -16,3 +16,23 @@ public OnItemCreate(itemid)
 #endif
 #define OnItemCreate gas_OnItemCreate
 forward gas_OnItemCreate(itemid);
+
+public OnItemNameRender(itemid)
+{
+	if(GetItemType(itemid) == item_GasCan)
+	{
+		new str[4];
+		valstr(str, GetItemExtraData(itemid));
+		strcat(str, "L");
+		SetItemNameExtra(itemid, str);
+	}
+
+	return CallLocalFunction("gas_OnItemNameRender", "d", itemid);
+}
+#if defined _ALS_OnItemNameRender
+	#undef OnItemNameRender
+#else
+	#define _ALS_OnItemNameRender
+#endif
+#define OnItemNameRender gas_OnItemNameRender
+forward gas_OnItemNameRender(itemid);
