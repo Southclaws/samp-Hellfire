@@ -1,0 +1,17 @@
+jcnt=2
+cash=450
+t_rg=1360336782
+t_gl=518846
+t_vh=1004228
+t_ft=1240284
+t_lg=1360337021
+qch0=NULL
+qch1=NULL
+qch2=NULL
+qch3=NULL
+qch4=NULL
+qch5=NULL
+qch6=NULL
+qch7=NULL
+qch8=NULL
+qch9=NULL
