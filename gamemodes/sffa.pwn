@@ -13,6 +13,8 @@
 #undef MAX_PLAYERS
 #define MAX_PLAYERS	(32)
 
+native IsValidVehicle(vehicleid);
+
 #include <YSI\y_utils>				// By Y_Less:				http://forum.sa-mp.com/showthread.php?p=1696956
 #include <YSI\y_va>
 #include <YSI\y_timers>
@@ -544,9 +546,9 @@ new
 
 //=====================Menus and Textdraws
 new
-Text:			InfoBar				= INVALID_TEXT_DRAW,
-Text:			ClockText			= INVALID_TEXT_DRAW,
-Text:			StopAnimText		= INVALID_TEXT_DRAW,
+Text:			InfoBar				= Text:INVALID_TEXT_DRAW,
+Text:			ClockText			= Text:INVALID_TEXT_DRAW,
+Text:			StopAnimText		= Text:INVALID_TEXT_DRAW,
 
 PlayerText:		VehicleNameText		= PlayerText:INVALID_TEXT_DRAW,
 PlayerText:		VehicleSpeedText	= PlayerText:INVALID_TEXT_DRAW,
@@ -2621,7 +2623,7 @@ internal_HitPlayer(playerid, targetid, weaponid)
 	if(bPlayerGameSettings[playerid] & DmgLock)
 		return 0;
 
-	if(weaponid == WEAPON_DESERTEAGLE)
+	if(weaponid == WEAPON_DEAGLE)
 	{
 		if(tickcount() - gWeaponHitTick[playerid] < 400)return 0;
 	}

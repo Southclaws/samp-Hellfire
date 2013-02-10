@@ -1576,7 +1576,7 @@ script_Deathmatch_hitPlayer(playerid, targetid, head, weapon)
 			GameTextForPlayer(targetid, "~r~Warning ~n~-~n~ Shots Fired", 1000, 5);
 
 	    if(pGear(playerid) == g_G12)
-	        if( (weapon == WEAPON_SPAS12 || weapon==WEAPON_SHOTGUN) && (trgDist <= 10.0) )
+	        if( (weapon == WEAPON_SHOTGSPA || weapon == WEAPON_SHOTGUN) && (trgDist <= 10.0) )
 				HpLoss *= 1.1;
 
 		if(pGear(playerid) == g_FMJ)
@@ -3732,8 +3732,8 @@ DMspawn(playerid)
 
 	if(dm_Preset != DM_BAREBONES)
 	{
-		if(pGear(playerid)==g_Night)GivePlayerWeapon(playerid, WEAPON_NIGHTVISION, 1);
-		if(pGear(playerid)==g_Thermal)GivePlayerWeapon(playerid, WEAPON_THERMALVISION, 1);
+		if(pGear(playerid)==g_Night)GivePlayerWeapon(playerid, 44, 1);
+		if(pGear(playerid)==g_Thermal)GivePlayerWeapon(playerid, 45, 1);
 	}
 	SetPlayerToTeam(playerid, pTeam(playerid));
 

@@ -1,6 +1,6 @@
 static Timer:CountDownTimer;
 
-new Text:CountdownText = INVALID_TEXT_DRAW;
+new Text:CountdownText = Text:INVALID_TEXT_DRAW;
 
 StartCountdown(m, s)
 {
