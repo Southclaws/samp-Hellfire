@@ -13,25 +13,25 @@
 #undef MAX_PLAYERS
 #define MAX_PLAYERS	(32)
 
-#include <YSI\y_utils>
+#include <YSI\y_utils>				// By Y_Less:				http://forum.sa-mp.com/showthread.php?p=1696956
 #include <YSI\y_va>
 #include <YSI\y_timers>
 #include <YSI\y_hooks>
 #include <YSI\y_iterate>
 
-#include <formatex>
-#include <strlib>
-#include <md-sort>
-#include <geoip>
-#include <sscanf2>
-#include <streamer>
-#include <CTime>
-#include <IniFiles>
-#include <bar>
-#include <playerbar>
-#include <rbits>
-#include <CameraMover>
-#include <SIF/SIF>
+#include <formatex>					// By Slice:				http://forum.sa-mp.com/showthread.php?t=313488
+#include <strlib>					// By Slice:				http://forum.sa-mp.com/showthread.php?t=362764
+#include <md-sort>					// By Slice:				http://forum.sa-mp.com/showthread.php?t=343172
+#include <geoip>					// By Totto8492:			http://forum.sa-mp.com/showthread.php?t=32509
+#include <sscanf2>					// By Y_Less:				http://forum.sa-mp.com/showthread.php?t=120356
+#include <streamer>					// By Incognito:			http://forum.sa-mp.com/showthread.php?t=102865
+#include <CTime>					// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=294054 - FIX: http://pastebin.com/zZ9bLs7K OR http://pastebin.com/2sJA38Kg
+#include <IniFiles>					// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=262795
+#include <bar>						// By Torbido:				http://forum.sa-mp.com/showthread.php?t=113443
+#include <playerbar>				// By Torbido/Southclaw:	http://pastebin.com/ZuLPd1K6
+#include <rbits>					// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=275142
+#include <CameraMover>				// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
+#include <SIF/SIF>					// By Southclaw:			https://github.com/Southclaw/SIF
 
 native WP_Hash(buffer[], len, const str[]);
 
