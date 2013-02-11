@@ -3176,7 +3176,11 @@ LoadDeathmatchData()
 
 	format(dmFile, 50, DM_DATA_FILE, dm_Map, dm_MapNames[dm_Map]);
 
-	if(!fexist(dmFile))return printf("File %s Not Found", dmFile);
+	if(!fexist(dmFile))
+	{
+		printf("File %s Not Found", dmFile);
+		return 0;
+	}
 	else file_Open(dmFile);
 
 
@@ -3569,7 +3573,11 @@ LoadDM_Map(mapid)
     format(fname, 50, DM_MAP_FILE, dm_MapNames[mapid]);
     file=fopen(fname, io_read);
 
-    if(!file)return printf("File %s Not Found", fname);
+    if(!file)
+    {
+    	printf("File %s Not Found", fname);
+    	return 0;
+    }
 
     while(fread(file, line))
     {

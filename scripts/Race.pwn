@@ -516,7 +516,11 @@ rc_Load()
 
 	format(tmpRaceFile, MAX_RACE_FILENAME, RC_DATA_FILE, rc_Data[rc_CurrentRace][rc_Name]);
 
-	if(!fexist(tmpRaceFile))return printf("File Not Found: %s", tmpRaceFile);
+	if(!fexist(tmpRaceFile))
+	{
+		printf("File Not Found: %s", tmpRaceFile);
+		return 0;
+	}
 
 	file_Open(tmpRaceFile);
 	{

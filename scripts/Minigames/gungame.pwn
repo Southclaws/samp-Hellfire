@@ -397,7 +397,10 @@ gun_LoadArenas()
 		spawnidx;
 
 	if(!fexist(GUN_INDEX_FILE))
-		return print("ERROR: Gungame index file not found");
+	{
+		print("ERROR: Gungame index file not found");
+		return 0;
+	}
 
 	idxFile = fopen(GUN_INDEX_FILE, io_read);
 	
@@ -414,7 +417,10 @@ gun_LoadArenas()
 	    format(filename, sizeof(filename), GUN_DATA_FILE, line);
 	    
 	    if(!fexist(filename))
-	        return printf("ERROR: Gungame arena '%s' file not found", filename);
+	    {
+	    	printf("ERROR: Gungame arena '%s' file not found", filename);
+	    	return 0;
+	    }
 	    
 		datFile = fopen(filename, io_read);
 

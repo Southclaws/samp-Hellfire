@@ -63,7 +63,11 @@ fdm_Start(area)
 		itemname[32];
 
 	format(filename, 40, FDM_DATA_FILE, fdm_AreaNames[area]);
-	if(!fexist(filename))return printf("ERROR: FILE '%s' NOT FOUND", filename);
+	if(!fexist(filename))
+	{
+		printf("ERROR: FILE '%s' NOT FOUND", filename);
+		return 0;
+	}
 
 	file=fopen(filename, io_read);
 
