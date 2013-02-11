@@ -788,61 +788,6 @@ ACMD:ford[4](playerid, params[])
 	return 1;
 }
 
-
-ACMD:sobj[4](playerid, params[])
-{
-	SelectObject(playerid);
-	SendClientMessage(playerid, 0xFFFFFFFF, "SERVER: Please select the object you'd like to edit!");
-	return 1;
-}
-public OnPlayerSelectObject(playerid, type, objectid, modelid, Float:fX, Float:fY, Float:fZ)
-{
-    printf("Player %d selected object %d", playerid, objectid);
-    if(type == SELECT_OBJECT_GLOBAL_OBJECT)
-    {
-        EditObject(playerid, objectid);
-    }
-    else
-    {
-        EditPlayerObject(playerid, objectid);
-    }
-    SendClientMessage(playerid, 0xFFFFFFFF, "You now are able to edit your object!");
-    return 1;
-}
-public OnPlayerEditObject(playerid, playerobject, objectid, response, Float:fX, Float:fY, Float:fZ, Float:fRotX, Float:fRotY, Float:fRotZ)
-{
-	new Float:oldX, Float:oldY, Float:oldZ,
-		Float:oldRotX, Float:oldRotY, Float:oldRotZ;
-	GetObjectPos(objectid, oldX, oldY, oldZ);
-	GetObjectRot(objectid, oldRotX, oldRotY, oldRotZ);
-	if(!playerobject) // If this is a global object, move it for other players
-	{
-	    if(!IsValidObject(objectid)) return;
-	    MoveObject(objectid, fX, fY, fZ, 10.0, fRotX, fRotY, fRotZ);
-	}
-
-	if(response == EDIT_RESPONSE_FINAL)
-	{
-		// The player clicked on the save icon
-		// Do anything here to save the updated object position (and rotation)
-	}
-
-	if(response == EDIT_RESPONSE_CANCEL)
-	{
-		//The player cancelled, so put the object back to it's old position
-		if(!playerobject) //Object is not a playerobject
-		{
-			SetObjectPos(objectid, oldX, oldY, oldZ);
-			SetObjectRot(objectid, oldRotX, oldRotY, oldRotZ);
-		}
-		else
-		{
-			SetPlayerObjectPos(playerid, objectid, oldX, oldY, oldZ);
-			SetPlayerObjectRot(playerid, objectid, oldRotX, oldRotY, oldRotZ);
-		}
-	}
-}
-
 CMD:additem(playerid, params[])
 {
 	new
