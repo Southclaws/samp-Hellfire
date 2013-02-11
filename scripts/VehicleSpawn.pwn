@@ -165,7 +165,7 @@ LoadAllVehicles(bool:prints = true)
 
 	while(fread(f, line))
 	{
-	    if(line[strlen(line)-2] == '\r')line[strlen(line) - 2] = EOS;
+	    strtrim(line, "\r\n");
 		format(str, 128, VEHICLE_DATA_FILE, line);
 		LoadVehiclesFromFile(str, prints);
 	}

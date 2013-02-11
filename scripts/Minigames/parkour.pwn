@@ -460,7 +460,6 @@ prk_LoadCourses()
 		File:idxFile=fopen(PRK_INDEX_FILE, io_read),
 		File:pkFile,
 		line[64],
-		len,
 		idx,
 		sub_idx,
 		pkFileLine[64],
@@ -475,15 +474,15 @@ prk_LoadCourses()
 
 	while(fread(idxFile, line))
 	{
-	    len = strlen(line);
-		if(line[len-2]=='\r')line[len-2]=EOS;
+		strtrim(line, "\r\n");
 
-		format(prk_Data[idx][prk_Name], 32, line);
-		format(filename, 48, PRK_DATA_FILE, prk_Data[idx][prk_Name]);
+		prk_Data[idx][prk_Name][0] = EOS;
+		strcat(prk_Data[idx][prk_Name], line, PRK_MAX_NAME);
+		format(filename, 48, PRK_DATA_FILE, line);
 
 		if(!fexist(filename))
 		{
-			printf("Error: File '%s' Not Found", filename);
+			printf("ERROR: File '%s' Not Found", filename);
 			continue;
 		}
 

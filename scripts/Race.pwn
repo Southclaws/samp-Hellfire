@@ -761,7 +761,10 @@ LoadRaces()
 	while(fread(idxFile, line))
 	{
 		if(sscanf(line, "p<,>s[32]fff", rc_Data[idx][rc_Name], rc_Data[idx][rc_Pos][0], rc_Data[idx][rc_Pos][1], rc_Data[idx][rc_Pos][2]))
-			print("Error: Race File Index");
+		{
+			print("Error: Race file index corrupted");
+			continue;
+		}
 
 
 		format(filename, sizeof(filename), RC_DATA_FILE, rc_Data[idx][rc_Name]);

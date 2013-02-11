@@ -74,15 +74,15 @@ prd_Join(playerid, msg = true)
 {
 	gCurrentMinigame[playerid] = MINIGAME_PRDRIVE;
 	if(prd_CurrentPlayer == -1)
-    {
-        prd_CurrentPlayer = playerid;
-	    TogglePlayerSpectating(prd_CurrentPlayer, false);
+	{
+		prd_CurrentPlayer = playerid;
+		TogglePlayerSpectating(prd_CurrentPlayer, false);
 		SetPlayerVirtualWorld(prd_CurrentPlayer, MINIGAME_WORLD);
-        prd_Spawn();
-    }
-    else
-    {
-    	prd_Queue[prd_NextQueueSlot()] = playerid;
+		prd_Spawn();
+	}
+	else
+	{
+		prd_Queue[prd_NextQueueSlot()] = playerid;
 		prd_Spectate(playerid);
 	}
 	if(msg)
@@ -102,7 +102,7 @@ prd_Leave(playerid, msg = true)
 
 	if(GetPlayersInPrd()==0 && IsValidVehicle(prd_VehicleID))
 	{
-	    prd_CurrentPlayer = -1;
+		prd_CurrentPlayer = -1;
 		DestroyVehicle(prd_VehicleID);
 		prd_State = PRD_STATE_NONE;
 	}
@@ -129,13 +129,13 @@ prd_RemoveFromQueue(playerid)
 
 	while(i < MAX_PLAYERS)
 	{
-	    if(prd_Queue[i] == playerid)
-	    	slot = i;
+		if(prd_Queue[i] == playerid)
+			slot = i;
 
-	    if(i > slot)
-	    	prd_Queue[i-1] = prd_Queue[i];
+		if(i > slot)
+			prd_Queue[i-1] = prd_Queue[i];
 
-	    i++;
+		i++;
 	}
 	return i;
 }
@@ -167,11 +167,11 @@ prd_Spectate(playerid)
 	}
 	else
 	{
-	    prd_Spectating[playerid] = PRD_SPECTATE_MODE_PLAYER;
-	    RemovePlayerFromVehicle(playerid);
+		prd_Spectating[playerid] = PRD_SPECTATE_MODE_PLAYER;
+		RemovePlayerFromVehicle(playerid);
 		TogglePlayerControllable(playerid, true);
-	    TogglePlayerSpectating(playerid, true);
-	    PlayerSpectateVehicle(playerid, prd_VehicleID);
+		TogglePlayerSpectating(playerid, true);
+		PlayerSpectateVehicle(playerid, prd_VehicleID);
 	}
 }
 timer prd_Spawn[1000]()
@@ -213,7 +213,7 @@ timer prd_Spawn[1000]()
 timer prd_Countdown[1000]()
 {
 	new
-	    str[4];
+		str[4];
 
 	SetPlayerVirtualWorld(prd_CurrentPlayer, MINIGAME_WORLD);
 	PutPlayerInVehicle(prd_CurrentPlayer, prd_VehicleID, 0);
@@ -254,9 +254,9 @@ script_prd_VehicleDamageUpdate(vehicleid)
 {
 	if(vehicleid == prd_VehicleID)
 	{
-	    prd_DamageCount++;
-	    prd_StartTick-=1000;
-	    GameTextForPlayer(prd_CurrentPlayer, "~r~+00:01.000", 1000, 5);
+		prd_DamageCount++;
+		prd_StartTick-=1000;
+		GameTextForPlayer(prd_CurrentPlayer, "~r~+00:01.000", 1000, 5);
 	}
 }
 script_prd_EnterDynamicRaceCP(playerid, checkpointid)
@@ -280,12 +280,12 @@ prd_Finish(playerid)
 		numrows,
 		place;
 
-    tmpTime = MsToString(tmpMs, 1);
+	tmpTime = MsToString(tmpMs, 1);
 
 	strcpy(tmpname, prd_Data[prd_CurrentTrack][prd_Name]);
 	strreplace(tmpname, " ", "_");
 
-    format(tmpQuery, 128,
+	format(tmpQuery, 128,
 		"SELECT * FROM `%s` WHERE `"#PRD_ROW_PLAYER"` = '%p'",
 		tmpname, playerid);
 
@@ -317,21 +317,21 @@ prd_Finish(playerid)
 
 	if(numrows > 0)
 	{
-	    new tmpField[24];
-	    while(place < numrows)
+		new tmpField[24];
+		while(place < numrows)
 		{
-		    db_get_field(tmpResult, 0, tmpField, 24);
+			db_get_field(tmpResult, 0, tmpField, 24);
 
-		    if(!strcmp(tmpField, gPlayerName[playerid], true))break;
+			if(!strcmp(tmpField, gPlayerName[playerid], true))break;
 
-		    db_next_row(tmpResult);
-		    place++;
+			db_next_row(tmpResult);
+			place++;
 		}
 
 		if(place == 0)
 		{
-		    prd_Data[prd_CurrentTrack][prd_BestPlayer] = gPlayerName[playerid];
-		    prd_Data[prd_CurrentTrack][prd_BestTime] = tmpMs;
+			prd_Data[prd_CurrentTrack][prd_BestPlayer] = gPlayerName[playerid];
+			prd_Data[prd_CurrentTrack][prd_BestTime] = tmpMs;
 		}
 	}
 
@@ -353,7 +353,7 @@ prd_Finish(playerid)
 	}
 
 	prd_State = PRD_STATE_NONE;
-    prd_DamageCount = 0;
+	prd_DamageCount = 0;
 	DestroyVehicle(prd_VehicleID);
 	DestroyDynamicRaceCP(prd_FinishLine);
 
@@ -384,8 +384,8 @@ prd_FormatTrackList(playerid)
 	new list[PRD_MAX_TRACK * (PRD_MAX_NAME+1)];
 	for(new i;i<prd_TotalTracks;i++)
 	{
-	    strcat(list, prd_Data[i][prd_Name]);
-	    strcat(list, "\n");
+		strcat(list, prd_Data[i][prd_Name]);
+		strcat(list, "\n");
 	}
 	strcat(list, "Cancel");
 	ShowPlayerDialog(playerid, d_PrdList, DIALOG_STYLE_LIST, "Precision Driving", list, "Start", "Top 10");
@@ -394,9 +394,9 @@ prd_FormatTrackList(playerid)
 prd_FormatHighScoreList(playerid, track)
 {
 	new
-	    tmpQuery[128],
-	    DBResult:tmpResult,
-	    tmpname[PRD_MAX_NAME],
+		tmpQuery[128],
+		DBResult:tmpResult,
+		tmpname[PRD_MAX_NAME],
 		numrows,
 		tmpStr[64],
 		title[PRD_MAX_NAME + 16],
@@ -415,21 +415,21 @@ prd_FormatHighScoreList(playerid, track)
 	if(numrows == 0)return 0;
 
 	new
-	    i,
+		i,
 		name[24],
 		time[11];
 
 	while(i < numrows)
 	{
-	    db_get_field(tmpResult, 0, name, 24);
-	    db_get_field(tmpResult, 1, time, 24);
+		db_get_field(tmpResult, 0, name, 24);
+		db_get_field(tmpResult, 1, time, 24);
 
 		format(tmpStr, 64, ""#C_BLUE"%s - "#C_YELLOW"%s\n", MsToString(strval(time), 1), name);
 
 		strcat(list, tmpStr);
 
-	    db_next_row(tmpResult);
-	    i++;
+		db_next_row(tmpResult);
+		i++;
 	}
 
 	strcpy(title, prd_Data[track][prd_Name]);
@@ -443,11 +443,11 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
 	if(dialogid == d_PrdList)
 	{
-	    if(listitem >= prd_TotalTracks)return 0;
-	    if(response)
-	    {
-		    prd_CurrentTrack = listitem;
-		    prd_Join(playerid);
+		if(listitem >= prd_TotalTracks)return 0;
+		if(response)
+		{
+			prd_CurrentTrack = listitem;
+			prd_Join(playerid);
 		}
 		else prd_FormatHighScoreList(playerid, listitem);
 	}
@@ -459,11 +459,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 prd_LoadTracks()
 {
 	new
-	    File:idxFile,
-	    File:dataFile,
-	    len,
-	    line[128],
-	    data[128],
+		File:idxFile,
+		File:dataFile,
+		line[128],
+		data[128],
 		filename[56],
 		tmpname[PRD_MAX_NAME],
 		idx,
@@ -477,16 +476,16 @@ prd_LoadTracks()
 
 	while(fread(idxFile, line))
 	{
-	    len = strlen(line);
-	    if(line[len-2] == '\r')line[len-2] = EOS;
+		strtrim(line, "\r\n");
 
-		format(prd_Data[idx][prd_Name], 32, line);
-		format(filename, 56, PRD_DATA_FILE, prd_Data[idx][prd_Name]);
+		prd_Data[idx][prd_Name][0] = EOS;
+		strcat(prd_Data[idx][prd_Name], line, PRD_MAX_NAME);
+		format(filename, 56, PRD_DATA_FILE, line);
 
 		if(!fexist(filename))
 		{
-		    printf("ERROR: Track data file '%s' not found", filename);
-		    continue;
+			printf("ERROR: Track data file '%s' not found", filename);
+			continue;
 		}
 
 		dataFile = fopen(filename, io_read);
@@ -520,7 +519,7 @@ prd_LoadTracks()
 		tmpResult = db_query(prd_Highscores, tmpQuery);
 		if(db_num_rows(tmpResult) > 0)
 		{
-		    new tmpField[24];
+			new tmpField[24];
 
 			db_get_field(tmpResult, 0, tmpField, 24);
 			prd_Data[idx][prd_BestPlayer] = tmpField;
@@ -531,7 +530,7 @@ prd_LoadTracks()
 		db_free_result(tmpResult);
 
 
-	    idx++;
+		idx++;
 	}
 	prd_TotalTracks = idx;
 	fclose(idxFile);

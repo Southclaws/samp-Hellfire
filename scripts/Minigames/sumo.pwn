@@ -424,9 +424,11 @@ smo_LoadArenas()
 	
 	while(fread(idxFile, line))
 	{
-	    line[strlen(line)-2] = EOS;
-
-	    if(sscanf(line, "p<=>s[32]f", smo_Data[idx][smo_Name], smo_Data[idx][smo_Base]))print("ERROR: Sumo Arena Data Corrupted");
+	    if(sscanf(line, "p<=>s[32]f", smo_Data[idx][smo_Name], smo_Data[idx][smo_Base]))
+	    {
+	    	print("ERROR: Sumo Arena Data Corrupted");
+	    	continue;
+	    }
 
 		format(str, 42, SMO_DATA_FILE, smo_Data[idx][smo_Name]);
 

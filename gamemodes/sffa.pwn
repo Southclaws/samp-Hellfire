@@ -4015,29 +4015,38 @@ LoadDeathmatches()
 {
 	print("- Loading Deathmatches...");
 	new
-		File:idxFile = fopen(DM_INDEX_FILE, io_read),
+		File:idxFile,
 		idx,
 		line[160];
+
+	if(!fexist(DM_INDEX_FILE))
+	{
+		print("ERROR: Deathmatch index not found.");
+		return;
+	}
+
+	idxFile = fopen(DM_INDEX_FILE, io_read);
 
 	while(fread(idxFile, line))
 	{
 		if(sscanf(line, "p<|>s[20]bds[128]s[14]s[26]", dm_MapNames[idx], dm_MapModes[idx], dm_MapRegion[idx], dm_MapInfo_Bio[idx], dm_MapInfo_Size[idx], dm_MapInfo_Kit[idx]))print("Error: Deathmatch File Index");
 		idx++;
 	}
+
 	fclose(idxFile);
 	dm_TotalMaps = idx;
 
 
-	for(new r;r<5;r++)
+	for(new r; r < 5; r++)
 	{
-	    idx=0;
+	    idx = 0;
 		format(dm_RegionList, 60, "%s%s\n", dm_RegionList, dm_RegionNames[r]);
-		for(new m;m<MAX_MAPS;m++)
+		for(new m; m < MAX_MAPS; m++)
 		{
-			if(dm_MapRegion[m]==r)
+			if(dm_MapRegion[m] == r)
 			{
 				format(dm_RegionMaps[r], 200, "%s%s\n", dm_RegionMaps[r], dm_MapNames[m]);
-				dm_RegionIndex[m]=idx;
+				dm_RegionIndex[m] = idx;
 				idx++;
 			}
 		}
@@ -4046,24 +4055,35 @@ LoadDeathmatches()
 	strcat(dm_RegionList, "Close");
 
 	LoadAwards();
+
+	return;
 }
 LoadFreeDM()
 {
 	new
-		File:file=fopen(FDM_INDEX_FILE, io_read),
+		File:file,
 		line[128],
-		idx,
-		len;
+		idx;
+
+	if(!fexist(FDM_INDEX_FILE))
+	{
+		print("ERROR: FreeDM index not found.");
+		return;
+	}
+
+	file = fopen(FDM_INDEX_FILE, io_read);
 
 	while(fread(file, line))
 	{
-	    len = strlen(line);
-		if(line[len-2] == '\r')line[len-2] = EOS;
-		format(fdm_AreaNames[idx], FDM_MAX_AREA_NAME, line);
+		strtrim(line, "\r\n");
+		strcat(fdm_AreaNames[idx], line);
 		idx++;
 	}
+
 	fdm_TotalAreas = idx;
 	fclose(file);
+
+	return;
 }
 
 

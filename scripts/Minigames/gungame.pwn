@@ -408,12 +408,10 @@ gun_LoadArenas()
 
 	while(fread(idxFile, line))
 	{
-	    if(line[strlen(line)-2] == '\r')
-			line[strlen(line)-2] = EOS;
+		strtrim(line, "\r\n");
 
         gun_ArenaName[arenaidx][0] = EOS;
 		strcat(gun_ArenaName[arenaidx], line);
-
 	    format(filename, sizeof(filename), GUN_DATA_FILE, line);
 	    
 	    if(!fexist(filename))

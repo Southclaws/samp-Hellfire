@@ -51,12 +51,8 @@ LoadVehicleMenu()
 
 	while(fread(file, str))
 	{
+		strtrim(str, "\r\n");
 		len = strlen(str);
-		if(str[len-2] == '\r')
-		{
-			str[len-2] = EOS;
-			len -= 2;
-	    }
 
 	    if(strfind(str, "category") > -1)
 	    {

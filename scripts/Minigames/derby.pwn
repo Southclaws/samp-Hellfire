@@ -497,10 +497,10 @@ dby_LoadArenas()
 
 	while(fread(idxFile, line))
 	{
+	    strtrim(line, "\r\n");
 
-	    line[strlen(line)-2] = EOS;
-		dby_Data[idx][dby_Name] = line;
-
+		dby_Data[idx][dby_Name][0] = EOS;
+		strcat(dby_Data[idx][dby_Name], line);
 		format(str, 42, DBY_DATA_FILE, line);
 
 		if(!fexist(str))
