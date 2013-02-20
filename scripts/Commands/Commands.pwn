@@ -441,7 +441,7 @@ CMD:idea(playerid, params[])
 			str[128+MAX_PLAYER_NAME+5];
 
 		format(str, sizeof(str), "%p - %s\r\n", playerid, idea);
-		if(!fexist("bugs.txt"))tmpfile = fopen("ideas.txt", io_write);
+		if(!fexist("ideas.txt"))tmpfile = fopen("ideas.txt", io_write);
 		else tmpfile = fopen("ideas.txt", io_append);
 		fwrite(tmpfile, str);
 		fclose(tmpfile);
