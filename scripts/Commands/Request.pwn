@@ -22,11 +22,11 @@ CMD:goto(playerid, params[])
 
 	if(pAdmin(targetid) > pAdmin(playerid) || !pAdmin(playerid))
 	{
-	    if(!IsPlayerInFreeRoam(targetid))
-	    {
-	        Msg(playerid, RED, " >  That player cannot be teleported to.");
-	        return 1;
-	    }
+		if(!IsPlayerInFreeRoam(targetid))
+		{
+			Msg(playerid, RED, " >  That player cannot be teleported to.");
+			return 1;
+		}
 		MsgF(targetid, YELLOW, " >  %P"#C_YELLOW" is requesting a teleport to you. You can "#C_BLUE"/accept "#C_YELLOW" or ignore this request.", playerid);
 		MsgF(playerid, YELLOW, " >  Requesting to teleport to %P", targetid);
 		gPlayerRequest[targetid][rq_target] = playerid;
@@ -46,12 +46,12 @@ CMD:get(playerid, params[])
 
 	if(pAdmin(targetid) > pAdmin(playerid) || !pAdmin(playerid))
 	{
-	    if(!IsPlayerInFreeRoam(playerid))return 0;
-	    if(!IsPlayerInFreeRoam(targetid))
-	    {
-	        Msg(playerid, RED, " >  That player cannot be teleported.");
-	        return 1;
-	    }
+		if(!IsPlayerInFreeRoam(playerid))return 0;
+		if(!IsPlayerInFreeRoam(targetid))
+		{
+			Msg(playerid, RED, " >  That player cannot be teleported.");
+			return 1;
+		}
 		MsgF(targetid, YELLOW, " >  %P"#C_YELLOW" is requesting you teleport to them. You can "#C_BLUE"/accept "#C_YELLOW" or ignore this request.", playerid);
 		MsgF(playerid, YELLOW, " >  Requesting to teleport %P", targetid);
 		gPlayerRequest[targetid][rq_target] = playerid;
@@ -65,12 +65,12 @@ CMD:accept(playerid, params[])
 {
 	if(gPlayerRequest[playerid][rq_type] == REQUEST_TYPE_NULL)
 	{
-	    Msg(playerid, RED, " >  Invalid request.");
-	    return 1;
+		Msg(playerid, RED, " >  Invalid request.");
+		return 1;
 	}
 
 	if(tickcount() - gPlayerRequest[playerid][rq_tick] < 10000)
-    {
+	{
 		if(gPlayerRequest[playerid][rq_type] == REQUEST_TYPE_GOTO)
 		{
 			TeleportPlayerToPlayer(gPlayerRequest[playerid][rq_target], playerid);
@@ -85,8 +85,8 @@ CMD:accept(playerid, params[])
 			gPlayerRequest[playerid][rq_tick] = 0;
 			gPlayerRequest[playerid][rq_type] = REQUEST_TYPE_NULL;
 		}
-    }
-    else Msg(playerid, RED, " >  The request has timed out.");
+	}
+	else Msg(playerid, RED, " >  The request has timed out.");
 	return 1;
 }
 
@@ -109,16 +109,16 @@ TeleportPlayerToPlayer(playerid, targetid)
 
 		GetVehiclePos(vehicleid, px, py, pz);
 		GetVehicleZAngle(vehicleid, ang);
-	    GetVehicleVelocity(vehicleid, vx, vy, vz);
-	    pz += 2.0;
+		GetVehicleVelocity(vehicleid, vx, vy, vz);
+		pz += 2.0;
 	}
 	else
 	{
 		GetPlayerPos(targetid, px, py, pz);
-	    GetPlayerFacingAngle(targetid, ang);
-	    GetPlayerVelocity(targetid, vx, vy, vz);
-	    px -= floatsin(-ang, degrees);
-	    py -= floatcos(-ang, degrees);
+		GetPlayerFacingAngle(targetid, ang);
+		GetPlayerVelocity(targetid, vx, vy, vz);
+		px -= floatsin(-ang, degrees);
+		py -= floatcos(-ang, degrees);
 	}
 
 	if(IsPlayerInAnyVehicle(playerid))
