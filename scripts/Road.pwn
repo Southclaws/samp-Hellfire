@@ -9,7 +9,7 @@
 
 
 new
-Bit1:	rd_IsPlayerAtRoad	<MAX_PLAYERS>,
+		rd_IsPlayerAtRoad	[MAX_PLAYERS],
 Float:	rd_PlayerRoadX		[MAX_PLAYERS],
 		rd_PlayerRoadObj	[MAX_PLAYERS][MAX_ROAD_OBJ],
 Timer:	rd_Timer[MAX_PLAYERS];
@@ -46,13 +46,13 @@ rd_Enter(playerid)
 	rd_PlayerRoadX[playerid] = ROAD_START_X;
 	rd_BuildForPlayer(playerid);
 
-	Bit1_Set(rd_IsPlayerAtRoad, playerid, true);
+	rd_IsPlayerAtRoad[playerid] = true;
 }
 
 rd_Exit(playerid)
 {
 	stop rd_Timer[playerid];
-	Bit1_Set(rd_IsPlayerAtRoad, playerid, false);
+	rd_IsPlayerAtRoad[playerid] = false;
 
 	for(new i;i<MAX_ROAD_OBJ;i++)
 	{

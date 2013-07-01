@@ -137,14 +137,14 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 					{
 						new str[32];
 						format(str, 32, "Item added to %s", containername);
-						ShowMsgBox(playerid, str, 3000, 150);
+						ShowActionText(playerid, str, 3000, 150);
 						return 1;
 					}
 					else
 					{
 						new str[32];
 						format(str, 32, "%s full", containername);
-						ShowMsgBox(playerid, str, 3000, 100);
+						ShowActionText(playerid, str, 3000, 100);
 						return 1;
 					}
 				}
@@ -255,7 +255,7 @@ public OnPlayerSelectInventoryOpt(playerid, option)
 
 				GetContainerName(containerid, name);
 				format(str, sizeof(str), "%s full", name);
-				ShowMsgBox(playerid, str, 3000, 100);
+				ShowActionText(playerid, str, 3000, 100);
 				DisplayPlayerInventory(playerid);
 				return 0;
 			}
@@ -323,14 +323,14 @@ public OnPlayerSelectContainerOpt(playerid, containerid, option)
 
 				GetContainerName(bagcontainerid, name);
 				format(str, sizeof(str), "%s full", name);
-				ShowMsgBox(playerid, str, 3000, 100);
+				ShowActionText(playerid, str, 3000, 100);
 				DisplayContainerInventory(playerid, containerid);
 				return 0;
 			}
 
 			if(!WillItemTypeFitInContainer(bagcontainerid, GetItemType(itemid)))
 			{
-				ShowMsgBox(playerid, "Item won't fit", 3000, 140);
+				ShowActionText(playerid, "Item won't fit", 3000, 140);
 				DisplayContainerInventory(playerid, containerid);
 				return 0;
 			}

@@ -292,7 +292,7 @@ script_FreeDM_OnPlayerDeath(playerid, killerid)
 	if(IsValidItem(fdm_PlayerWeaponDrop[playerid]))
 	    DestroyItem(fdm_PlayerWeaponDrop[playerid]);
 
-	fdm_PlayerWeaponDrop[playerid] = PlayerDropWeapon(playerid);
+	// fdm_PlayerWeaponDrop[playerid] = PlayerDropWeapon(playerid);
 
 	return 1;
 }

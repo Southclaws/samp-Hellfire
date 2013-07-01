@@ -633,7 +633,7 @@ ACMD:mark[4](playerid, params[])
 		}
 		ACMD:msgbox[4](playerid, params[])
 		{
-			ShowMsgBox(playerid, "This is a message~n~This is a new line~n~~g~h~r~e~b~l~y~l~p~o ~g~w~r~o~y~r~b~l~p~d~y~!", 3000);
+			ShowActionText(playerid, "This is a message~n~This is a new line~n~~g~h~r~e~b~l~y~l~p~o ~g~w~r~o~y~r~b~l~p~d~y~!", 3000);
 		    return 1;
 		}
 		ACMD:decam[4](playerid, params[])

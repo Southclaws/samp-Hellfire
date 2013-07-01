@@ -50,11 +50,7 @@ stock StringToBool(string[])
 	}
 	return result;
 }
-stock IsNumeric(const string[])
-{
-	for(new i,j=strlen(string);i<j;i++)if (string[i] > '9' || string[i] < '0') return 0;
-	return 1;
-}
+
 stock IsCharNumeric(c)
 {
 	if(c>='0'&&c<='9')return 1;

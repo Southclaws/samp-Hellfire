@@ -355,7 +355,7 @@ prk_UpdateGUI(playerid)
 {
     new str[128];
     format(str, 128, "Checkpoint: %d/%d", prk_CurrentCheck[playerid]-1, prk_Data[prk_CurrentCourse[playerid]][prk_MaxCP]-1);
-    ShowMsgBox(playerid, str, 0, 100);
+    ShowActionText(playerid, str, 0, 100);
 }
 prk_Leave(playerid, msg = true)
 {
@@ -371,7 +371,7 @@ prk_Leave(playerid, msg = true)
 	CancelSelectTextDraw(playerid);
 
 	ResetSpectatorTarget(playerid);
-	HideMsgBox(playerid);
+	HideActionText(playerid);
 
 	if(msg)
 	{

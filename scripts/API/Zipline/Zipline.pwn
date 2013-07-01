@@ -94,7 +94,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 	{
 		if(areaid == zip_Data[i][zip_startArea])
 		{
-			ShowMsgBox(playerid, "Press F to use zipline", 0, 140);
+			ShowActionText(playerid, "Press F to use zipline", 0, 140);
 		}
 		if(areaid == zip_Data[i][zip_endArea] && zip_currentZipline[playerid] != -1)
 		{
@@ -114,7 +114,7 @@ forward zip_OnPlayerEnterDynamicArea(playerid, areaid);
 
 public OnPlayerLeaveDynamicArea(playerid, areaid)
 {
-	HideMsgBox(playerid);
+	HideActionText(playerid);
 	return CallLocalFunction("zip_OnPlayerLeaveDynamicArea", "dd", playerid, areaid);
 }
 #if defined _ALS_OnPlayerLeaveDynamicArea

@@ -40,7 +40,7 @@ CMD:home(playerid, params[])
 	TextDrawShowForPlayer(playerid, ClockText);
 
 
-	HideMsgBox(playerid);
+	HideActionText(playerid);
     return 1;
 }
 CMD:mystats(playerid, params[])

@@ -9,7 +9,7 @@ ItemType:	item_Medkit = INVALID_ITEM_TYPE,
 Timer:		gPlayerMedkitTimer[MAX_PLAYERS],
 Float:		gPlayerMedkitProgress[MAX_PLAYERS],
 			gPlayerMedkitTarget[MAX_PLAYERS],
-Bit1:		gPlayerUsingMedkit<MAX_PLAYERS>;
+bool:		gPlayerUsingMedkit[MAX_PLAYERS];
 
 
 hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
@@ -33,9 +33,9 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		if(oldkeys == 16)
 		{
 			stop gPlayerMedkitTimer[playerid];
-			if(Bit1_Get(gPlayerUsingMedkit, playerid))
+			if(gPlayerUsingMedkit[playerid])
 			{
-	        	Bit1_Set(gPlayerUsingMedkit, playerid, false);
+	        	gPlayerUsingMedkit[playerid] = false;
 				HidePlayerProgressBar(playerid, ActionBar);
 				if(gPlayerMedkitTarget[playerid] != playerid)
 				{
@@ -54,7 +54,7 @@ public OnPlayerEnterPlayerArea(playerid, targetid)
 {
 	if(GetItemType(GetPlayerItem(playerid)) == item_Medkit)
 	{
-		ShowMsgBox(playerid, "Press N to give~n~Hold F to heal");
+		ShowActionText(playerid, "Press N to give~n~Hold F to heal");
 	}
     return CallLocalFunction("med_OnPlayerEnterPlayerArea", "dd", playerid, targetid);
 }
@@ -69,7 +69,7 @@ forward med_OnPlayerEnterPlayerArea(playerid, targetid);
 
 public OnPlayerLeavePlayerArea(playerid, targetid)
 {
-	HideMsgBox(playerid);
+	HideActionText(playerid);
 
     return CallLocalFunction("med_OnPlayerLeavePlayerArea", "dd", playerid, targetid);
 }
@@ -85,7 +85,7 @@ forward med_OnPlayerLeavePlayerArea(playerid, targetid);
 
 timer MedkitStartUse[100](playerid)
 {
-	Bit1_Set(gPlayerUsingMedkit, playerid, true);
+	gPlayerUsingMedkit[playerid] = true;
 	gPlayerMedkitProgress[playerid] = 0.0;
 	SetPlayerProgressBarMaxValue(playerid, ActionBar, MEDKIT_PROGRESS_MAX);
 	SetPlayerProgressBarValue(playerid, ActionBar, 0.0);
@@ -152,7 +152,7 @@ timer MedkitHealUpdate[100](playerid)
 		ClearAnimations(playerid);
 		GivePlayerHP(gPlayerMedkitTarget[playerid], 50.0);
 		DestroyItem(GetPlayerItem(playerid));
-		HideMsgBox(playerid);
+		HideActionText(playerid);
 
 		gPlayerMedkitTarget[playerid] = INVALID_PLAYER_ID;
 	}

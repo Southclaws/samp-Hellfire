@@ -355,7 +355,7 @@ clt_UpdateGUI(playerid)
 {
     new str[128];
     format(str, 128, "Items: %d/%d", clt_ItemCount[playerid], clt_Data[clt_CurrentCourse[playerid]][clt_MaxItem] - 1);
-    ShowMsgBox(playerid, str, 0, 100);
+    ShowActionText(playerid, str, 0, 100);
 }
 clt_Leave(playerid, msg = true)
 {
@@ -376,7 +376,7 @@ clt_Leave(playerid, msg = true)
 	CancelSelectTextDraw(playerid);
 
 	ResetSpectatorTarget(playerid);
-	HideMsgBox(playerid);
+	HideActionText(playerid);
 
 	if(msg)
 	{

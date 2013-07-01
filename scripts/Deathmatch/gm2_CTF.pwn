@@ -23,7 +23,7 @@ script_Deathmatch_Pickup(playerid, pickupid)
 					bitTrue(bPlayerDeathmatchSettings[playerid], dm_HasFlag);
 					UpdateFlagIcons();
 
-					ShowMsgBox(playerid, "Get the flag back to the ~n~~b~drop point!", 3000);
+					ShowActionText(playerid, "Get the flag back to the ~n~~b~drop point!", 3000);
 					MsgDeathmatchF(BLUE, " >  %P"#C_BLUE" Has picked up the Raven flag!", playerid);
 					GiveXP(playerid, 10, "Flag Picked Up");
 				}
@@ -45,7 +45,7 @@ script_Deathmatch_Pickup(playerid, pickupid)
 				pStatCount[playerid][st_Obj][st_CtfCaps]++;
 				AwardDataUpdate(playerid, .obj=1);
 			}
-			else ShowMsgBox(playerid, "~w~This is your flag, ~r~defend it!~n~~w~If you capture an enemy flag, ~b~drop it here!", 3000);
+			else ShowActionText(playerid, "~w~This is your flag, ~r~defend it!~n~~w~If you capture an enemy flag, ~b~drop it here!", 3000);
 		}
 	}
 	return 1;

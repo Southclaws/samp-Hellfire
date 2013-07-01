@@ -24,14 +24,21 @@ native IsValidVehicle(vehicleid);
 #include <formatex>					// By Slice:				http://forum.sa-mp.com/showthread.php?t=313488
 #include <strlib>					// By Slice:				http://forum.sa-mp.com/showthread.php?t=362764
 #include <md-sort>					// By Slice:				http://forum.sa-mp.com/showthread.php?t=343172
-#include <geoip>					// By Totto8492:			http://forum.sa-mp.com/showthread.php?t=32509
+
+#define result GeoIP_result
+#include <GeoIP>					// By Whitetiger:			http://forum.sa-mp.com/showthread.php?t=296171
+#undef result
+
 #include <sscanf2>					// By Y_Less:				http://forum.sa-mp.com/showthread.php?t=120356
 #include <streamer>					// By Incognito:			http://forum.sa-mp.com/showthread.php?t=102865
-#include <CTime>					// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=294054 - FIX: http://pastebin.com/zZ9bLs7K OR http://pastebin.com/2sJA38Kg
+
+#define time ctime_time
+#include <CTime>					// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=294054
+#undef time
+
 #include <IniFiles>					// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=262795
 #include <bar>						// By Torbido:				http://forum.sa-mp.com/showthread.php?t=113443
 #include <playerbar>				// By Torbido/Southclaw:	http://pastebin.com/ZuLPd1K6
-#include <rbits>					// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=275142
 #include <CameraMover>				// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
 #include <SIF/SIF>					// By Southclaw:			https://github.com/Southclaw/SIF
 
@@ -736,7 +743,6 @@ forward OnDeath(playerid, killerid, reason);
 
 //======================API Scripts
 
-#include <SIF/Modules/WeaponItems.pwn>
 #include <SIF/Modules/Craft.pwn>
 #include <SIF/Modules/Dispenser.pwn>
 
@@ -1501,9 +1507,11 @@ public OnPlayerConnect(playerid)
 
 	ResetVariables(playerid);
 
-	if(gPlayerData[playerid][ply_IP] == 2130706433)tmpCountry = "Localhost";
-	else GetCountryName(tmpIP, tmpCountry);
-	
+	GetPlayerCountry(playerid, tmpCountry);
+
+	if(isnull(tmpCountry))
+		tmpCountry = "Unknown";
+
 	if(isnull(tmpCountry))format(tmpCountry, sizeof(tmpCountry), "Unknown (%s maybe?)", RandomCountries[random(sizeof(RandomCountries))]);
 
 	if(bServerGlobalSettings&dm_LobbyCounting)TextDrawShowForPlayer(playerid, LobbyText);
@@ -2118,7 +2126,7 @@ stock FormatGenStats(playerid, type = 0)
 
 		GetPlayerHealth(playerid, stat_hp);
 		GetPlayerArmour(playerid, stat_ap);
-		GetCountryName(IpIntToStr(gPlayerData[playerid][ply_IP]), tmpCountry);
+		GetPlayerCountry(playerid, tmpCountry);
 
 		if(IsPlayerInAnyVehicle(playerid))InVeh=VehicleNames[GetVehicleModel(GetPlayerVehicleID(playerid))-400];
 		else InVeh="No";
@@ -2280,27 +2288,17 @@ stock FormatGenStatsFromFile(file[], name[], type = 0)
 		new
 			tmpQuery[128],
 			DBResult:tmpResult,
-			tmpPassword[32],
 			tmpIpStr[16],
-			tmpIp,
-			tmpCountry[32];
+			tmpIp;
 
 		format(tmpQuery, sizeof(tmpQuery), "SELECT * FROM `Player` WHERE `"#ROW_NAME"` = '%p'", name);
 	    tmpResult = db_query(gAccounts, tmpQuery);
-		db_get_field_assoc(tmpResult, #ROW_PASS, tmpPassword, MAX_PASSWORD_LEN);
 		db_get_field_assoc(tmpResult, #ROW_PASS, tmpIpStr, MAX_PASSWORD_LEN);
 		db_free_result(tmpResult);
 
 		tmpIp = strval(tmpIpStr);
 
-        GetCountryName(IpIntToStr(tmpIp), tmpCountry);
-
-		format(str, 256, "\
-			"#C_BLUE"IP\t\t\t\t\t"#C_GREEN"%s\n\
-			"#C_BLUE"Country:\t\t"#C_GREEN"%s",
-
-			IpIntToStr(tmpIp),
-			tmpCountry);
+		format(str, 256, ""#C_BLUE"IP\t\t\t\t\t"#C_GREEN"%s", IpIntToStr(tmpIp));
 	}
 	return str;
 }
@@ -2495,7 +2493,7 @@ public OnPlayerUpdate(playerid)
 
 		GetAnimationName(idx, animlib, 32, animname, 32);
 		format(str, 78, "AnimIDX:%d~n~AnimName:%s~n~AnimLib:%s", idx, animname, animlib);
-		ShowMsgBox(playerid, str);
+		ShowActionText(playerid, str);
 	}
 	if(IsPlayerInAnyVehicle(playerid))
 	{
@@ -2566,7 +2564,7 @@ public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid)
 	{
 		new str[64];
 		format(str, 64, "took %.2f~n~from %p~n~weap %d", amount, issuerid, weaponid);
-		ShowMsgBox(playerid, str, 1000, 120);
+		ShowActionText(playerid, str, 1000, 120);
 	}
 */
     if(issuerid == INVALID_PLAYER_ID)
@@ -2682,7 +2680,7 @@ internal_HitPlayer(playerid, targetid, weaponid)
 			{
 				new str[32];
 				format(str, 32, "did %.2f", HpLoss);
-				ShowMsgBox(playerid, str, 1000, 120);
+				ShowActionText(playerid, str, 1000, 120);
 			}
 
 		}
@@ -3964,7 +3962,6 @@ UnloadPlayerTextDraws(playerid)
 	dby_UnloadPlayerTextDraws(playerid);
 	gun_UnloadPlayerTextDraws(playerid);
 
-	PlayerTextDrawDestroy(playerid, MsgBox);
 	PlayerTextDrawDestroy(playerid, VehicleNameText);
 	PlayerTextDrawDestroy(playerid, VehicleSpeedText);
 	PlayerTextDrawDestroy(playerid, mapMain);
@@ -4377,6 +4374,6 @@ timer UnfreezePlayer[time](playerid, time)
 forward sffa_msgbox(playerid, message[], time, width);
 public sffa_msgbox(playerid, message[], time, width)
 {
-	ShowMsgBox(playerid, message, time, width);
+	ShowActionText(playerid, message, time, width);
 }
 

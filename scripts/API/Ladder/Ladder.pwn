@@ -140,7 +140,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 	{
 	    if(areaid == ldr_Data[i][ldr_areaID])
 	    {
-	        ShowMsgBox(playerid, "Press F to climb", 0, 120);
+	        ShowActionText(playerid, "Press F to climb", 0, 120);
 	    }
 	}
     return CallLocalFunction("ldr_OnPlayerEnterDynamicArea", "dd", playerid, areaid);
@@ -156,7 +156,7 @@ forward ldr_OnPlayerEnterDynamicArea(playerid, areaid);
 
 public OnPlayerLeaveDynamicArea(playerid, areaid)
 {
-	HideMsgBox(playerid);
+	HideActionText(playerid);
     return CallLocalFunction("ldr_OnPlayerLeaveDynamicArea", "dd", playerid, areaid);
 }
 #if defined _ALS_OnPlayerLeaveDynamicArea

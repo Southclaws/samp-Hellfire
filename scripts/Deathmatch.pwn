@@ -1590,10 +1590,10 @@ script_Deathmatch_hitPlayer(playerid, targetid, head, weapon)
 	new str[64];
 
 	format(str, 64, "DEATHMATCH~n~Did %.2f Damage", HpLoss);
-	ShowMsgBox(playerid, str, 3000);
+	ShowActionText(playerid, str, 3000);
 
 	format(str, 64, "DEATHMATCH~n~Took %.2f Damage", HpLoss);
-	ShowMsgBox(targetid, str, 3000);
+	ShowActionText(targetid, str, 3000);
 	return 1;
 }
 dm_GivePlayerHP(targetid, Float:amount, playerid=INVALID_PLAYER_ID, weapon=0, head=0, bleed=1)
@@ -1668,7 +1668,7 @@ EnterBleedout(playerid, attacker=INVALID_PLAYER_ID, weapon=0)
 
 	ShowPlayerProgressBar(playerid, BleedoutBar);
 	SetPlayerProgressBarMaxValue(playerid, BleedoutBar, 100);
-	ShowMsgBox(playerid, "Press ~r~"#TEXT_ACTION_KEY" ~w~to Bleed-Out");
+	ShowActionText(playerid, "Press ~r~"#TEXT_ACTION_KEY" ~w~to Bleed-Out");
 	dm_BleedPrtObj[playerid] = CreateDynamicObject(18706, px, py, pz-2.3, 0.0, 0.0, 0.0, DEATHMATCH_WORLD);
 
 	SetPlayerCameraLookAt(playerid, px, py, pz);
@@ -1692,7 +1692,7 @@ EnterBleedout(playerid, attacker=INVALID_PLAYER_ID, weapon=0)
 ExitBleedOut(playerid)
 {
 	HidePlayerProgressBar(playerid, BleedoutBar);
-	HideMsgBox(playerid);
+	HideActionText(playerid);
 	DestroyDynamicObject(dm_BleedPrtObj[playerid]);
 	bitFalse(bPlayerDeathmatchSettings[playerid], dm_Bleeding);
 	dm_BleedTotal--;
@@ -2238,8 +2238,8 @@ script_Deathmatch_EnterArea(playerid, areaid)
 		{
 			if(areaid==gPlayerArea[i] && playerid!=i)
 			{
-			    if(bPlayerDeathmatchSettings[i]&dm_Bleeding)ShowMsgBox(playerid, "Press ~g~"#TEXT_EQUIP_KEY" ~w~to revive player");
-			    else if(gPlayerHP[i] < MAX_HEALTH)ShowMsgBox(playerid, "Press ~g~"#TEXT_EQUIP_KEY" ~w~to heal player");
+			    if(bPlayerDeathmatchSettings[i]&dm_Bleeding)ShowActionText(playerid, "Press ~g~"#TEXT_EQUIP_KEY" ~w~to revive player");
+			    else if(gPlayerHP[i] < MAX_HEALTH)ShowActionText(playerid, "Press ~g~"#TEXT_EQUIP_KEY" ~w~to heal player");
 				else return 1;
 			}
 		}
@@ -2261,7 +2261,7 @@ script_Deathmatch_EnterArea(playerid, areaid)
 					capturer=playerid;
 				}
 			}
-			else ShowMsgBox(playerid, "This is the base you defend", 3000);
+			else ShowActionText(playerid, "This is the base you defend", 3000);
 		}
 	}
 	else if(dm_Mode==DM_MODE_CQS)
@@ -2286,7 +2286,7 @@ script_Deathmatch_EnterArea(playerid, areaid)
 }
 script_Deathmatch_ExitArea(playerid, areaid)
 {
-	PlayerLoop(i)if(areaid==gPlayerArea[i])HideMsgBox(playerid);
+	PlayerLoop(i)if(areaid==gPlayerArea[i])HideActionText(playerid);
 
 	if(areaid == dm_CombatZone)GameTextForPlayer(playerid, "~w~get back to the fight!", 500, 4);
 
@@ -2600,7 +2600,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			else
 			{
-				ShowMsgBox(playerid, "You haven't ~r~captured ~w~this ~y~command post ~w~yet", 3000);
+				ShowActionText(playerid, "You haven't ~r~captured ~w~this ~y~command post ~w~yet", 3000);
 				dm_FormatSpawnMenu(playerid);
 			    TogglePlayerSpectating(playerid, false);
 			}
@@ -2874,7 +2874,7 @@ dm_IsValidMapMode(map, mode)
 }
 dm_FormatLobbyInfo(playerid)
 {
-	HideMsgBox(playerid);
+	HideActionText(playerid);
 	new
 		str[290],
 		tmpRavenColour = 'b',
@@ -2907,7 +2907,7 @@ dm_FormatLobbyInfo(playerid)
 	dm_ModeNamesShort[dm_Mode],
 	dm_MapAuthor);
 
-	ShowMsgBox(playerid, str);
+	ShowActionText(playerid, str);
 }
 dm_FormatLobbyInfoForAll()
 {
@@ -3344,7 +3344,7 @@ timer JoinLobby[3000](playerid)
 	bitTrue(bPlayerDeathmatchSettings[playerid], dm_InLobby);
 	bitFalse(bPlayerDeathmatchSettings[playerid], dm_Ready);
 
-	HideMsgBox(playerid);
+	HideActionText(playerid);
 	HideDeathMSG(playerid);
 	SpecDM(playerid);
 	TextDrawHideForPlayer(playerid, SpawnCount);
@@ -3734,7 +3734,7 @@ DMspawn(playerid)
 	TextDrawHideForPlayer(playerid, ClockText);
 	ShowHUD(playerid);
 //	UpdateHealthBar(playerid);
-	HideMsgBox(playerid);
+	HideActionText(playerid);
 	UpdatePlayerIconForAll(playerid);
 	UpdateScoreStatus(playerid);
 
@@ -4000,7 +4000,7 @@ ExitDeathmatch(playerid)
 
 	GangZoneHideForPlayer(playerid, dm_RadarBlock);
 	HideMenuForPlayer(dm_LobbyMenu, playerid);
-	HideMsgBox(playerid);
+	HideActionText(playerid);
 
 	RemovePlayerAttachedObject(playerid, PRIMARY_SLOT);
 	RemovePlayerAttachedObject(playerid, SIDEARM_SLOT);

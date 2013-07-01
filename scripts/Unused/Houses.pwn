@@ -607,8 +607,8 @@ script_Houses_OnEnterArea(playerid, areaid)
 		{
 			if(areaid==HouseData[h][h_CarArea][g])
 			{
-			    if(IsPlayerHouseOwner(playerid, h))ShowMsgBox(playerid, "Save your car here");
-				else ShowMsgBox(playerid, "This is someone elses house");
+			    if(IsPlayerHouseOwner(playerid, h))ShowActionText(playerid, "Save your car here");
+				else ShowActionText(playerid, "This is someone elses house");
 			}
 		}
 	}
@@ -621,7 +621,7 @@ script_Houses_OnExitArea(playerid, areaid)
 		{
 			if(areaid==HouseData[h][h_CarArea][g])
 			{
-			    if(bPlayerGameSettings[playerid]&vMsgBox)HideMsgBox(playerid);
+			    if(bPlayerGameSettings[playerid]&vMsgBox)HideActionText(playerid);
 			}
 		}
 	}
@@ -670,10 +670,10 @@ script_Houses_OnExitVeh(playerid, vehicleid)
 			    if(IsPlayerHouseOwner(playerid, h))
 			    {
 					SaveHouseCar(h, g, vehicleid);
-					ShowMsgBox(playerid, "Car saved!", 3000);
+					ShowActionText(playerid, "Car saved!", 3000);
 					return 1;
 				}
-				else ShowMsgBox(playerid, "~r~You can't park there!~n~~w~This house does not belong to you!", 3000);
+				else ShowActionText(playerid, "~r~You can't park there!~n~~w~This house does not belong to you!", 3000);
 			}
 		}
 	}
@@ -938,7 +938,7 @@ public KeyCheck(playerid)
 	AngToObj,
 	Ang);
 
-	ShowMsgBox(playerid, str);
+	ShowActionText(playerid, str);
 }
 
 CheckArea(direction, playerid, houseid, roomid, Float:xMove, Float:yMove)
