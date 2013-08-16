@@ -510,7 +510,7 @@ CMD:races(playerid, params[])
 rc_Load()
 {
 	new
-		slotstr[6],
+		slotstr[MAX_KEY_LENGTH],
 		slotdata[128],
 		tmpRaceFile[MAX_RACE_FILENAME];
 

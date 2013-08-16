@@ -3164,7 +3164,7 @@ LoadDeathmatchData()
 {
 	new
 		dmFile[64],
-		buffer[128];
+		buffer[MAX_VAL_LENGTH];
 
 	bitFalse(bServerGlobalSettings, dm_Started);
 	bitTrue(bServerGlobalSettings, dm_InProgress);
@@ -3251,7 +3251,7 @@ LoadDeathmatchData()
 	}
 	if(dm_Mode==DM_MODE_CQS)
 	{
-	    new tmpkey[13];
+	    new tmpkey[MAX_KEY_LENGTH];
 		file_Open(dmFile);
 		for(new i; i < MAX_CP; i++)
 		{
@@ -4075,7 +4075,7 @@ LoadDMStats(playerid)
 LoadDMLoadout(playerid)
 {
 	new
-		tmpKey[6],
+		tmpKey[MAX_KEY_LENGTH],
 		buffer[128];
 
 	for(new c; c < MAX_KIT; c++)
@@ -4096,7 +4096,7 @@ LoadDMLoadout(playerid)
 LoadDMAwards(playerid)
 {
 	new
-		tmpKey[6],
+		tmpKey[MAX_KEY_LENGTH],
 		buffer[128];
 
 	for(new g; g < MAX_AWARD_GROUP; g++)
@@ -4139,9 +4139,9 @@ SaveDMStats(playerid)
 SaveDMLoadout(playerid)
 {
 	new
-	    line[128],
+	    line[MAX_VAL_LENGTH],
 	    tmpStr[8],
-		tmpKey[8];
+		tmpKey[MAX_KEY_LENGTH];
 
 	for(new c;c<MAX_KIT;c++)
 	{
@@ -4163,9 +4163,9 @@ SaveDMLoadout(playerid)
 SaveDMAwards(playerid)
 {
 	new
-	    line[128],
+	    line[MAX_VAL_LENGTH],
 	    tmpKey[8],
-		tmpStr[6];
+		tmpStr[MAX_KEY_LENGTH];
 
 	for(new g;g<MAX_AWARD_GROUP;g++)
 	{

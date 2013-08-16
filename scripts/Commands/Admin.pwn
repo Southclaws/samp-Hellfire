@@ -122,7 +122,7 @@ SetPlayerAdminLevel(playerid, level)
 		}
 
 		file_Open(ADMIN_DATA_FILE);
-		file_Remove(gPlayerName[playerid]);
+		fremove(gPlayerName[playerid]);
 		file_Save(ADMIN_DATA_FILE);
 		file_Close();
 

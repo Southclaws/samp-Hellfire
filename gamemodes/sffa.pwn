@@ -36,7 +36,7 @@ native IsValidVehicle(vehicleid);
 #include <CTime>					// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=294054
 #undef time
 
-#include <IniFiles>					// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=262795
+#include <IniFiles>					// By Southclaw:			https://gist.github.com/Southclaw/5979695/
 #include <bar>						// By Torbido:				http://forum.sa-mp.com/showthread.php?t=113443
 #include <playerbar>				// By Torbido/Southclaw:	http://pastebin.com/ZuLPd1K6
 #include <CameraMover>				// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
@@ -900,7 +900,6 @@ public OnGameModeInit()
 {
 	print("Starting Main Game Script 'sffa' ...");
 
-	file_OS();
 	SetGameModeText("Freeroam [No DM]");
 	SetMapName("San Andrawesome");
 
