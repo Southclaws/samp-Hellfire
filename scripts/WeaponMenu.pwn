@@ -134,7 +134,7 @@ FormatWeaponSearchDialog(playerid, query[])
 		tmp[(32 + 2 + 32 + 3)],
 		id;
 
-	if(IsNumeric(query))
+	if(isnumeric(query))
 	{
 	    id = strval(query);
 		if(0 <= id <= WEAPON_PARACHUTE)return id;

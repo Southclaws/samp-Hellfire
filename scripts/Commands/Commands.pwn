@@ -685,7 +685,7 @@ CMD:chat(playerid, params[])
 {
 	new id = strval(params);
 
-	if(!IsPlayerConnected(id) || !IsNumeric(params) || isnull(params))
+	if(!IsPlayerConnected(id) || !isnumeric(params) || isnull(params))
 		return Msg(playerid, YELLOW, "Usage: /chat [playerid] - your chat messages will only be sent to this player");
 
 	if(Blocked[playerid][id])return Msg(playerid, RED, "This player has blocked you from sending personal messages and using private chat");
@@ -709,7 +709,7 @@ CMD:chat(playerid, params[])
 CMD:block(playerid, params[])
 {
 	new id=strval(params);
-	if(!IsPlayerConnected(id)||!IsNumeric(params)||!(strlen(params)>0) || id >= MAX_PLAYERS || id < 0)Msg(playerid, YELLOW, "Usage: /block [playerid] - Block or Unblock a player from PM and Private Chatting with you");
+	if(!IsPlayerConnected(id)||!isnumeric(params)||!(strlen(params)>0) || id >= MAX_PLAYERS || id < 0)Msg(playerid, YELLOW, "Usage: /block [playerid] - Block or Unblock a player from PM and Private Chatting with you");
 	else
 	{
 	    if(Blocked[playerid][id])
@@ -735,7 +735,7 @@ CMD:block(playerid, params[])
 CMD:hide(playerid, params[])
 {
 	new id=strval(params);
-	if(!IsPlayerConnected(id)||!IsNumeric(params)||!(strlen(params)>0))Msg(playerid, YELLOW, "Usage: /hide [playerid] - Hide a players chat text from appearing on your chat box");
+	if(!IsPlayerConnected(id)||!isnumeric(params)||!(strlen(params)>0))Msg(playerid, YELLOW, "Usage: /hide [playerid] - Hide a players chat text from appearing on your chat box");
 	else
 	{
 	    if(Hidden[playerid][id])

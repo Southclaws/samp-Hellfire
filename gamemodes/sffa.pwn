@@ -37,8 +37,8 @@ native IsValidVehicle(vehicleid);
 #undef time
 
 #include <IniFiles>					// By Southclaw:			https://gist.github.com/Southclaw/5979695/
-#include <bar>						// By Torbido:				http://forum.sa-mp.com/showthread.php?t=113443
-#include <playerbar>				// By Torbido/Southclaw:	http://pastebin.com/ZuLPd1K6
+#include <progress>					// By Torbido:				http://forum.sa-mp.com/showthread.php?t=113443
+#include <playerprogress>			// By Torbido/Southclaw:	http://pastebin.com/ZuLPd1K6
 #include <CameraMover>				// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
 #include <SIF/SIF>					// By Southclaw:			https://github.com/Southclaw/SIF
 
