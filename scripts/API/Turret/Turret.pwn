@@ -502,10 +502,10 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		new id = inTurret[playerid];
 		if(Iter_Contains(tur_Index, id))
 		{
-			if(tur_canFire[id] && (tickcount() - tur_fireTick[id]) > tur_fireRate[id])
+			if(tur_canFire[id] && (GetTickCount() - tur_fireTick[id]) > tur_fireRate[id])
 			{
 				FireTurret(id);
-				tur_fireTick[id] = tickcount();
+				tur_fireTick[id] = GetTickCount();
 			}
 		}
 	}

@@ -41,8 +41,13 @@ native IsValidVehicle(vehicleid);
 #include <playerprogress>			// By Torbido/Southclaw:	http://pastebin.com/ZuLPd1K6
 #include <CameraMover>				// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
 #include <SIF/SIF>					// By Southclaw:			https://github.com/Southclaw/SIF
+#include <Balloon>					// By Southclaw:			https://gist.github.com/Southclaw/6254507
+#include <Line>						// By Southclaw:			https://gist.github.com/Southclaw/6254512
+#include <Zipline>					// By Southclaw:			https://gist.github.com/Southclaw/6254523
+#include <Ladder>					// By Southclaw:			https://gist.github.com/Southclaw/6254527
 
 native WP_Hash(buffer[], len, const str[]);
+									// By Y_Less:				http://forum.sa-mp.com/showthread.php?t=65290
 
 
 //===================================================================Definitions
@@ -692,23 +697,23 @@ stock GetGenderFromSkin(skinid)
 
 DriverTickStart(playerid)
 {
-	EnterVehTick[playerid]=tickcount();
+	EnterVehTick[playerid]=GetTickCount();
 }
 DriverTickEnd(playerid)
 {
 	if(EnterVehTick[playerid]==0)return 0xFF;
-	gPlayerData[playerid][ply_TimeInVeh]+=(tickcount()-EnterVehTick[playerid]);
+	gPlayerData[playerid][ply_TimeInVeh]+=(GetTickCount()-EnterVehTick[playerid]);
 	EnterVehTick[playerid]=0;
 	return 1;
 }
 WalkerTickStart(playerid)
 {
-	EnterFootTick[playerid]=tickcount();
+	EnterFootTick[playerid]=GetTickCount();
 }
 WalkerTickEnd(playerid)
 {
 	if(EnterFootTick[playerid]==0)return 0xFF;
-	gPlayerData[playerid][ply_TimeOnFoot]+=(tickcount()-EnterFootTick[playerid]);
+	gPlayerData[playerid][ply_TimeOnFoot]+=(GetTickCount()-EnterFootTick[playerid]);
 	EnterFootTick[playerid]=0;
 	return 1;
 }
@@ -747,11 +752,7 @@ forward OnDeath(playerid, killerid, reason);
 #include <SIF/Modules/Dispenser.pwn>
 
 
-#include "../scripts/API/Balloon/Balloon.pwn"
 #include "../scripts/API/Checkpoint/Checkpoint.pwn"
-#include "../scripts/API/Line/Line.pwn"
-#include "../scripts/API/Zipline/Zipline.pwn"
-#include "../scripts/API/Ladder/Ladder.pwn"
 #include "../scripts/API/Turret/Turret.pwn"
 #include "../scripts/API/SprayTag/SprayTag.pwn"
 
@@ -918,7 +919,7 @@ public OnGameModeInit()
 	gTimeMinute			= random(60);
 	gTimeHour			= random(24);
 	gWeatherID			= WeatherData[random(sizeof(WeatherData))][weather_id];
-	gLastWeatherChange	= tickcount();
+	gLastWeatherChange	= GetTickCount();
 
 /*
 	Group_Create("Deathmatch");
@@ -1085,7 +1086,7 @@ RestartGamemode()
 
 task GameUpdate[1000]()
 {
-	if(tickcount() / 1000 % 5 == 0)TextDrawSetString(InfoBar, InfoBarText[random(sizeof(InfoBarText))]);
+	if(GetTickCount() / 1000 % 5 == 0)TextDrawSetString(InfoBar, InfoBarText[random(sizeof(InfoBarText))]);
 
 	if(bServerGlobalSettings & ServerTimeFlow)
 	{
@@ -1126,10 +1127,10 @@ task GameUpdate[1000]()
 		TextDrawSetString(ClockText, szClockText);
 	}
 
-	if(tickcount() - gLastWeatherChange > 480000 && RandomCondition(5))
+	if(GetTickCount() - gLastWeatherChange > 480000 && RandomCondition(5))
 	{
 	    new id = random(sizeof(WeatherData));
-		gLastWeatherChange = tickcount();
+		gLastWeatherChange = GetTickCount();
 		gWeatherID = WeatherData[id][weather_id];
 		PlayerLoop(i)
 		{
@@ -1151,24 +1152,24 @@ ptask PlayerUpdate[100](playerid)
 	}
 	if(bPlayerGameSettings[playerid] & InRace && bServerGlobalSettings & rc_Started)
 	{
-		if((tickcount() - rc_StartTick[playerid]) > 5000 && gPlayerVelocity[playerid] == 0.0)
+		if((GetTickCount() - rc_StartTick[playerid]) > 5000 && gPlayerVelocity[playerid] == 0.0)
 			rc_Leave(playerid);
 	}
 
 	if(bPlayerGameSettings[playerid] & RegenHP)
 	{
-		if(tickcount() - tick_StartRegenHP[playerid] > REGEN_HP_TIME)
+		if(GetTickCount() - tick_StartRegenHP[playerid] > REGEN_HP_TIME)
 			f:bPlayerGameSettings[playerid]<RegenHP>;
 
-		if(tickcount() - tick_LastDamg[playerid] > 6000)
+		if(GetTickCount() - tick_LastDamg[playerid] > 6000)
 			gPlayerHP[playerid] += 0.1;
 	}
 	if(bPlayerGameSettings[playerid] & RegenAP)
 	{
-		if(tickcount() - tick_StartRegenAP[playerid] > REGEN_AP_TIME)
+		if(GetTickCount() - tick_StartRegenAP[playerid] > REGEN_AP_TIME)
 			f:bPlayerGameSettings[playerid]<RegenAP>;
 
-		if(tickcount() - tick_LastDamg[playerid] > 6000)
+		if(GetTickCount() - tick_LastDamg[playerid] > 6000)
 			gPlayerAP[playerid] += 0.1;
 	}
 
@@ -1183,7 +1184,7 @@ ptask PlayerUpdate[100](playerid)
 		if(health < 400.0)
 			v_Engine(vehicleid, 0);
 
-		if(tickcount() - tick_ExitVehicle[playerid] > 3000 && GetPlayerState(playerid) == PLAYER_STATE_PASSENGER)
+		if(GetTickCount() - tick_ExitVehicle[playerid] > 3000 && GetPlayerState(playerid) == PLAYER_STATE_PASSENGER)
 			SetPlayerArmedWeapon(playerid, 0);
 	}
 
@@ -1250,7 +1251,7 @@ ptask AfkCheckUpdate[3000](playerid)
 		{
 			if(!(bPlayerGameSettings[playerid] & IsAfk))
 			{
-				if(tickcount() - tick_ExitVehicle[playerid] > 2000 && ((1 <= playerstate <= 3) || playerstate == 8))
+				if(GetTickCount() - tick_ExitVehicle[playerid] > 2000 && ((1 <= playerstate <= 3) || playerstate == 8))
 				{
 					OnPlayerPauseStateChange(playerid, 1);
 				}
@@ -1749,7 +1750,7 @@ CreateNewUserfile(playerid, password[])
 	}
 	if(pAdmin(playerid)>0)MsgF(playerid, BLUE, " >  Your admin level: %d", pAdmin(playerid));
 
-	gPlayerData[playerid][ply_JoinTick] = tickcount();
+	gPlayerData[playerid][ply_JoinTick] = GetTickCount();
 	gPlayerData[playerid][ply_RegDate]	= gettime();
     gPlayerData[playerid][ply_LastLogged] = gettime();
 
@@ -1823,7 +1824,7 @@ LoadPlayerData(playerid)
 
 	file_Open(file);
 	{
-		gPlayerData[playerid][ply_JoinTick] = tickcount();
+		gPlayerData[playerid][ply_JoinTick] = GetTickCount();
 		ResetPlayerMoney(playerid);
 		GivePlayerMoney(playerid, file_GetVal(KEY_CASH));
 
@@ -1910,10 +1911,10 @@ SavePlayerData(playerid)
 
 	file_SetVal(KEY_CASH, GetPlayerMoney(playerid));
 
-	if(EnterVehTick[playerid]>0)inveh_additional=(tickcount()-EnterVehTick[playerid]);
-	if(EnterFootTick[playerid]>0)onfoot_additional=(tickcount()-EnterFootTick[playerid]);
+	if(EnterVehTick[playerid]>0)inveh_additional=(GetTickCount()-EnterVehTick[playerid]);
+	if(EnterFootTick[playerid]>0)onfoot_additional=(GetTickCount()-EnterFootTick[playerid]);
 
-	file_IncVal(KEY_T_GL, tickcount()-gPlayerData[playerid][ply_JoinTick]);
+	file_IncVal(KEY_T_GL, GetTickCount()-gPlayerData[playerid][ply_JoinTick]);
 	file_SetVal(KEY_T_VH, gPlayerData[playerid][ply_TimeInVeh]+inveh_additional);
 	file_SetVal(KEY_T_FT, gPlayerData[playerid][ply_TimeOnFoot]+onfoot_additional);
 
@@ -2055,11 +2056,11 @@ stock FormatGenStats(playerid, type = 0)
 		strftime(tmpRegDate, 32, "%x - %X", tmRegDate);
 		strftime(tmpLogDate, 32, "%x - %X", tmLogDate);
 
-		if(EnterVehTick[playerid]>0)inveh_additional=(tickcount()-EnterVehTick[playerid]);
-		if(EnterFootTick[playerid]>0)onfoot_additional=(tickcount()-EnterFootTick[playerid]);
+		if(EnterVehTick[playerid]>0)inveh_additional=(GetTickCount()-EnterVehTick[playerid]);
+		if(EnterFootTick[playerid]>0)onfoot_additional=(GetTickCount()-EnterFootTick[playerid]);
 
-		t_total=(gPlayerData[playerid][ply_TimePlayed]+(tickcount()-gPlayerData[playerid][ply_JoinTick]));
-		t_session=(tickcount()-gPlayerData[playerid][ply_JoinTick]);
+		t_total=(gPlayerData[playerid][ply_TimePlayed]+(GetTickCount()-gPlayerData[playerid][ply_JoinTick]));
+		t_session=(GetTickCount()-gPlayerData[playerid][ply_JoinTick]);
 		t_inveh=(gPlayerData[playerid][ply_TimeInVeh]+inveh_additional);
 		t_onfoot=(gPlayerData[playerid][ply_TimeOnFoot]+onfoot_additional);
 
@@ -2425,7 +2426,7 @@ public OnPlayerSpawn(playerid)
 
 public OnPlayerDeath(playerid, killerid, reason)
 {
-	if(tickcount() - gPlayerDeathTick[playerid] > 3000)
+	if(GetTickCount() - gPlayerDeathTick[playerid] > 3000)
 		return internal_OnPlayerDeath(playerid, killerid, reason);
 
 	return 1;
@@ -2433,7 +2434,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 internal_OnPlayerDeath(playerid, killerid, reason)
 {
-	gPlayerDeathTick[playerid] = tickcount();
+	gPlayerDeathTick[playerid] = GetTickCount();
 	SendDeathMessage(killerid, playerid, reason);
 
 	DriverTickEnd(playerid);
@@ -2571,7 +2572,7 @@ public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid)
 		if(bPlayerGameSettings[playerid] & InDM)
 		{
 			dm_GivePlayerHP(playerid, -(amount*2), .weapon = weaponid);
-	    	tick_LastDamg[playerid] = tickcount();
+	    	tick_LastDamg[playerid] = GetTickCount();
 		}
 		else
 		{
@@ -2622,14 +2623,14 @@ internal_HitPlayer(playerid, targetid, weaponid)
 
 	if(weaponid == WEAPON_DEAGLE)
 	{
-		if(tickcount() - gWeaponHitTick[playerid] < 400)return 0;
+		if(GetTickCount() - gWeaponHitTick[playerid] < 400)return 0;
 	}
 	else
 	{
-		if(tickcount() - gWeaponHitTick[playerid] < 100)return 0;
+		if(GetTickCount() - gWeaponHitTick[playerid] < 100)return 0;
 	}
 
-	gWeaponHitTick[playerid] = tickcount();
+	gWeaponHitTick[playerid] = GetTickCount();
 
 	new head;
 	
@@ -2646,7 +2647,7 @@ internal_HitPlayer(playerid, targetid, weaponid)
 		if(bPlayerGameSettings[targetid] & InDM && bPlayerGameSettings[targetid] & Spawned)
 			script_Deathmatch_hitPlayer(playerid, targetid, head, weaponid);
 
-        tick_LastDamg[targetid] = tickcount();
+        tick_LastDamg[targetid] = GetTickCount();
 	}
 	else
 	{
@@ -2934,7 +2935,7 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 
 public OnPlayerText(playerid, text[])
 {
-	new tmpMuteTime = tickcount() - ChatMuteTick[playerid];
+	new tmpMuteTime = GetTickCount() - ChatMuteTick[playerid];
 
 	if(bServerGlobalSettings & ChatLocked)
 	{
@@ -2953,18 +2954,18 @@ public OnPlayerText(playerid, text[])
 	}
 
 
-	if(tickcount() - tick_LastChatMessage[playerid] < 1000)
+	if(GetTickCount() - tick_LastChatMessage[playerid] < 1000)
 	{
 		ChatMessageStreak[playerid]++;
 		if(ChatMessageStreak[playerid] == 5)
 		{
-		    ChatMuteTick[playerid] = tickcount();
+		    ChatMuteTick[playerid] = GetTickCount();
 		    return 0;
 		}
 	}
 	else ChatMessageStreak[playerid]--;
 
-	tick_LastChatMessage[playerid] = tickcount();
+	tick_LastChatMessage[playerid] = GetTickCount();
 
 	if(gPlayerChatChannel[playerid] != CHANNEL_GLOBAL)
 	{
@@ -3337,7 +3338,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 
 		    if(bPlayerGameSettings[playerid] & AntiFallOffBike)
 		    {
-		    	if(GetVehicleType(gPlayerVehicleID[playerid]) == VTYPE_BIKE && tickcount()-tick_ExitVehicle[playerid] > 2000)
+		    	if(GetVehicleType(gPlayerVehicleID[playerid]) == VTYPE_BIKE && GetTickCount()-tick_ExitVehicle[playerid] > 2000)
 					PutPlayerInVehicle(playerid, gPlayerVehicleID[playerid], 0);
 			}
 
@@ -3417,7 +3418,7 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 	PlayerLoop(i)
 		if(gPlayerSpectating[i] == playerid)PlayerSpectatePlayer(i, playerid);
 
-	tick_ExitVehicle[playerid] = tickcount();
+	tick_ExitVehicle[playerid] = GetTickCount();
 
 	return 1;
 }

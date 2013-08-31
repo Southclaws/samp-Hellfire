@@ -52,13 +52,13 @@ CMD:mystats(playerid, params[])
 		onfoot_additional;
 
 	if(EnterVehTick[playerid]==0)inveh_additional=0;
-	else inveh_additional=(tickcount()-EnterVehTick[playerid]);
+	else inveh_additional=(GetTickCount()-EnterVehTick[playerid]);
 	if(EnterFootTick[playerid]==0)onfoot_additional=0;
-	else onfoot_additional=(tickcount()-EnterFootTick[playerid]);
+	else onfoot_additional=(GetTickCount()-EnterFootTick[playerid]);
 
 	new
-		t_total		= (gPlayerData[playerid][ply_TimePlayed] + (tickcount() - gPlayerData[playerid][ply_JoinTick])),
-		t_session	= (tickcount() - gPlayerData[playerid][ply_JoinTick]),
+		t_total		= (gPlayerData[playerid][ply_TimePlayed] + (GetTickCount() - gPlayerData[playerid][ply_JoinTick])),
+		t_session	= (GetTickCount() - gPlayerData[playerid][ply_JoinTick]),
 		t_inveh		= (gPlayerData[playerid][ply_TimeInVeh] + inveh_additional),
 		t_onfoot	= (gPlayerData[playerid][ply_TimeOnFoot] + onfoot_additional);
 

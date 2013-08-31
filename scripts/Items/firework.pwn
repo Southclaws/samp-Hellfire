@@ -90,11 +90,11 @@ public OnPlayerUseItemWithItem(playerid, itemid, withitemid)
 {
 	if(GetItemType(itemid) == item_FireLighter && GetItemType(withitemid) == item_FireworkBox)
 	{
-		if(tickcount() - fwk_CooldownTick > 3000)
+		if(GetTickCount() - fwk_CooldownTick > 3000)
 		{
 			ApplyAnimation(playerid, "BOMBER", "BOM_PLANT_IN", 5.0, 0, 0, 0, 0, 450);
 			defer FireworkLaunch(withitemid);
-			fwk_CooldownTick = tickcount();
+			fwk_CooldownTick = GetTickCount();
 		}
 	}
 	return CallLocalFunction("fwk_OnPlayerUseItemWithItem", "ddd", playerid, itemid, withitemid);

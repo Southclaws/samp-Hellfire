@@ -1479,7 +1479,7 @@ script_Deathmatch_PlayerUpdate(playerid)
 {
 	if( !(bPlayerGameSettings[playerid]&Spawned) )return 0;
 	
-	if( !(bPlayerDeathmatchSettings[playerid]&dm_Bleeding) && (dm_Preset != DM_HARDCORE) && tickcount()-tick_LastDamg[playerid] > REGEN_TICK)
+	if( !(bPlayerDeathmatchSettings[playerid]&dm_Bleeding) && (dm_Preset != DM_HARDCORE) && GetTickCount()-tick_LastDamg[playerid] > REGEN_TICK)
 	{
 	    if(gPlayerHP[playerid]<dm_GlobalMaxHP)
 	    {
@@ -1496,7 +1496,7 @@ script_Deathmatch_PlayerUpdate(playerid)
 //	UpdateHealthBar(playerid);
 
 	if(bPlayerDeathmatchSettings[playerid] & dm_Spotted)
-		if(tickcount()-tick_Spotted[playerid] >= MAX_SPOT_TIME)UnSpotPlayer(playerid);
+		if(GetTickCount()-tick_Spotted[playerid] >= MAX_SPOT_TIME)UnSpotPlayer(playerid);
 
 
 	return 1;
@@ -1566,7 +1566,7 @@ script_Deathmatch_hitPlayer(playerid, targetid, head, weapon)
 
 	flag_ShotBy[targetid]=playerid;
 	flag_LastShot[playerid]=playerid;
-	tick_LastShot[playerid]=tickcount();
+	tick_LastShot[playerid]=GetTickCount();
 
 	if( (trgDist<=1.5) && IsPlayerFacingPlayer(playerid, targetid, 60) && IsPlayerBehindPlayer(playerid, targetid, 10) )HpLoss+=frandom( (dm_GlobalMaxHP*0.5), dm_GlobalMaxHP);
     if(head)HpLoss*=1.5;
@@ -1714,7 +1714,7 @@ script_Deathmatch_OnPlayerKill(playerid, killerid, reason, head=0)
 	    return 1;
 	}
 
-	if(tickcount()-tick_LastKill[killerid]<=500)return 0;
+	if(GetTickCount()-tick_LastKill[killerid]<=500)return 0;
 
 	new
 		Float:DPX, Float:DPY, Float:DPZ,
@@ -1740,8 +1740,8 @@ script_Deathmatch_OnPlayerKill(playerid, killerid, reason, head=0)
 		ShowDeathMSG(playerid, killerid, reason);
 		KillStatsUpdate(playerid, killerid, reason, head);
 
-		tick_LastKill[killerid]=tickcount();
-		tick_LastDeath[playerid]=tickcount();
+		tick_LastKill[killerid]=GetTickCount();
+		tick_LastDeath[playerid]=GetTickCount();
 		flag_LastKill[killerid]=playerid;
 
 		AwardDataUpdate(killerid, .wp=1, .wg=1, .wt=1, .obj=1, .ktp=1);
@@ -1884,7 +1884,7 @@ KillStatsUpdate(playerid, killerid, weapon, head)
 
 
 // Avenger
-	if( ((tickcount()-tick_LastKill[playerid])<=MAX_VENGE_TIME) && pTeam(flag_LastKill[playerid]) != pTeam(killerid) )
+	if( ((GetTickCount()-tick_LastKill[playerid])<=MAX_VENGE_TIME) && pTeam(flag_LastKill[playerid]) != pTeam(killerid) )
 	{
 		GiveXP(killerid, 3, "Avenged");
 		pStatCount[killerid][st_Ktp][st_KtAvenge]++;
@@ -1924,7 +1924,7 @@ KillStatsUpdate(playerid, killerid, weapon, head)
 // Saviour
 	if(flag_LastShot[playerid] != -1)
 	{
-		if(pTeam(flag_LastShot[playerid]) == pTeam(killerid) && (tickcount()-tick_LastShot[playerid]) < 5000 )
+		if(pTeam(flag_LastShot[playerid]) == pTeam(killerid) && (GetTickCount()-tick_LastShot[playerid]) < 5000 )
 		{
 			GiveXP(flag_ShotBy[playerid], 3, "saviour");
 			pStatCount[killerid][st_Ktp][st_KtSaviour]++;
@@ -1933,7 +1933,7 @@ KillStatsUpdate(playerid, killerid, weapon, head)
 
 
 // dm_Combo
-	if(tickcount()-tick_LastKill[killerid]<2000)
+	if(GetTickCount()-tick_LastKill[killerid]<2000)
 	{
 		dm_PlayerData[killerid][dm_Combo]++;
 	    if(dm_PlayerData[killerid][dm_Combo]>1)
@@ -1941,7 +1941,7 @@ KillStatsUpdate(playerid, killerid, weapon, head)
 			new sComboInfo[10];
 			format(sComboInfo, 10, "dm_Combo x%d", dm_PlayerData[killerid][dm_Combo]);
 			GiveXP(killerid, (2*dm_PlayerData[killerid][dm_Combo]), sComboInfo);
-			MsgF(killerid, WHITE, "** dm_Combo: %d tick: %d", dm_PlayerData[killerid][dm_Combo], tickcount()-tick_LastKill[killerid]);
+			MsgF(killerid, WHITE, "** dm_Combo: %d tick: %d", dm_PlayerData[killerid][dm_Combo], GetTickCount()-tick_LastKill[killerid]);
 		}
 	}
 

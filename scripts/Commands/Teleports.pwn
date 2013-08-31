@@ -67,7 +67,7 @@ TeleportPlayer(playerid, id)
 	if(TeleportData[id][tp_Freeze])
 		FreezePlayer(playerid, 3000);
 
-	if(tickcount() - gPlayerTeleportMessageTick[playerid][id] > 5000)
+	if(GetTickCount() - gPlayerTeleportMessageTick[playerid][id] > 5000)
 	{
 		PlayerLoop(i)if(IsPlayerInFreeRoam(i))
 		{
@@ -75,7 +75,7 @@ TeleportPlayer(playerid, id)
 				playerid, TeleportData[id][tp_Name], TeleportData[id][tp_Cmd]);
 		}
 
-		gPlayerTeleportMessageTick[playerid][id] = tickcount();
+		gPlayerTeleportMessageTick[playerid][id] = GetTickCount();
 	}
 }
 

@@ -8,7 +8,7 @@ public OnPlayerUseItem(playerid, itemid)
 	if(GetItemType(itemid) == item_ArmourRegen)
 	{
 		t:bPlayerGameSettings[playerid]<RegenAP>;
-		tick_StartRegenAP[playerid] = tickcount();
+		tick_StartRegenAP[playerid] = GetTickCount();
 		DestroyItem(itemid);
 	}
     return CallLocalFunction("eap_OnPlayerUseItem", "dd", playerid, itemid);

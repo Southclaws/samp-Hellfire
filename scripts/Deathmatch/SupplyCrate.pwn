@@ -78,7 +78,7 @@ public OnButtonPress(playerid, buttonid)
 	{
 	    if(buttonid == crt_Data[i][crt_buttonId])
 	    {
-			if( (tickcount() - crt_CrateUseTick[playerid][crt_Data[i][crt_type]]) >= MAX_CRATE_COOL)
+			if( (GetTickCount() - crt_CrateUseTick[playerid][crt_Data[i][crt_type]]) >= MAX_CRATE_COOL)
 				UseSupplyCrate(playerid, i);
 
 			break;

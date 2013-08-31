@@ -110,9 +110,9 @@ hook OnPlayerUpdate(playerid)
 
 	if(bServerGlobalSettings & rc_Started)
 	{
-		PlayerTextDrawSetString(playerid, TimerText, MsToString(tickcount()-rc_StartTick[playerid], 1));
+		PlayerTextDrawSetString(playerid, TimerText, MsToString(GetTickCount()-rc_StartTick[playerid], 1));
 		PlayerTextDrawShow(playerid, TimerText);
-		if((tickcount()-rc_StartTick[playerid]) > rc_Data[rc_CurrentRace][rc_BestTime] && rc_Data[rc_CurrentRace][rc_BestTime] > 1000)PlayerTextDrawColor(playerid, TimerText, 0xff0000ff);
+		if((GetTickCount()-rc_StartTick[playerid]) > rc_Data[rc_CurrentRace][rc_BestTime] && rc_Data[rc_CurrentRace][rc_BestTime] > 1000)PlayerTextDrawColor(playerid, TimerText, 0xff0000ff);
 
 		valstr(str, rc_playerPosition[playerid]+1);
 
@@ -208,7 +208,7 @@ rc_Finish(playerid)
 		place,
 		failedpb;
 
-	tmpMs=tickcount()-rc_StartTick[playerid];
+	tmpMs=GetTickCount()-rc_StartTick[playerid];
 	tmpTime = MsToString(tmpMs, 1);
 
 	strcpy(tmpRaceName, rc_Data[rc_CurrentRace][rc_Name]);
@@ -619,7 +619,7 @@ rc_Start()
 
 	PlayerLoop(i)if(bPlayerGameSettings[i] & InRace)
 	{
-		rc_StartTick[i]=tickcount();
+		rc_StartTick[i]=GetTickCount();
         PlayerTextDrawColor(i, TimerText, 0xFFFFFFFF);
 		PlayerTextDrawShow(i, rc_DistCount);
 

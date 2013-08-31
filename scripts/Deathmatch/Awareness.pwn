@@ -1,6 +1,6 @@
 playerSpot(playerid)
 {
-	if(tickcount() - tick_LastTag[playerid] < TAG_TICK)return 0;
+	if(GetTickCount() - tick_LastTag[playerid] < TAG_TICK)return 0;
 
 	new
 		Float:x,
@@ -16,7 +16,7 @@ playerSpot(playerid)
 		{
 	    	if(bPlayerGameSettings[i] & InDM)
 	    	{
-	    	    tick_LastTag[playerid] = tickcount();
+	    	    tick_LastTag[playerid] = GetTickCount();
 				if( (pTeam(i) != pTeam(playerid)) )
 				{
 				    if( !(bPlayerDeathmatchSettings[i] & dm_Spotted) )SpotPlayer(i, playerid);
@@ -36,7 +36,7 @@ SpotPlayer(playerid, spotterid)
 {
 	t:bPlayerDeathmatchSettings[playerid]<dm_Spotted>;
 	UpdatePlayerIconForAll(playerid);
-	tick_Spotted[playerid] = tickcount();
+	tick_Spotted[playerid] = GetTickCount();
 	flag_Spotted[playerid] = spotterid;
 }
 UnSpotPlayer(playerid)

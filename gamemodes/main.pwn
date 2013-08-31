@@ -4,9 +4,7 @@
 
 main()
 {
-	new k = 3, d = 34;
 
-	new Float:kd = k / d;
 }
 
 

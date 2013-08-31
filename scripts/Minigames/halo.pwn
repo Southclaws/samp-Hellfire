@@ -244,7 +244,7 @@ hlo_Start()
 	GivePlayerWeapon(hlo_CurrentPlayer, 46, 1);
 
 	hlo_State = HLO_STATE_STARTED;
-	hlo_StartTick = tickcount();
+	hlo_StartTick = GetTickCount();
 	hlo_OpenedChute = false;
 
 	hlo_LandingZone = CreateDynamicRaceCP(2,
@@ -267,7 +267,7 @@ hook OnPlayerUpdate(playerid)
 		if(animidx == 971 && !hlo_OpenedChute) // Parachute open
 		{
 			hlo_OpenedChute = true;
-			hlo_FreefallTime = tickcount() - hlo_StartTick;
+			hlo_FreefallTime = GetTickCount() - hlo_StartTick;
 
 			PlayerLoop(i)
 				if(gCurrentMinigame[i] == MINIGAME_HALOPAR)

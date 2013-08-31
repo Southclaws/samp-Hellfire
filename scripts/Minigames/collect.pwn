@@ -168,7 +168,7 @@ clt_Start(playerid)
 	tmpTime = MsToString(ms, 1);
 
 	TogglePlayerControllable(playerid, true);
-	clt_StartTick[playerid] = tickcount();
+	clt_StartTick[playerid] = GetTickCount();
 	SetPlayerHP(playerid, 100.0);
 
 
@@ -213,7 +213,7 @@ clt_Finish(playerid)
 {
 	new
 		tmpTime[20],
-		tmpMs = tickcount()-clt_StartTick[playerid],
+		tmpMs = GetTickCount()-clt_StartTick[playerid],
 		tmpname[CLT_MAX_NAME],
 		tmpQuery[128],
 		tmpField[24],

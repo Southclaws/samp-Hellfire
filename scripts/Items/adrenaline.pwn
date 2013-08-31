@@ -8,7 +8,7 @@ public OnPlayerUseItem(playerid, itemid)
 	if(GetItemType(itemid) == item_HealthRegen)
 	{
 		t:bPlayerGameSettings[playerid]<RegenHP>;
-		tick_StartRegenHP[playerid] = tickcount();
+		tick_StartRegenHP[playerid] = GetTickCount();
 		DestroyItem(itemid);
 	}
 	return CallLocalFunction("adr_OnPlayerUseItem", "dd", playerid, itemid);

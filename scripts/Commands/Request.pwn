@@ -30,7 +30,7 @@ CMD:goto(playerid, params[])
 		MsgF(targetid, YELLOW, " >  %P"#C_YELLOW" is requesting a teleport to you. You can "#C_BLUE"/accept "#C_YELLOW" or ignore this request.", playerid);
 		MsgF(playerid, YELLOW, " >  Requesting to teleport to %P", targetid);
 		gPlayerRequest[targetid][rq_target] = playerid;
-		gPlayerRequest[targetid][rq_tick] = tickcount();
+		gPlayerRequest[targetid][rq_tick] = GetTickCount();
 		gPlayerRequest[targetid][rq_type] = REQUEST_TYPE_GOTO;
 	}
 	else TeleportPlayerToPlayer(playerid, targetid);
@@ -55,7 +55,7 @@ CMD:get(playerid, params[])
 		MsgF(targetid, YELLOW, " >  %P"#C_YELLOW" is requesting you teleport to them. You can "#C_BLUE"/accept "#C_YELLOW" or ignore this request.", playerid);
 		MsgF(playerid, YELLOW, " >  Requesting to teleport %P", targetid);
 		gPlayerRequest[targetid][rq_target] = playerid;
-		gPlayerRequest[targetid][rq_tick] = tickcount();
+		gPlayerRequest[targetid][rq_tick] = GetTickCount();
 		gPlayerRequest[targetid][rq_type] = REQUEST_TYPE_GET;
 	}
 	else TeleportPlayerToPlayer(targetid, playerid);
@@ -69,7 +69,7 @@ CMD:accept(playerid, params[])
 		return 1;
 	}
 
-	if(tickcount() - gPlayerRequest[playerid][rq_tick] < 10000)
+	if(GetTickCount() - gPlayerRequest[playerid][rq_tick] < 10000)
 	{
 		if(gPlayerRequest[playerid][rq_type] == REQUEST_TYPE_GOTO)
 		{

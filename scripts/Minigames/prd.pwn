@@ -236,7 +236,7 @@ prd_Start()
 {
 	SetPlayerVirtualWorld(prd_CurrentPlayer, MINIGAME_WORLD);
 	prd_State = PRD_STATE_STARTED;
-	prd_StartTick = tickcount();
+	prd_StartTick = GetTickCount();
 	prd_DamageCount = 0;
 
 	prd_FinishLine = CreateDynamicRaceCP(2,

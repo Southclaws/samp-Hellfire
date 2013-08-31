@@ -322,7 +322,7 @@ script_dgw_Update(playerid)
 {
 	if(Iter_Contains(dgw_SpawnedIndex, playerid))
 	{
-		if(dgw_State == DGW_STATE_STARTED && tickcount()-dgw_spawnTick[playerid] > 1000)
+		if(dgw_State == DGW_STATE_STARTED && GetTickCount()-dgw_spawnTick[playerid] > 1000)
 		{
 			new Float:z;
 			GetPlayerPos(playerid, z, z, z);
@@ -455,7 +455,7 @@ dgw_Spawn(playerid)
 
     Iter_Add(dgw_SpawnedIndex, playerid);
 	dgw_Spectating[playerid]	= false;
-    dgw_spawnTick[playerid]     = tickcount();
+    dgw_spawnTick[playerid]     = GetTickCount();
 
     TogglePlayerControllable(playerid, true);
 	SetCameraBehindPlayer(playerid);
