@@ -119,7 +119,7 @@ EnterLadder(playerid, ladder)
 	SetPlayerPos(playerid, ldr_Data[ladder][ldr_posX], ldr_Data[ladder][ldr_posY], zOffset);
 
 	ApplyAnimation(playerid, "PED", "CLIMB_IDLE", 3.0, 0, 0, 0, 1, 0, 1);
-    ldr_enterLadderTick[playerid] = GetGetTickCount();
+    ldr_enterLadderTick[playerid] = GetTickCount();
     ldr_currentLadder[playerid] = ladder;
 }
 ExitLadder(playerid)
@@ -181,7 +181,7 @@ public OnPlayerUpdate(playerid)
 		GetPlayerKeys(playerid, k, ud, lr);
 		GetPlayerPos(playerid, z, z, z);
 
-		if(GetGetTickCount()-ldr_enterLadderTick[playerid] > 1000 &&
+		if(GetTickCount()-ldr_enterLadderTick[playerid] > 1000 &&
 			( z-ldr_Data[ldr_currentLadder[playerid]][ldr_base]<0.5 || z >= ldr_Data[ldr_currentLadder[playerid]][ldr_top]-0.5) )
 		{
 			ExitLadder(playerid);
