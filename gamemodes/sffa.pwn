@@ -41,6 +41,8 @@ native IsValidVehicle(vehicleid);
 #include <playerprogress>			// By Torbido/Southclaw:	http://pastebin.com/ZuLPd1K6
 #include <CameraMover>				// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
 #include <SIF/SIF>					// By Southclaw:			https://github.com/Southclaw/SIF
+#include <SIF/Modules/Craft>
+#include <SIF/Modules/Dispenser>
 #include <Balloon>					// By Southclaw:			https://gist.github.com/Southclaw/6254507
 #include <Line>						// By Southclaw:			https://gist.github.com/Southclaw/6254512
 #include <Zipline>					// By Southclaw:			https://gist.github.com/Southclaw/6254523
@@ -747,10 +749,6 @@ forward OnDeath(playerid, killerid, reason);
 #include "../scripts/Handcuffs.pwn"
 
 //======================API Scripts
-
-#include <SIF/Modules/Craft.pwn>
-#include <SIF/Modules/Dispenser.pwn>
-
 
 #include "../scripts/API/Checkpoint/Checkpoint.pwn"
 #include "../scripts/API/Turret/Turret.pwn"
