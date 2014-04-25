@@ -36,13 +36,16 @@ native IsValidVehicle(vehicleid);
 #include <CTime>					// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=294054
 #undef time
 
-#include <IniFiles>					// By Southclaw:			https://gist.github.com/Southclaw/5979695/
+#include <SimpleINI>				// By Southclaw:			https://gist.github.com/Southclaw/5979695/
 #include <progress>					// By Torbido:				http://forum.sa-mp.com/showthread.php?t=113443
 #include <playerprogress>			// By Torbido/Southclaw:	http://pastebin.com/ZuLPd1K6
-#include <CameraMover>				// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
+#include <CameraSequencer>			// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
 #include <SIF/SIF>					// By Southclaw:			https://github.com/Southclaw/SIF
-#include <SIF/Modules/Craft>
-#include <SIF/Modules/Dispenser>
+#include <SIF/extensions/InventoryDialog>
+#include <SIF/extensions/InventoryKeys>
+#include <SIF/extensions/ContainerDialog>
+#include <SIF/extensions/Craft>
+#include <SIF/extensions/Dispenser>
 #include <Balloon>					// By Southclaw:			https://gist.github.com/Southclaw/6254507
 #include <Line>						// By Southclaw:			https://gist.github.com/Southclaw/6254512
 #include <Zipline>					// By Southclaw:			https://gist.github.com/Southclaw/6254523
