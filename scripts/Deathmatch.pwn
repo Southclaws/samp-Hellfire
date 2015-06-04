@@ -871,7 +871,6 @@ stock UpdatePlayerXPBar(playerid)
 	{
 		SetPlayerProgressBarValue(playerid, XPbar, 100);
 		SetPlayerProgressBarMaxValue(playerid, XPbar, 100);
-		UpdatePlayerProgressBar(playerid, XPbar);
 
 		valstr(str, MAX_RANK);
 		PlayerTextDrawSetString(playerid, RankTextCurr, str);
@@ -883,7 +882,6 @@ stock UpdatePlayerXPBar(playerid)
 
 	SetPlayerProgressBarValue(playerid, XPbar, pExp(playerid)-RequiredExp[pRank(playerid)]);
 	SetPlayerProgressBarMaxValue(playerid, XPbar, RequiredExp[pRank(playerid)+1]-RequiredExp[pRank(playerid)]);
-	UpdatePlayerProgressBar(playerid, XPbar);
 		
 	valstr(str, pRank(playerid)+1);
 	PlayerTextDrawSetString(playerid, RankTextCurr, str);
@@ -1511,7 +1509,6 @@ timer GuiUpdate[100](playerid)
 		dm_BleedPoints[playerid]--;
 
 		SetPlayerProgressBarValue(playerid, BleedoutBar, dm_BleedPoints[playerid]);
-		UpdatePlayerProgressBar(playerid, BleedoutBar);
 
 		if(dm_BleedPoints[playerid]<=0)
 		{

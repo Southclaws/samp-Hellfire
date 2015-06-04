@@ -78,7 +78,6 @@ timer ApplyHandcuffs[100](playerid, targetid, itemid)
 
 	SetPlayerProgressBarValue(playerid, ActionBar, cuf_UpdateProgress[playerid]);
 	SetPlayerProgressBarMaxValue(playerid, ActionBar, 20.0);
-	UpdatePlayerProgressBar(playerid, ActionBar);
 
 	cuf_UpdateProgress[playerid] += 1.0;
 	return;

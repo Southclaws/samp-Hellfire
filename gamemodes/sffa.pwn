@@ -25,9 +25,7 @@ native IsValidVehicle(vehicleid);
 #include <strlib>					// By Slice:				http://forum.sa-mp.com/showthread.php?t=362764
 #include <md-sort>					// By Slice:				http://forum.sa-mp.com/showthread.php?t=343172
 
-#define result GeoIP_result
-#include <GeoIP>					// By Whitetiger:			http://forum.sa-mp.com/showthread.php?t=296171
-#undef result
+#include <geolocation>				// By Whitetiger:			https://github.com/Whitetigerswt/SAMP-geoip
 
 #include <sscanf2>					// By Y_Less:				http://forum.sa-mp.com/showthread.php?t=120356
 #include <streamer>					// By Incognito:			http://forum.sa-mp.com/showthread.php?t=102865
@@ -38,9 +36,9 @@ native IsValidVehicle(vehicleid);
 
 #include <SimpleINI>				// By Southclaw:			https://gist.github.com/Southclaw/5979695/
 #include <progress>					// By Torbido:				http://forum.sa-mp.com/showthread.php?t=113443
-#include <playerprogress>			// By Torbido/Southclaw:	http://pastebin.com/ZuLPd1K6
-#include <CameraSequencer>			// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
-#include <SIF/SIF>					// By Southclaw:			https://github.com/Southclaw/SIF
+#include <progress2>				// By Torbido/Southclaw:	http://forum.sa-mp.com/showthread.php?t=537468
+#include <camerasequencer>			// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
+#include <SIF>						// By Southclaw:			https://github.com/Southclaw/SIF
 #include <SIF/extensions/InventoryDialog>
 #include <SIF/extensions/InventoryKeys>
 #include <SIF/extensions/ContainerDialog>
@@ -971,20 +969,20 @@ public OnGameModeInit()
 		SortDeepArray(gAdminData, admin_Level, .order = SORT_DESC);
 	}
 
-	item_Medkit			= DefineItemType("Medkit",			1580,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,		0.0,	0.269091, 0.166367, 0.000000, 90.000000, 0.000000, 0.000000);
-	item_HardDrive		= DefineItemType("Hard Drive",		328,	ITEM_SIZE_SMALL);
-	item_Key			= DefineItemType("Key",				327,	ITEM_SIZE_SMALL);
-	item_FireworkBox	= DefineItemType("Firework Box",	3014,	ITEM_SIZE_LARGE);
-	item_FireLighter	= DefineItemType("Lighter",			327,	ITEM_SIZE_SMALL);
-	item_timer			= DefineItemType("Timer Device",	19273,	ITEM_SIZE_SMALL);
-	item_explosive		= DefineItemType("Explosive",		1576,	ITEM_SIZE_SMALL);
-	item_timebomb		= DefineItemType("Time Bomb",		1252,	ITEM_SIZE_SMALL);
-	item_battery		= DefineItemType("Battery",			2040,	ITEM_SIZE_MEDIUM);
-	item_fusebox		= DefineItemType("Fuse Box",		2038,	ITEM_SIZE_SMALL);
-	item_Beer			= DefineItemType("Beer",			1543,	ITEM_SIZE_MEDIUM,	0.0, 0.0, 0.0,		0.063,	0.132318, 0.249579, 338.786285, 175.964538, 0.000000);
-	item_Sign			= DefineItemType("Sign",			19471,	ITEM_SIZE_LARGE,	0.0, 0.0, 270.0,	0.0);
-	item_HealthRegen	= DefineItemType("Adrenaline",		1575,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,		0.0,	0.262021, 0.014938, 0.000000, 279.040191, 352.944946, 358.980987);
-	item_ArmourRegen	= DefineItemType("ElectroArmour",	19515,	ITEM_SIZE_SMALL,	0.0, 0.0, 0.0,		0.0,	0.300333, -0.090105, 0.000000, 0.000000, 0.000000, 180.000000);
+	item_Medkit			= DefineItemType("Medkit",			"Medkit",		1580,	1,	0.0, 0.0, 0.0,		0.0,	0.269091, 0.166367, 0.000000, 90.000000, 0.000000, 0.000000);
+	item_HardDrive		= DefineItemType("Hard Drive",		"HardDrive",	328,	1);
+	item_Key			= DefineItemType("Key",				"Key",			327,	1);
+	item_FireworkBox	= DefineItemType("Firework Box",	"FireworkBox",	3014,	3);
+	item_FireLighter	= DefineItemType("Lighter",			"FireLighter",	327,	1);
+	item_timer			= DefineItemType("Timer Device",	"timer",		19273,	1);
+	item_explosive		= DefineItemType("Explosive",		"explosive",	1576,	1);
+	item_timebomb		= DefineItemType("Time Bomb",		"timebomb",		1252,	1);
+	item_battery		= DefineItemType("Battery",			"battery",		2040,	2);
+	item_fusebox		= DefineItemType("Fuse Box",		"fusebox",		2038,	1);
+	item_Beer			= DefineItemType("Beer",			"Beer",			1543,	2,	0.0, 0.0, 0.0,		0.063,	0.132318, 0.249579, 338.786285, 175.964538, 0.000000);
+	item_Sign			= DefineItemType("Sign",			"Sign",			19471,	3,	0.0, 0.0, 270.0,	0.0);
+	item_HealthRegen	= DefineItemType("Adrenaline",		"HealthRegen",	1575,	1,	0.0, 0.0, 0.0,		0.0,	0.262021, 0.014938, 0.000000, 279.040191, 352.944946, 358.980987);
+	item_ArmourRegen	= DefineItemType("ElectroArmour",	"ArmourRegen",	19515,	1,	0.0, 0.0, 0.0,		0.0,	0.300333, -0.090105, 0.000000, 0.000000, 0.000000, 180.000000);
 
 
 	disp_HealoMatic		= DefineDispenserType("Heal-O-Matic", item_Medkit, 50);
@@ -1282,7 +1280,6 @@ timer TankHeatUpdate[100](playerid)
 	if(TankHeat[playerid]>0.0)TankHeat[playerid]-=1.0;
 	SetPlayerProgressBarMaxValue(playerid, TankHeatBar, 30.0);
 	SetPlayerProgressBarValue(playerid, TankHeatBar, TankHeat[playerid]);
-	UpdatePlayerProgressBar(playerid, TankHeatBar);
 }
 
 UpdateIcons(playerid)
@@ -2794,7 +2791,6 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			TankHeat[playerid] += 20.0;
 			SetPlayerProgressBarMaxValue(playerid, TankHeatBar, 30.0);
 			SetPlayerProgressBarValue(playerid, TankHeatBar, Float:TankHeat[playerid]);
-			UpdatePlayerProgressBar(playerid, TankHeatBar);
 
 			if(TankHeat[playerid] >= 30.0)
 			{

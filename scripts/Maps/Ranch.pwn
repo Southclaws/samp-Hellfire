@@ -30,7 +30,7 @@ public OnLoad()
 	RanchHdd			= CreateItem(item_HardDrive, -693.1787, 942.0, 15.93, 90.0, 0.0, 37.5, .zoffset = FLOOR_OFFSET);
 	QuarryDoorKey		= CreateItem(item_Key, -2813.96, -1530.55, 140.97, 0.36, -85.14, 25.00);
 
-	RanchPcCam = LoadCameraMover("ranch");
+	RanchPcCam = LoadCameraSequencer("ranch");
 	CreateDynamicObject(2574, -2811.88, -1530.59, 139.84, 0.00, 0.00, 180.00);
 	CaveLift=CreateDynamicObject(7246, -2759.4704589844, 3756.869140625, 6.9, 270, 180, 340.91540527344, 0);
 
@@ -117,13 +117,13 @@ public OnButtonPress(playerid, buttonid)
 	    {
 			if(RanchPcPlayerViewing[playerid])
 			{
-			    ExitCamera(playerid);
+			    ExitPlayerCameraSequencer(playerid);
 			    TogglePlayerControllable(playerid, true);
 			    RanchPcPlayerViewing[playerid] = false;
 			}
 			else
 			{
-			    PlayCameraMover(playerid, RanchPcCam, .loop = true, .tp = false);
+			    PlayCameraSequenceForPlayer(playerid, RanchPcCam, .loop = true, .tp = false);
 			    RanchPcPlayerViewing[playerid] = true;
 			}
 	    }

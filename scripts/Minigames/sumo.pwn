@@ -125,8 +125,8 @@ smo_Join(playerid, msg = true)
 
 smo_Spawn(playerid)
 {
-	if(smo_Spectating[playerid] == SMO_SPEC_ARENA && IsValidCameraHandle(smo_Data[smo_CurrentArena][smo_Camera]))
-		ExitCamera(playerid);
+	if(smo_Spectating[playerid] == SMO_SPEC_ARENA && IsValidCameraSequencer(smo_Data[smo_CurrentArena][smo_Camera]))
+		ExitPlayerCameraSequencer(playerid);
 
 	TogglePlayerSpectating(playerid, false);
 	TogglePlayerControllable(playerid, true);
@@ -267,7 +267,7 @@ smo_Spectate(playerid)
 	}
 
 	Msg(playerid, YELLOW, " >  You are now spectating: "#C_BLUE"Arena");
-	if(!IsValidCameraHandle(smo_Data[smo_CurrentArena][smo_Camera]))
+	if(!IsValidCameraSequencer(smo_Data[smo_CurrentArena][smo_Camera]))
 	{
 		new
 			spawn1,
@@ -303,7 +303,7 @@ smo_Spectate(playerid)
 			smo_Data[smo_CurrentArena][smo_SpawnY][spawn2],
 			smo_Data[smo_CurrentArena][smo_SpawnZ][spawn2] + SMO_SPAWN_ZOFFSET);
 	}
-	else PlayCameraMover(playerid, smo_Data[smo_CurrentArena][smo_Camera], .loop = true);
+	else PlayCameraSequenceForPlayer(playerid, smo_Data[smo_CurrentArena][smo_Camera], .loop = true);
 	smo_Spectating[playerid] = SMO_SPEC_ARENA;
 	
 	return 0;
@@ -324,10 +324,11 @@ smo_Leave(playerid, msg = true)
     gCurrentMinigame[playerid] = MINIGAME_NONE;
 	if(smo_Spectating[playerid] != SMO_SPEC_NONE)
 	{
-	    if(smo_Spectating[playerid] == SMO_SPEC_ARENA)ExitCamera(playerid);
+	    if(smo_Spectating[playerid] == SMO_SPEC_ARENA)
+	    	ExitPlayerCameraSequencer(playerid);
+
 	    TogglePlayerSpectating(playerid, false);
-	    SpawnPlayer(playerid);
-	    
+	    SpawnPlayer(playerid);	    
 	}
 	stop smo_SpawnTimer[playerid];
 	stop smo_SpawnDelayTimer[playerid];
@@ -453,7 +454,7 @@ smo_LoadArenas()
 		}
 		format(str, 42, SMO_CAM_FILE, smo_Data[idx][smo_Name]);
 		smo_Data[idx][smo_MaxSpawns] = spawnIdx;
-		smo_Data[idx][smo_Camera] = LoadCameraMover(str);
+		smo_Data[idx][smo_Camera] = LoadCameraSequencer(str);
 
 		fclose(dataFile);
 	    idx++;
@@ -465,8 +466,8 @@ smo_UnloadArenas()
 {
     for(new i; i < smo_TotalArenas; i++)
     {
-        if(IsValidCameraHandle(smo_Data[i][smo_Camera]))
-            ClearCameraID(smo_Data[i][smo_Camera]);
+        if(IsValidCameraSequencer(smo_Data[i][smo_Camera]))
+            DestroyCameraSequencer(smo_Data[i][smo_Camera]);
     }
     smo_TotalArenas = 0;
 }

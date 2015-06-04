@@ -56,7 +56,7 @@ public OnLoad()
 	ch_doorstate = false;
 
 	AddItemToContainer(
-		CreateContainer("Generator", 6, -2318.9067, -1636.5662, 483.7031),
+		CreateContainer("Generator", 6, CreateButton(-2318.9067, -1636.5662, 483.7031, "Generator")),
 		CreateItem(item_Medkit, -2322.9257, -1639.8038, 483.7031));
 
 	return CallLocalFunction("mtchil_OnLoad", "");

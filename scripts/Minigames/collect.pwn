@@ -66,11 +66,11 @@ clt_Join(playerid, course, msg = true)
 	SetPlayerPos(playerid, clt_CheckPointPos[course][0][0], clt_CheckPointPos[course][0][1], clt_CheckPointPos[course][0][2]);
 	SetPlayerVirtualWorld(playerid, MINIGAME_WORLD);
 
-    if(bPlayerGameSettings[playerid] & clt_SkipIntro || !IsValidCameraHandle(clt_Data[course][clt_IntroCam]))
+    if(bPlayerGameSettings[playerid] & clt_SkipIntro || !IsValidCameraSequencer(clt_Data[course][clt_IntroCam]))
 		clt_StartCount(playerid);
 
 	else
-		PlayCameraMover(playerid, clt_Data[course][clt_IntroCam]);
+		PlayCameraSequenceForPlayer(playerid, clt_Data[course][clt_IntroCam]);
 
 
 	if(msg)
@@ -84,21 +84,21 @@ clt_Join(playerid, course, msg = true)
 
 clt_SkipIntroCam(playerid)
 {
-	ExitCamera(playerid);
+	ExitPlayerCameraSequencer(playerid);
 	clt_StartCount(playerid);
 	Msg(playerid, ORANGE, "Intro Skipped!");
 }
 
 
-public OnCameraReachNode(playerid, camera, node)
+public OnCameraReachNode(playerid, cameraid, node)
 {
-	if(IsValidCameraHandle(clt_Data[clt_CurrentCourse[playerid]][clt_IntroCam]))
+	if(IsValidCameraSequencer(clt_Data[clt_CurrentCourse[playerid]][clt_IntroCam]))
 	{
-		if(camera == clt_Data[clt_CurrentCourse[playerid]][clt_IntroCam] && node == GetCameraMaxNodes(camera) )
+		if(cameraid == clt_Data[clt_CurrentCourse[playerid]][clt_IntroCam] && node == GetCameraTotalNodes(cameraid) )
 			clt_StartCount(playerid);
 	}
 
-	return CallLocalFunction("clt_OnCameraReachNode", "ddd", playerid, camera, node);
+	return CallLocalFunction("clt_OnCameraReachNode", "ddd", playerid, cameraid, node);
 }
 #if defined _ALS_OnCameraReachNode
     #undef OnCameraReachNode
@@ -503,7 +503,7 @@ clt_LoadCourses()
 		fclose(datFile);
 
 		format(camfile, 64, "clt.%s", clt_Data[idx][clt_Name]);
-		clt_Data[idx][clt_IntroCam] = LoadCameraMover(camfile);
+		clt_Data[idx][clt_IntroCam] = LoadCameraSequencer(camfile);
 
 		strcpy(tmpname, clt_Data[idx][clt_Name]);
 		strreplace(tmpname, " ", "_");
@@ -543,8 +543,8 @@ clt_UnloadCourses()
 {
 	for(new i;i<clt_TotalCourses;i++)
 	{
-	    if(IsValidCameraHandle(clt_Data[i][clt_IntroCam]))
-		    ClearCameraID(clt_Data[i][clt_IntroCam]);
+	    if(IsValidCameraSequencer(clt_Data[i][clt_IntroCam]))
+		    DestroyCameraSequencer(clt_Data[i][clt_IntroCam]);
 	}
 	clt_TotalCourses = 0;
 }

@@ -163,7 +163,6 @@ timer SprayTag[100](playerid, tagid)
 
 	progress += 1.0;
 	SetPlayerProgressBarValue(playerid, ActionBar, progress);
-	UpdatePlayerProgressBar(playerid, ActionBar);
 	
 	if(progress == SPT_MAX_PROGRESS)
 	{

@@ -134,7 +134,6 @@ timer UseSupplyCrateUpdate[100](playerid, crateid)
 		Float:val = GetPlayerProgressBarValue(playerid, ActionBar);
 
 	SetPlayerProgressBarValue(playerid, ActionBar, val + 1.0);
-	UpdatePlayerProgressBar(playerid, ActionBar);
 
 	if(val >= 50.0)
 	{

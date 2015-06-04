@@ -65,11 +65,11 @@ prk_Join(playerid, course, msg = true)
 	SetPlayerPos(playerid, prk_CheckPointPos[course][0][0], prk_CheckPointPos[course][0][1], prk_CheckPointPos[course][0][2]);
 	SetPlayerVirtualWorld(playerid, MINIGAME_WORLD);
 
-    if(bPlayerGameSettings[playerid] & prk_SkipIntro || !IsValidCameraHandle(prk_Data[course][prk_IntroCam]))
+    if(bPlayerGameSettings[playerid] & prk_SkipIntro || !IsValidCameraSequencer(prk_Data[course][prk_IntroCam]))
 		prk_StartCount(playerid);
 
 	else
-		PlayCameraMover(playerid, prk_Data[course][prk_IntroCam]);
+		PlayCameraSequenceForPlayer(playerid, prk_Data[course][prk_IntroCam]);
 
 
 	if(msg)
@@ -83,21 +83,21 @@ prk_Join(playerid, course, msg = true)
 
 prk_SkipIntroCam(playerid)
 {
-	ExitCamera(playerid);
+	ExitPlayerCameraSequencer(playerid);
 	prk_StartCount(playerid);
 	Msg(playerid, ORANGE, "Intro Skipped!");
 }
 
 
-public OnCameraReachNode(playerid, camera, node)
+public OnCameraReachNode(playerid, cameraid, node)
 {
-	if(IsValidCameraHandle(prk_Data[prk_CurrentCourse[playerid]][prk_IntroCam]))
+	if(IsValidCameraSequencer(prk_Data[prk_CurrentCourse[playerid]][prk_IntroCam]))
 	{
-		if(camera == prk_Data[prk_CurrentCourse[playerid]][prk_IntroCam] && node == GetCameraMaxNodes(camera) )
+		if(cameraid == prk_Data[prk_CurrentCourse[playerid]][prk_IntroCam] && node == GetCameraTotalNodes(cameraid) )
 			prk_StartCount(playerid);
 	}
 
-	return CallLocalFunction("prk_OnCameraReachNode", "ddd", playerid, camera, node);
+	return CallLocalFunction("prk_OnCameraReachNode", "ddd", playerid, cameraid, node);
 }
 #if defined _ALS_OnCameraReachNode
     #undef OnCameraReachNode
@@ -105,7 +105,7 @@ public OnCameraReachNode(playerid, camera, node)
     #define _ALS_OnCameraReachNode
 #endif
 #define OnCameraReachNode prk_OnCameraReachNode
-forward prk_OnCameraReachNode(playerid, camera, node);
+forward prk_OnCameraReachNode(playerid, cameraid, node);
 
 
 prk_StartCount(playerid)
@@ -502,7 +502,7 @@ prk_LoadCourses()
 		fclose(pkFile);
 
 		format(pkCamDir, 64, "pkcam.%s", prk_Data[idx][prk_Name]);
-		prk_Data[idx][prk_IntroCam] = LoadCameraMover(pkCamDir);
+		prk_Data[idx][prk_IntroCam] = LoadCameraSequencer(pkCamDir);
 
 		strcpy(tmpname, prk_Data[idx][prk_Name]);
 		strreplace(tmpname, " ", "_");
@@ -542,8 +542,8 @@ prk_UnloadCourses()
 {
 	for(new i;i<prk_TotalCourses;i++)
 	{
-	    if(IsValidCameraHandle(prk_Data[i][prk_IntroCam]))
-		    ClearCameraID(prk_Data[i][prk_IntroCam]);
+	    if(IsValidCameraSequencer(prk_Data[i][prk_IntroCam]))
+		    DestroyCameraSequencer(prk_Data[i][prk_IntroCam]);
 	}
 	prk_TotalCourses = 0;
 }

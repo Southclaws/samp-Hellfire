@@ -119,8 +119,8 @@ dby_Join(playerid, msg = true)
 
 dby_Spawn(playerid)
 {
-	if(dby_Spectating[playerid] == DBY_SPEC_ARENA && IsValidCameraHandle(dby_Data[dby_CurrentArena][dby_Camera]))
-		ExitCamera(playerid);
+	if(dby_Spectating[playerid] == DBY_SPEC_ARENA && IsValidCameraSequencer(dby_Data[dby_CurrentArena][dby_Camera]))
+		ExitPlayerCameraSequencer(playerid);
 
 	TogglePlayerSpectating(playerid, false);
 	TogglePlayerControllable(playerid, true);
@@ -308,13 +308,13 @@ timer dby_Spectate[3000](playerid)
 	}
 
     Msg(playerid, YELLOW, " >  You are now spectating: "#C_BLUE"Arena");
-    if(!IsValidCameraHandle(dby_Data[dby_CurrentArena][dby_Camera]))
+    if(!IsValidCameraSequencer(dby_Data[dby_CurrentArena][dby_Camera]))
     {
 		TogglePlayerSpectating(playerid, false);
 		TogglePlayerControllable(playerid, false);
 		dby_SpectateTimer[playerid] = defer SetBackupSpectateCamera(playerid);
     }
-	else PlayCameraMover(playerid, dby_Data[dby_CurrentArena][dby_Camera], .loop = true);
+	else PlayCameraSequenceForPlayer(playerid, dby_Data[dby_CurrentArena][dby_Camera], .loop = true);
     dby_Spectating[playerid] = DBY_SPEC_ARENA;
 
 	return 0;
@@ -368,7 +368,9 @@ dby_Leave(playerid, msg = true)
 	t:bPlayerGameSettings[playerid]<Invis>;
 	if(dby_Spectating[playerid] != DBY_SPEC_NONE)
 	{
-	    if(dby_Spectating[playerid] == DBY_SPEC_ARENA)ExitCamera(playerid);
+	    if(dby_Spectating[playerid] == DBY_SPEC_ARENA)
+	    	ExitPlayerCameraSequencer(playerid);
+
 	    TogglePlayerSpectating(playerid, false);
 	    SpawnPlayer(playerid);
 	}
@@ -524,7 +526,7 @@ dby_LoadArenas()
 		}
 		format(str, 42, DBY_CAM_FILE, line);
 		dby_Data[idx][dby_MaxSpawns] = spawnIdx;
-		dby_Data[idx][dby_Camera] = LoadCameraMover(str);
+		dby_Data[idx][dby_Camera] = LoadCameraSequencer(str);
 		
 		fclose(dataFile);
 	    idx++;
@@ -537,8 +539,8 @@ dby_UnloadArenas()
 {
     for(new i; i < dby_TotalArenas; i++)
     {
-        if(IsValidCameraHandle(dby_Data[i][dby_Camera]))
-            ClearCameraID(dby_Data[i][dby_Camera]);
+        if(IsValidCameraSequencer(dby_Data[i][dby_Camera]))
+            DestroyCameraSequencer(dby_Data[i][dby_Camera]);
     }
     dby_TotalArenas = 0;
 }
