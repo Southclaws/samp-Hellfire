@@ -1,0 +1,26 @@
+{
+    "entry": "gamemodes/sffa.pwn",
+    "output": "gamemodes/sffa.amx",
+    "dependencies": [
+        "Southclaws/samp-stdlib:0.3.7-R2-2-1",
+        "Zeex/samp-plugin-crashdetect/include",
+        "maddinat0r/sscanf",
+        "Zeex/amx_assembly",
+        "Misiur/YSI-Includes",
+        "samp-incognito/samp-streamer-plugin",
+        "Southclaws/formatex",
+        "oscar-broman/strlib",
+        "oscar-broman/md-sort",
+        "Southclaws/easyDialog",
+        "Southclaws/SAMP-geoip",
+        "Southclaws/samp-ctime",
+        "Southclaws/progress2",
+        "Southclaws/CameraSequencer",
+        "Southclaws/samp-ini",
+        "Southclaws/SIF",
+        "Southclaws/Balloon",
+        "Southclaws/Line",
+        "Southclaws/Zipline",
+        "Southclaws/Ladder"
+    ]
+}

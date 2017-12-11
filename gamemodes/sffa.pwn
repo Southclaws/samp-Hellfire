@@ -34,16 +34,18 @@ native IsValidVehicle(vehicleid);
 #include <CTime>					// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=294054
 #undef time
 
-#include <SimpleINI>				// By Southclaw:			https://gist.github.com/Southclaw/5979695/
-#include <progress>					// By Torbido:				http://forum.sa-mp.com/showthread.php?t=113443
+#include <ini>						// By Southclaw:			https://gist.github.com/Southclaw/5979695/
 #include <progress2>				// By Torbido/Southclaw:	http://forum.sa-mp.com/showthread.php?t=537468
 #include <camerasequencer>			// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
 #include <SIF>						// By Southclaw:			https://github.com/Southclaw/SIF
-#include <SIF/extensions/InventoryDialog>
-#include <SIF/extensions/InventoryKeys>
-#include <SIF/extensions/ContainerDialog>
-#include <SIF/extensions/Craft>
-#include <SIF/extensions/Dispenser>
+#include <SIF/extensions/item-array-data>
+#include <SIF/extensions/item-serializer>
+#include <SIF/extensions/dialog-inventory>
+#include <SIF/extensions/keys-inventory>
+#include <SIF/extensions/dialog-container>
+#include <SIF/extensions/craft>
+#include <SIF/extensions/debug-labels>
+#include <SIF/old/Dispenser.pwn>
 #include <Balloon>					// By Southclaw:			https://gist.github.com/Southclaw/6254507
 #include <Line>						// By Southclaw:			https://gist.github.com/Southclaw/6254512
 #include <Zipline>					// By Southclaw:			https://gist.github.com/Southclaw/6254523
