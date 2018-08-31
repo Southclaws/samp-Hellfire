@@ -22,10 +22,10 @@ ACMD:sp[4](playerid, params[])
 			GetPlayerFacingAngle(playerid, r);
 		}
 		format(string, 128, "%.4f, %.4f, %.4f, %.4f", x, y, z, r);
-		file_Open("savedpositions.txt");
-		file_SetStr(PositionName, string);
-		file_Save("savedpositions.txt");
-		file_Close();
+		ini_open("savedpositions.txt");
+		ini_setString(PositionName, string);
+		ini_commit();
+		ini_close();
 		MsgF(playerid, ORANGE, " >  %s = %s "#C_BLUE"Saved!", PositionName, string);
 	}
 	else Msg(playerid, YELLOW, " >  Usage: /sp [position name]");
@@ -43,14 +43,14 @@ ACMD:tp[4](playerid, params[])
 			Float:r,
 			data[256];
 
-		file_Open("savedpositions.txt");
+		ini_open("savedpositions.txt");
 		{
-			if(file_IsKey(PositionName))
-				file_GetStr(PositionName, data);
+			if(ini_isKey(PositionName))
+				ini_getString(PositionName, data);
 			else
 			    return Msg(playerid, RED, " >  Position not found");
 		}
-		file_Close();
+		ini_close();
 
 		sscanf(data, "p<,>ffff", x, y, z, r);
 		MsgF(playerid, YELLOW, " >  "#C_BLUE"%s = %s "#C_YELLOW"Loaded!", PositionName, data);
@@ -722,9 +722,9 @@ ACMD:telemap[4](playerid, params[])
 
 		format(fname, 64, DM_DATA_FILE, map, dm_MapNames[map]);
 
-		file_Open(fname);
-		file_GetStr("GEN_spawn1", lineData);
-		file_Close();
+		ini_open(fname);
+		ini_getString("GEN_spawn1", lineData);
+		ini_close();
 
 		sscanf(lineData, "p<,>fff", spawnX, spawnY, spawnZ);
 		SetPlayerPos(playerid, spawnX, spawnY, spawnZ);
@@ -763,10 +763,10 @@ ACMD:savepcar[4](playerid, params[])
 		new str[100],
 		m=GetVehicleModel(GetPlayerVehicleID(playerid));
 		format(str, 100, "{\"/cmd\",\t\"%s\",\t%d,\t%d,\t%d}", n, m, c_1, c_2);
-		file_Open("savedpositions.txt");
-		file_SetStr(n, str);
-		file_Save("savedpositions.txt");
-		file_Close();
+		ini_open("savedpositions.txt");
+		ini_setString(n, str);
+		ini_commit();
+		ini_close();
 	    Msg(playerid, YELLOW, "Vehicle Saved");
 	}
 	return 1;
@@ -804,7 +804,7 @@ CMD:additem(playerid, params[])
 	itemid = CreateItem(type,
 			x + (0.5 * floatsin(-r, degrees)),
 			y + (0.5 * floatcos(-r, degrees)),
-			z-0.8568, .rz = r, .zoffset = 0.7);
+			z-0.8568, .rz = r);
 
 	if(0 < _:type <= WEAPON_PARACHUTE)
 		SetItemExtraData(itemid, WepData[_:type][MagSize]);

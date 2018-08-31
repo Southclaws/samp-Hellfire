@@ -287,7 +287,7 @@ new
 	dm_ObjectTable[DM_MAX_OBJECTS],
 	dm_VehicleTable[DM_MAX_VEHICLE],
 	Iterator:dm_ObjectTableIndex<DM_MAX_OBJECTS>,
-	Iterator:dm_VehicleTableIndex<DM_MAX_VEHICLE>;
+	Iterator:dm_VehTableIndex<DM_MAX_VEHICLE>;
 
 //======================Gamemode Names
 
@@ -1677,7 +1677,7 @@ EnterBleedout(playerid, attacker=INVALID_PLAYER_ID, weapon=0)
 		{
 			f:bPlayerDeathmatchSettings[playerid]<dm_Capturing>;
 
-			HideProgressBarForPlayer(playerid, ADbar);
+			HidePlayerProgressBar(playerid, ADbar[playerid]);
 			if(GetPlayersCapturingAD() == 0)
 			{
 				PointCT=false;
@@ -2020,7 +2020,7 @@ DeathmatchDataUpdate(playerid, killerid)
 		if(bPlayerDeathmatchSettings[playerid]&dm_Capturing)
 		{
 			bitFalse(bPlayerDeathmatchSettings[playerid], dm_Capturing);
-			HideProgressBarForPlayer(playerid, ADbar);
+			HidePlayerProgressBar(playerid, ADbar[playerid]);
 			if(GetPlayersCapturingAD() == 0)
 			{
 				PointCT=false;
@@ -2118,7 +2118,7 @@ DropCurrentWeapon(playerid)
 
 		dm_PlayerWeaponDrop[playerid] = CreateItem(
 				ItemType:type, x, y, z - 0.86,
-				.rx = 90.0, .rz = a, .zoffset = 1.0,
+				.rx = 90.0, .ry = a, .rz = 1.0,
 				.world = DEATHMATCH_WORLD, .interior = 0);
 
 		SetItemLabel(dm_PlayerWeaponDrop[playerid], str);
@@ -2273,7 +2273,7 @@ script_Deathmatch_EnterArea(playerid, areaid)
 					CapturingCP[playerid] = cp;
 					CPtimer[cp]=true;
 
-					ShowProgressBarForPlayer(playerid, CPbar[cp]);
+					ShowPlayerProgressBar(playerid, CPbar[playerid][cp]);
 					MsgDeathmatchF(BLUE, " >  %P"#C_BLUE" Is Capturing %s!", playerid, CPname[cp]);
 				}
 			}
@@ -2294,7 +2294,7 @@ script_Deathmatch_ExitArea(playerid, areaid)
 		    ContinueMatchTime();
 		    bitFalse(bPlayerDeathmatchSettings[playerid], dm_Capturing);
 			if(GetPlayersCapturingAD() == 0) PointCT=false;
-			HideProgressBarForPlayer(playerid, ADbar);
+			HidePlayerProgressBar(playerid, ADbar[playerid]);
 		}
 	}
 	if(dm_Mode==DM_MODE_CQS)
@@ -2305,7 +2305,7 @@ script_Deathmatch_ExitArea(playerid, areaid)
 		    {
 				CapturingCP[playerid] = -1;
 				if(GetPlayersCapturing(cp) == 0)CPtimer[cp]=false;
-				HideProgressBarForPlayer(playerid, CPbar[cp]);
+				HidePlayerProgressBar(playerid, CPbar[playerid][cp]);
 			}
 		}
 	}
@@ -2530,10 +2530,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 			pLoadout[playerid][pKit(playerid)][WEAPON_SLOT_PRIMARY] = dm_WepListIndex[0][listitem];
 
-			file_Open(file);
+			ini_open(file);
 			SaveDMLoadout(playerid);
-			file_Save(file);
-			file_Close();
+			ini_commit();
+			ini_close();
 
 			dm_FormatCustomMenu(playerid);
 		}
@@ -2550,10 +2550,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 			pLoadout[playerid][pKit(playerid)][WEAPON_SLOT_SIDEARM] = dm_WepListIndex[1][listitem];
 
-			file_Open(file);
+			ini_open(file);
 			SaveDMLoadout(playerid);
-			file_Save(file);
-			file_Close();
+			ini_commit();
+			ini_close();
 
 			dm_FormatCustomMenu(playerid);
 		}
@@ -2700,7 +2700,7 @@ dm_UpdateGraphicMenu(playerid)
 	PlayerTextDrawSetString(playerid, dm_GraMenu_RightOpt, tmpStr);
 }
 
-hook OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
+hook OnPlayerClickPlayerTD(playerid, PlayerText:playertextid)
 {
 	if(playertextid == dm_GraMenu_Left)
 	{
@@ -2726,15 +2726,16 @@ hook OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 		GetFile(gPlayerName[playerid], file);
 
 	    pGraphic[playerid] = dm_GraMenuCurrent[playerid];
-		file_Open(file);
+		ini_open(file);
 		SaveDMLoadout(playerid);
-		file_Save(file);
-		file_Close();
+		ini_commit();
+		ini_close();
 
 		dm_HideGraphicMenu(playerid);
 		CancelSelectTextDraw(playerid);
 		dm_FormatCustomMenu(playerid);
 	}
+	return 1;
 }
 
 hook OnPlayerSelectedMenuRow(playerid, row, Menu:pMenu)
@@ -3178,70 +3179,70 @@ LoadDeathmatchData()
 		printf("File %s Not Found", dmFile);
 		return 0;
 	}
-	else file_Open(dmFile);
+	else ini_open(dmFile);
 
 
-    file_GetStr("GEN_CamPos", buffer);
+    ini_getString("GEN_CamPos", buffer);
 	sscanf(buffer, "p<,>ffffff", dm_SpecPos[0], dm_SpecPos[1], dm_SpecPos[2], dm_SpecPos[3], dm_SpecPos[4], dm_SpecPos[5]);
 
-	dm_Weather = file_GetVal("GEN_Weather");
+	ini_getInt("GEN_Weather", dm_Weather);
 
-    file_GetStr("GEN_Time", buffer);
+    ini_getString("GEN_Time", buffer);
 	sscanf(buffer, "p<,>dd", dm_TimeH, dm_TimeM);
 
-    file_GetStr("GEN_Author", buffer);
+    ini_getString("GEN_Author", buffer);
 	sscanf(buffer, "s[10]", dm_MapAuthor);
 
-    file_GetStr("GEN_spawn1", buffer);
+    ini_getString("GEN_spawn1", buffer);
 	sscanf(buffer, "p<,>fff", dm_MapSpawnPos[0][0], dm_MapSpawnPos[0][1], dm_MapSpawnPos[0][2]);
 
-    file_GetStr("GEN_spawn2", buffer);
+    ini_getString("GEN_spawn2", buffer);
 	sscanf(buffer, "p<,>fff", dm_MapSpawnPos[1][0], dm_MapSpawnPos[1][1], dm_MapSpawnPos[1][2]);
 
 
 	LoadDeathmatchItems();
-	file_Close();
+	ini_close();
 
 	if(dm_Mode==DM_MODE_AD)
 	{
-	    file_Open(dmFile);
-		DefendingTeam = file_GetVal("AD_DefendingTeam");
+	    ini_open(dmFile);
+		ini_getInt("AD_DefendingTeam", DefendingTeam);
 		MaxPoints=1;
 
-		file_GetStr("AD_CapturePoint1", buffer);
+		ini_getString("AD_CapturePoint1", buffer);
 		sscanf(buffer, "p<,>fff", CapturePoint[0][0], CapturePoint[0][1], CapturePoint[0][2]);
 
-		if(file_IsKey("AD_CapturePoint2"))
+		if(ini_isKey("AD_CapturePoint2"))
 		{
-			file_GetStr("AD_CapturePoint2", buffer);
+			ini_getString("AD_CapturePoint2", buffer);
 			sscanf(buffer, "p<,>fff", CapturePoint[1][0], CapturePoint[1][1], CapturePoint[1][2]);
 			MaxPoints=2;
 		}
-		if(file_IsKey("AD_CapturePoint3"))
+		if(ini_isKey("AD_CapturePoint3"))
 		{
-			file_GetStr("AD_CapturePoint3", buffer);
+			ini_getString("AD_CapturePoint3", buffer);
 			sscanf(buffer, "p<,>fff", CapturePoint[2][0], CapturePoint[2][1], CapturePoint[2][2]);
 			MaxPoints=3;
 		}
-        file_Close();
+        ini_close();
 
         CreateCaptureBase(CapturePoint[0][0], CapturePoint[0][1], CapturePoint[0][2]);
 
-		ADbar				=	CreateProgressBar(50, 200, 60, 5, YELLOW, ADcaptureTime);
+		PlayerLoop(i) ADbar[i] = CreatePlayerProgressBar(i, 50, 200, 60, 5, YELLOW, ADcaptureTime);
 		ADfill				=	0;
 		CaptureProgress 	=	0;
 	}
 	if(dm_Mode==DM_MODE_CTF)
 	{
-	    file_Open(dmFile);
+	    ini_open(dmFile);
 
-	    file_GetStr("CTF_flag1", buffer);
+	    ini_getString("CTF_flag1", buffer);
 		sscanf(buffer, "p<,>fff", CtfPosF[0][0], CtfPosF[0][1], CtfPosF[0][2]);
 
-		file_GetStr("CTF_flag2", buffer);
+		ini_getString("CTF_flag2", buffer);
 		sscanf(buffer, "p<,>fff", CtfPosF[1][0], CtfPosF[1][1], CtfPosF[1][2]);
 
-        file_Close();
+        ini_close();
 
 		CtfFlag[0] = CreateDynamicPickup(CTF_FLAG_MODEL, 1, CtfPosF[0][0], CtfPosF[0][1], CtfPosF[0][2], DEATHMATCH_WORLD, _, _, 300.0);
 		CtfFlag[1] = CreateDynamicPickup(CTF_FLAG_MODEL, 1, CtfPosF[1][0], CtfPosF[1][1], CtfPosF[1][2], DEATHMATCH_WORLD, _, _, 300.0);
@@ -3249,32 +3250,32 @@ LoadDeathmatchData()
 	if(dm_Mode==DM_MODE_CQS)
 	{
 	    new tmpkey[MAX_KEY_LENGTH];
-		file_Open(dmFile);
+		ini_open(dmFile);
 		for(new i; i < MAX_CP; i++)
 		{
 			format(tmpkey, 13, "CQS_point%d", i);
-		    file_GetStr(tmpkey, buffer);
+		    ini_getString(tmpkey, buffer);
 			sscanf(buffer, "p<,>fff", CPpoint[i][0], CPpoint[i][1], CPpoint[i][2]);
 
 			format(tmpkey, 13, "CQS_name%d", i);
-			file_GetStr(tmpkey, CPname[i]);
+			ini_getString(tmpkey, CPname[i]);
 
 			format(tmpkey, 13, "CQS_CPOfSet%d", i);
-			file_GetStr(tmpkey, buffer);
+			ini_getString(tmpkey, buffer);
 			sscanf(buffer, "p<,>fff", CPOfSet[i][0], CPOfSet[i][1], CPOfSet[i][2]);
 
 			format(tmpkey, 13, "CQS_owner%d", i);
-			CPowner[i] = file_GetVal(tmpkey);
+			ini_getInt(tmpkey, CPowner[i]);
 
 			CreateCommandPost(i, CPpoint[i][0], CPpoint[i][1], CPpoint[i][2]);
 
 			CPfill[i]	= 0;
 
 		}
-        file_Close();
+        ini_close();
 		dm_MatchTimeLimit=0;
 	}
-	file_Close();
+	ini_close();
 	dm_TeamScore[score_Kills][0] = 0;
 	dm_TeamScore[score_Kills][1] = 0;
 	dm_TeamScore[score_Flags][0] = 0;
@@ -3496,14 +3497,14 @@ LoadDeathmatchItems()
 			Float:z,
 			Float:r;
 
-        if(!file_IsKey("CQS_msu1"))print("ERROR: Loading MSU1 Data");
-        if(!file_IsKey("CQS_msu2"))print("ERROR: Loading MSU2 Data");
+        if(!ini_isKey("CQS_msu1"))print("ERROR: Loading MSU1 Data");
+        if(!ini_isKey("CQS_msu2"))print("ERROR: Loading MSU2 Data");
 
-		file_GetStr("CQS_msu1", buffer);
+		ini_getString("CQS_msu1", buffer);
 		sscanf(buffer, "p<,>dffff", model, x, y, z, r);
 		dm_MsuVehicleID[0] = CreateVehicle(model, x, y, z, r, -1, -1, -1);
 
-		file_GetStr("CQS_msu2", buffer);
+		ini_getString("CQS_msu2", buffer);
 		sscanf(buffer, "p<,>dffff", model, x, y, z, r);
 		dm_MsuVehicleID[1] = CreateVehicle(model, x, y, z, r, -1, -1, -1);
 
@@ -3656,10 +3657,10 @@ LoadDM_Vehicles()
 	{
 		if(!sscanf(line, "p<,>dffff", modelid, x, y, z, r))
 		{
-		    vehId = Iter_Free(dm_VehicleTableIndex);
+		    vehId = Iter_Free(dm_VehTableIndex);
 			dm_VehicleTable[vehId] = CreateVehicle(modelid, x, y, z, r, -1, -1, 10000);
 			SetVehicleVirtualWorld(dm_VehicleTable[vehId], DEATHMATCH_WORLD);
-			Iter_Add(dm_VehicleTableIndex, vehId);
+			Iter_Add(dm_VehTableIndex, vehId);
 		}
 		else print("Error: Deathmatch Vehicle File");
 	}
@@ -3914,7 +3915,7 @@ timer NextRound[20000]()
 		   	DestroyDynamicArea(PointToCapture);
 		   	StopMatchTime();
 			DestroyDynamicMapIcon(CaptureIcon);
-			DestroyProgressBar(ADbar);
+			DestroyPlayerProgressBar(i, ADbar[i]);
 		}
 		if(dm_Mode==DM_MODE_CTF)
 		{
@@ -3931,7 +3932,7 @@ timer NextRound[20000]()
 				DestroyDynamic3DTextLabel(CPlabel[cp][1]);
 				DestroyDynamicMapIcon(CPicon[cp][0]);
 				DestroyDynamicMapIcon(CPicon[cp][1]);
-				DestroyProgressBar(CPbar[cp]);
+				DestroyPlayerProgressBar(i, CPbar[i][cp]);
 			}
 		}
 	}
@@ -3975,11 +3976,11 @@ ExitDeathmatch(playerid)
 	GetFile(gPlayerName[playerid], file);
 
 	SaveDMStats(playerid);
-	file_Open(file);
+	ini_open(file);
 	SaveDMLoadout(playerid);
 	SaveDMAwards(playerid);
-	file_Save(file);
-	file_Close();
+	ini_commit();
+	ini_close();
 
 	stop dm_GuiUpdateTimer[playerid];
 	stop crt_UpdateTimer[playerid];
@@ -4078,7 +4079,7 @@ LoadDMLoadout(playerid)
 	for(new c; c < MAX_KIT; c++)
 	{
 		format(tmpKey, 6, "dml%d", c);
-		file_GetStr(tmpKey, buffer);
+		ini_getString(tmpKey, buffer);
 
 		sscanf(buffer, "p<|>ddd",
 			pLoadout[playerid][c][0],
@@ -4099,8 +4100,8 @@ LoadDMAwards(playerid)
 	for(new g; g < MAX_AWARD_GROUP; g++)
 	{
 		format(tmpKey, 6, "awd%d", g);
-		file_GetStr(tmpKey, buffer);
-		if(file_IsKey(tmpKey))sscanf(buffer, "p<|>a<d>["#MAX_AWARD"]", pAwardData[playerid][g]);
+		ini_getString(tmpKey, buffer);
+		if(ini_isKey(tmpKey))sscanf(buffer, "p<|>a<d>["#MAX_AWARD"]", pAwardData[playerid][g]);
 	}
 }
 
@@ -4152,10 +4153,10 @@ SaveDMLoadout(playerid)
 	        strcat(line, tmpStr);
 	        if(s<(MAX_LOADOUT_WEP-1))strcat(line, "|");
 	    }
-		file_SetStr(tmpKey, line);
+		ini_setString(tmpKey, line);
 		line[0] = EOS;
 	}
-	file_SetVal("dmlg", pGraphic[playerid]);
+	ini_setInt("dmlg", pGraphic[playerid]);
 }
 SaveDMAwards(playerid)
 {
@@ -4172,7 +4173,7 @@ SaveDMAwards(playerid)
 			format(tmpStr, 6, "%d|", pAwardData[playerid][g][s]);
 			strcat(line, tmpStr);
 	    }
-		file_SetStr(tmpKey, line);
+		ini_setString(tmpKey, line);
 		line[0] = EOS;
 	}
 }
@@ -4196,7 +4197,7 @@ EndDeathmatch()
 		   	DestroyDynamicArea(PointToCapture);
 		   	StopMatchTime();
 			DestroyDynamicMapIcon(CaptureIcon);
-			DestroyProgressBar(ADbar);
+			DestroyPlayerProgressBar(i, ADbar[i]);
 		}
 		if(dm_Mode==DM_MODE_CTF)
 		{
@@ -4213,7 +4214,7 @@ EndDeathmatch()
 				DestroyDynamic3DTextLabel(CPlabel[cp][1]);
 				DestroyDynamicMapIcon(CPicon[cp][0]);
 				DestroyDynamicMapIcon(CPicon[cp][1]);
-				DestroyProgressBar(CPbar[cp]);
+				DestroyPlayerProgressBar(i, CPbar[i][cp]);
 			}
 		}
 	}
@@ -4223,7 +4224,7 @@ EndDeathmatch()
 }
 UnloadDM()
 {
-	foreach(new i : dm_VehicleTableIndex)
+	foreach(new i : dm_VehTableIndex)
 		DestroyVehicle(dm_VehicleTable[i]);
 
 	foreach(new i : dm_ObjectTableIndex)

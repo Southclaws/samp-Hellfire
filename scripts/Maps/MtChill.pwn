@@ -46,7 +46,7 @@ public OnLoad()
 //	-2310.5117, -1647.1541, 483.9890 inside door
 
 	ch_battery = CreateItem(item_battery, -2316.15, -1646.64, 483.43, 0.00, 0.00, 32.04);
-	ch_fusebox = CreateItem(item_fusebox, -2315.67, -1644.89, 483.06, 0.00, 0.00, 262.98, .zoffset = FLOOR_OFFSET/2);
+	ch_fusebox = CreateItem(item_fusebox, -2315.67, -1644.89, 483.06, 0.00, 0.00, 262.98);
 
 	ch_keypad = CreateDynamicObject(19273, -2311.4968, -1647.6813, 484.3600, 0.0000, 0.0000, 26.2200);
 
@@ -55,9 +55,10 @@ public OnLoad()
 
 	ch_doorstate = false;
 
-	AddItemToContainer(
-		CreateContainer("Generator", 6, CreateButton(-2318.9067, -1636.5662, 483.7031, "Generator")),
-		CreateItem(item_Medkit, -2322.9257, -1639.8038, 483.7031));
+	new _container = CreateContainer("Generator", 6);
+	CreateButton(-2318.9067, -1636.5662, 483.7031, "Generator");
+	new _items = CreateItem(item_Medkit, -2322.9257, -1639.8038, 483.7031);
+	AddItemToContainer(_container, _items);
 
 	return CallLocalFunction("mtchil_OnLoad", "");
 }

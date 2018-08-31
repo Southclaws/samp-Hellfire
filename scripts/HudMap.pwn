@@ -84,7 +84,7 @@ HideMapForPlayer(playerid)
 	f:bPlayerGameSettings[playerid]<ViewingMap>;
 }
 
-hook OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
+hook OnPlayerClickPlayerTD(playerid, PlayerText:playertextid)
 {
 	if(playertextid == mapText)
 	{

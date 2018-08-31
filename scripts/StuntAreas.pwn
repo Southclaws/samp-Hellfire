@@ -26,17 +26,17 @@ LoadStuntParks()
 	while(fread(idxFile, idxLine))
 	{
 	    format(ParkFile, 40, StuntParkFile, idxLine);
-		file_Open(ParkFile);
+		ini_open(ParkFile);
 
-		StuntAreas[ParkID][PerimPoints]=file_GetVal("PerimPoints");
+		ini_getInt("PerimPoints", StuntAreas[ParkID][PerimPoints]);
 		for(new i;i<StuntAreas[ParkID][PerimPoints];i++)
 		{
 			format(str, 5, "pt%d", i);
-			format(line, 60, file_GetStr(str));
+			format(line, 60, ini_getString(str));
 		    sscanf(line, "p<,>ff", StuntAreas[ParkID][PerimX][i], StuntAreas[ParkID][PerimY][i]);
 		}
 
-		file_Close();
+		ini_close();
 		ParkID++;
 	}
 }

@@ -227,7 +227,7 @@ ExitSpectateMode(playerid)
 	gPlayerSpectateGroup[playerid] = -1;
 	TogglePlayerSpectating(playerid, false);
 }
-hook OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
+hook OnPlayerClickPlayerTD(playerid, PlayerText:playertextid)
 {
 	if(gPlayerSpectating[playerid] == INVALID_PLAYER_ID)return 1;
 

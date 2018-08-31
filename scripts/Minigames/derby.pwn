@@ -196,7 +196,7 @@ timer dby_UpdateSpawnButton[1000](playerid)
 	dby_ShowLobbyControls(playerid);
 }
 
-hook OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
+hook OnPlayerClickPlayerTD(playerid, PlayerText:playertextid)
 {
 	if(playertextid == dby_TdVehicle)
 	{

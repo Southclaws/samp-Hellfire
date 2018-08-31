@@ -9,22 +9,22 @@ enum E_SIGN_DATA
 			sgn_button,
 			sgn_text[MAX_SIGN_TEXT],
 			sgn_owner[MAX_PLAYER_NAME],
-Float:		sgn_posX,
-Float:		sgn_posY,
-Float:		sgn_posZ,
-Float:		sgn_rotZ,
+	Float:	sgn_posX,
+	Float:	sgn_posY,
+	Float:	sgn_posZ,
+	Float:	sgn_rotZ,
 }
 
 
 static
 			sgn_Data[MAX_SIGN][E_SIGN_DATA],
-Iterator:	sgn_Index<MAX_SIGN>;
+	Iterator:sgn_Index<MAX_SIGN>;
 
 static
 			sgn_CurrentSign[MAX_PLAYERS];
 
 new
-ItemType:	item_Sign = INVALID_ITEM_TYPE;
+	ItemType:item_Sign = INVALID_ITEM_TYPE;
 
 
 stock CreateSign(playerid, text[MAX_SIGN_TEXT], Float:x, Float:y, Float:z, Float:rot)

@@ -234,7 +234,7 @@ timer smo_UpdateSpawnButton[1000](playerid)
 	}
 	smo_ShowLobbyControls(playerid);
 }
-hook OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
+hook OnPlayerClickPlayerTD(playerid, PlayerText:playertextid)
 {
 	if(playertextid == smo_TdVehicle)
 	{

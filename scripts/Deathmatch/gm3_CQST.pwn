@@ -11,13 +11,13 @@ new
 	CPflag			[MAX_CP],
 	CP_ObjPole      [MAX_CP],
 	CP_ObjFlag      [MAX_CP][2][2],
-	Bar:CPbar		[MAX_CP],
+	PlayerBar:CPbar	[MAX_PLAYERS][MAX_CP],
 
 	CPowner			[MAX_CP]=-1,
 	CPname          [MAX_CP][MAX_CPNAME],
 	Float:CPpoint	[MAX_CP][3],
 	Float:CPOfSet   [MAX_CP][3],
-	CPfill			[MAX_CP],
+	Float:CPfill	[MAX_CP],
 	bool:CPtimer	[MAX_CP],
 	FirstToCapture  [MAX_CP],
 	CPFlash         [MAX_CP]=-1,
@@ -27,36 +27,36 @@ new
 
 //======================Conquest Functions
 
-	stock GetPlayersCapturing(cp)
-	{
-		new c;
-		PlayerLoop(i)if(CapturingCP[i]==cp)c++;
-		return c;
-	}
-	stock GetPlayersInTeamCapturing(teamid, cp)
-	{
-		new c;
-		PlayerLoop(i) if( (pTeam(i)==teamid) && (IsPlayerInDynamicArea(i, CPflag[cp])) ) c++;
-		return c;
-	}
-	stock GetRavenCPs()
-	{
-		new TcpS;
-		for(new t;t<MAX_CP;t++)if(CPowner[t] == 0) TcpS++;
-		return TcpS;
-	}
-	stock GetValorCPs()
-	{
-		new TcpS;
-		for(new t;t<MAX_CP;t++)if(CPowner[t] == 1) TcpS++;
-		return TcpS;
-	}
-	stock GetEmptyCPs()
-	{
-		new TcpS;
-		for(new t;t<MAX_CP;t++)if(CPowner[t] == -1) TcpS++;
-		return TcpS;
-	}
+stock GetPlayersCapturing(cp)
+{
+	new c;
+	PlayerLoop(i)if(CapturingCP[i]==cp)c++;
+	return c;
+}
+stock GetPlayersInTeamCapturing(teamid, cp)
+{
+	new c;
+	PlayerLoop(i) if( (pTeam(i)==teamid) && (IsPlayerInDynamicArea(i, CPflag[cp])) ) c++;
+	return c;
+}
+stock GetRavenCPs()
+{
+	new TcpS;
+	for(new t;t<MAX_CP;t++)if(CPowner[t] == 0) TcpS++;
+	return TcpS;
+}
+stock GetValorCPs()
+{
+	new TcpS;
+	for(new t;t<MAX_CP;t++)if(CPowner[t] == 1) TcpS++;
+	return TcpS;
+}
+stock GetEmptyCPs()
+{
+	new TcpS;
+	for(new t;t<MAX_CP;t++)if(CPowner[t] == -1) TcpS++;
+	return TcpS;
+}
 
 CreateCommandPost(cp, Float:x, Float:y, Float:z)
 {
@@ -64,7 +64,7 @@ CreateCommandPost(cp, Float:x, Float:y, Float:z)
 	if(CPowner[cp]!=-1)tmpOffset = 4.5;
 
 	CPflag[cp]	= CreateDynamicSphere(x, y, z, 10.0, DEATHMATCH_WORLD);
-	CPbar[cp]	= CreateProgressBar(50, 200, 60, 5, BLUE, REQ_CAPTURE_POINTS);
+	PlayerLoop(i) CPbar[i][cp] = CreatePlayerProgressBar(i, 50, 200, 60, 5, BLUE, REQ_CAPTURE_POINTS);
 
 	CPlabel[cp][0] = CreateDynamic3DTextLabel("<COMMAND POST>", YELLOW, x, y, z, 1000.0, _, DEATHMATCH_WORLD);
 	CPlabel[cp][1] = CreateDynamic3DTextLabel("<COMMAND POST>", YELLOW, x, y, z, 1000.0, _, DEATHMATCH_WORLD);
@@ -113,13 +113,18 @@ CP_CaptureUpdate(playerid, cp)
 	{
 	    CPFlash[cp]=-1;
 		if(CPowner[cp] == -1)
-		{
-			SetProgressBarColor(CPbar[cp], BLUE);
-			CPfill[cp] += (1*GetPlayersCapturing(cp));
-			SetProgressBarValue(CPbar[cp], CPfill[cp]);
+		{			
+			CPfill[cp] += (1*GetPlayersCapturing(cp));			
 			MoveCPFlag(cp);
+			PlayerLoop(i)
+			{
+				if(CapturingCP[i]==cp)
+				{
+					SetPlayerProgressBarColour(i, CPbar[i][cp], BLUE);
+					SetPlayerProgressBarValue(i, CPbar[i][cp], CPfill[cp]);
+				}
+			}
 
-			PlayerLoop(i)if(CapturingCP[i]==cp)UpdateProgressBar(CPbar[cp], i);
 			if(CPfill[cp]==REQ_CAPTURE_POINTS)
 			{
 				OnCPCapture(playerid, cp);
@@ -128,12 +133,17 @@ CP_CaptureUpdate(playerid, cp)
 		}
 		if(CPowner[cp] == poTeam(playerid))
 		{
-		    SetProgressBarColor(CPbar[cp], RED);
 			CPfill[cp] -= (1*GetPlayersCapturing(cp));
-			SetProgressBarValue(CPbar[cp], CPfill[cp]);
 			MoveCPFlag(cp);
+			PlayerLoop(i)
+			{
+				if(CapturingCP[i]==cp)
+				{
+					SetPlayerProgressBarColour(i, CPbar[i][cp], RED);
+					SetPlayerProgressBarValue(i, CPbar[i][cp], CPfill[cp]);
+				}
+			}
 
-			PlayerLoop(i)if(CapturingCP[i]==cp)UpdateProgressBar(CPbar[cp], i);
 			if(CPfill[cp]==0)
 			{
 			    OnCPLoss(playerid, cp);
@@ -158,7 +168,7 @@ OnCPCapture(playerid, cp)
 {
 	MsgTeamF(pTeam(playerid), BLUE, "We Have Captured "#C_BLUE"%s!", CPname[cp]);
 	MsgTeamF(poTeam(playerid), BLUE, "They Have Captured "#C_RED"%s!", CPname[cp]);
-	HideProgressBarForPlayer(playerid, CPbar[cp]);
+	HidePlayerProgressBar(playerid, CPbar[playerid][cp]);
 	PlayerLoop(i)
 	{
 		if(CapturingCP[i]==cp)

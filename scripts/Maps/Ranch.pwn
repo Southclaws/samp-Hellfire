@@ -27,7 +27,7 @@ public OnLoad()
 	new
 		buttonid[2];
 
-	RanchHdd			= CreateItem(item_HardDrive, -693.1787, 942.0, 15.93, 90.0, 0.0, 37.5, .zoffset = FLOOR_OFFSET);
+	RanchHdd			= CreateItem(item_HardDrive, -693.1787, 942.0, 15.93, 90.0, 0.0, 37.5);
 	QuarryDoorKey		= CreateItem(item_Key, -2813.96, -1530.55, 140.97, 0.36, -85.14, 25.00);
 
 	RanchPcCam = LoadCameraSequencer("ranch");

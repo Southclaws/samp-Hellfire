@@ -2,8 +2,8 @@
 
 public OnLoad()
 {
-	CreateItem(item_timer, -102.15, 1365.88, 9.27, -90.00, 0.00, -128.00, .zoffset = FLOOR_OFFSET);
-	CreateItem(item_explosive, -101.23, 1371.59, 9.35, 0.00, 0.00, 0.00, .zoffset = FLOOR_OFFSET);
+	CreateItem(item_timer, -102.15, 1365.88, 9.27, -90.00, 0.00, -128.00);
+	CreateItem(item_explosive, -101.23, 1371.59, 9.35, 0.00, 0.00, 0.00);
 
 	DefineItemCraftSet(item_timebomb, item_timer, false, item_explosive, false);
 
