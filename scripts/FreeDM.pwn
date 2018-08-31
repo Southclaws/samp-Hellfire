@@ -91,8 +91,7 @@ fdm_Start(area)
 			fdm_SpawnData[idx][fdm_posX],
 			fdm_SpawnData[idx][fdm_posY],
 			fdm_SpawnData[idx][fdm_posZ]-0.8,
-			90.0, 0.0, 0.0,
-			0.8, FREEROAM_WORLD);
+			90.0, 0.0, 0.0, FREEROAM_WORLD);
 
 		ammo = WepData[fdm_SpawnData[idx][fdm_type]][MagSize] * (2 + random(5));
 		SetItemExtraData(fdm_SpawnData[idx][fdm_pickup], ammo);
@@ -273,8 +272,7 @@ timer fdm_RespawnPickup[60000](id)
 		fdm_SpawnData[id][fdm_posX],
 		fdm_SpawnData[id][fdm_posY],
 		fdm_SpawnData[id][fdm_posZ]-0.8,
-		90.0, 0.0, 0.0,
-		0.8, FREEROAM_WORLD);
+		90.0, 0.0, 0.0, FREEROAM_WORLD);
 
 	ammo = WepData[fdm_SpawnData[id][fdm_type]][MagSize] * (2 + random(5));
 

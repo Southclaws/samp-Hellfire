@@ -121,10 +121,10 @@ SetPlayerAdminLevel(playerid, level)
 			}
 		}
 
-		file_Open(ADMIN_DATA_FILE);
+		ini_open(ADMIN_DATA_FILE);
 		fremove(gPlayerName[playerid]);
-		file_Save(ADMIN_DATA_FILE);
-		file_Close();
+		ini_commit();
+		ini_close();
 
 		gTotalAdmins--;
 	}
@@ -149,10 +149,10 @@ SetPlayerAdminLevel(playerid, level)
 				break;
 			}
 		}
-		file_Open(ADMIN_DATA_FILE);
-		file_SetVal(gPlayerName[playerid], level);
-		file_Save(ADMIN_DATA_FILE);
-		file_Close();
+		ini_open(ADMIN_DATA_FILE);
+		ini_setInt(gPlayerName[playerid], level);
+		ini_commit();
+		ini_close();
 	}
 	SortDeepArray(gAdminData, admin_Level, .order = SORT_DESC);
 	return 1;

@@ -22,12 +22,6 @@ stock Float:GetDistancePointLine(Float:line_x,Float:line_y,Float:line_z,Float:ve
 	return floatsqroot(floatpower((vector_y) * ((point_z) - (line_z)) - (vector_z) * ((point_y) - (line_y)), 2.0)+floatpower((vector_z) * ((point_x) - (line_x)) - (vector_x) * ((point_z) - (line_z)), 2.0)+floatpower((vector_x) * ((point_y) - (line_y)) - (vector_y) * ((point_x) - (line_x)), 2.0))/floatsqroot((vector_x) * (vector_x) + (vector_y) * (vector_y) + (vector_z) * (vector_z));
 
 /*
-	Angle from point to dest
-*/
-stock Float:GetAngleToPoint(Float:fPointX, Float:fPointY, Float:fDestX, Float:fDestY)
-	return absoluteangle(-(90-(atan2((fDestY - fPointY), (fDestX - fPointX)))));
-
-/*
 	2D Projection position based on distance and angle
 */
 stock GetXYFromAngle(&Float:x, &Float:y, Float:a, Float:distance)

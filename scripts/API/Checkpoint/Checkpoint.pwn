@@ -35,7 +35,7 @@ enum ENUM_CHECKPOINT_DATA
 
 new
 			CheckPointData[MAX_CHECKPOINT][ENUM_CHECKPOINT_DATA],
-Iterator:	CheckpointIndex<MAX_CHECKPOINT>;
+	Iterator:CheckpointIndex<MAX_CHECKPOINT>;
 
 
 forward OnPlayerActivateCheckpoint(playerid, checkpointid);

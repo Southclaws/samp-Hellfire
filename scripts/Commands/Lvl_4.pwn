@@ -179,10 +179,10 @@ ACMD:motd[4](playerid, params[])
 		return Msg(playerid, YELLOW, " >  Usage: /motd [message]");
 
 	MsgAllF(YELLOW, " >  MOTD updated: "#C_BLUE"%s", gMessageOfTheDay);
-	file_Open(SETTINGS_FILE);
-	file_SetStr("motd", gMessageOfTheDay);
-	file_Save(SETTINGS_FILE);
-	file_Close();
+	ini_open(SETTINGS_FILE);
+	ini_setString("motd", gMessageOfTheDay);
+	ini_commit();
+	ini_close();
 
 	return 1;
 }

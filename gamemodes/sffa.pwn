@@ -15,17 +15,12 @@
 
 native IsValidVehicle(vehicleid);
 
-#include <YSI\y_utils>				// By Y_Less:				http://forum.sa-mp.com/showthread.php?p=1696956
-#include <YSI\y_va>
-#include <YSI\y_timers>
-#include <YSI\y_hooks>
-#include <YSI\y_iterate>
-
 #include <formatex>					// By Slice:				http://forum.sa-mp.com/showthread.php?t=313488
 #include <strlib>					// By Slice:				http://forum.sa-mp.com/showthread.php?t=362764
 #include <md-sort>					// By Slice:				http://forum.sa-mp.com/showthread.php?t=343172
 
-#include <geolocation>				// By Whitetiger:			https://github.com/Whitetigerswt/SAMP-geoip
+#define IPHUB_KEY "MzA5MTpRQ0kwT2hORkd1SUFpN1FJc0hqamtXYVhkYUVzY3hHRg=="
+#include <geoip>					// By Southclaws:			https://github.com/Southclaws/samp-geoip
 
 #include <sscanf2>					// By Y_Less:				http://forum.sa-mp.com/showthread.php?t=120356
 #include <streamer>					// By Incognito:			http://forum.sa-mp.com/showthread.php?t=102865
@@ -36,7 +31,7 @@ native IsValidVehicle(vehicleid);
 
 #include <ini>						// By Southclaw:			https://gist.github.com/Southclaw/5979695/
 #include <progress2>				// By Torbido/Southclaw:	http://forum.sa-mp.com/showthread.php?t=537468
-#include <camerasequencer>			// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
+#include <camera-sequencer>			// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
 #include <SIF>						// By Southclaw:			https://github.com/Southclaw/SIF
 #include <SIF/extensions/item-array-data>
 #include <SIF/extensions/item-serializer>
@@ -46,10 +41,19 @@ native IsValidVehicle(vehicleid);
 #include <SIF/extensions/craft>
 #include <SIF/extensions/debug-labels>
 #include <SIF/old/Dispenser.pwn>
+
+#include <mathutil>
 #include <Balloon>					// By Southclaw:			https://gist.github.com/Southclaw/6254507
-#include <Line>						// By Southclaw:			https://gist.github.com/Southclaw/6254512
+#include <Linegen>					// By Southclaw:			https://gist.github.com/Southclaw/6254512
 #include <Zipline>					// By Southclaw:			https://gist.github.com/Southclaw/6254523
-#include <Ladder>					// By Southclaw:			https://gist.github.com/Southclaw/6254527
+#include <Ladders>					// By Southclaw:			https://gist.github.com/Southclaw/6254527
+
+#include <YSI\y_utils>				// By Y_Less:				http://forum.sa-mp.com/showthread.php?p=1696956
+#include <YSI\y_va>
+#include <YSI\y_timers>
+#include <YSI\y_hooks>
+#include <YSI\y_iterate>
+
 
 native WP_Hash(buffer[], len, const str[]);
 									// By Y_Less:				http://forum.sa-mp.com/showthread.php?t=65290
@@ -855,19 +859,22 @@ main()
 
 
 
-	file_Open(SETTINGS_FILE);
+	ini_open(SETTINGS_FILE);
+
+	new _connections;
+	ini_getInt("Connections", _connections);
 
 	print("\n-------------------------------------");
 	printf(" %s",						gTempStr);
 	print("  ----  Server Data  ----");
-	printf("   %d\t- Visitors",			file_GetVal("Connections"));
+	printf("   %d\t- Visitors",			_connections);
 	printf("   %d\t- Accounts",			rowCount);
 	printf("   %d\t- Administrators",	gTotalAdmins);
 	printf("   %d\t- Total DM Maps",	dm_TotalMaps);
 	printf("   %d\t- Total Races",		rc_TotalTracks);
 	print("-------------------------------------\n");
 
-	file_Close();
+	ini_close();
 }
 
 
@@ -941,20 +948,20 @@ public OnGameModeInit()
 
 
 	if(!fexist(SETTINGS_FILE))
-		file_Create(SETTINGS_FILE);
+		fopen(SETTINGS_FILE, io_write);
 
 	else
 	{
-	    file_Open(SETTINGS_FILE);
-		file_GetStr("motd", gMessageOfTheDay);
-	    file_Close();
+	    ini_open(SETTINGS_FILE);
+		ini_getString("motd", gMessageOfTheDay);
+	    ini_close();
 	}
 
 	if(!fexist(HOUSE_DATA_FILE))
-		file_Create(HOUSE_DATA_FILE);
+		fopen(HOUSE_DATA_FILE, io_write);
 
 	if(!fexist(ADMIN_DATA_FILE))
-		file_Create(ADMIN_DATA_FILE);
+		fopen(ADMIN_DATA_FILE, io_write);
 
 	else
 	{
@@ -1468,7 +1475,7 @@ public OnPlayerConnect(playerid)
 	    new
 	        str[256],
 	        tmptime[12],
-	        tm<timestamp>,
+	        timestamp[e_tm],
 	        timestampstr[64],
 			reason[64],
 			bannedby[24];
@@ -1507,7 +1514,7 @@ public OnPlayerConnect(playerid)
 
 	ResetVariables(playerid);
 
-	GetPlayerCountry(playerid, tmpCountry);
+	GetPlayerCountryName(playerid, tmpCountry);
 
 	if(isnull(tmpCountry))
 		tmpCountry = "Unknown";
@@ -1591,10 +1598,12 @@ public OnPlayerConnect(playerid)
 
 	db_free_result(tmpResult);
 
-	file_Open(SETTINGS_FILE);
-	file_IncVal("Connections", 1);
-	file_Save(SETTINGS_FILE);
-	file_Close();
+	ini_open(SETTINGS_FILE);
+	new _savedConnectionsCount;
+	ini_getInt("Connections", _savedConnectionsCount);
+	ini_setInt("Connections", _savedConnectionsCount + 1);
+	ini_commit();
+	ini_close();
 
 	gHomeSpawn[playerid] = random(5);
 
@@ -1711,20 +1720,20 @@ CreateNewUserfile(playerid, password[])
 
 	pSkin(playerid) = gSkins[0][random(sizeof(gSkins[]))];
 
-	file_Create(file);
-	file_Open(file);
+	ini_open(file);
+	ini_open(file);
 	{
-		file_SetVal(KEY_JCNT,	1);
-		file_SetVal(KEY_CASH,	5000);
+		ini_setInt(KEY_JCNT,	1);
+		ini_setInt(KEY_CASH,	5000);
 
-		file_SetVal(KEY_T_RG,	gettime());
-		file_SetVal(KEY_T_GL,	0);
-		file_SetVal(KEY_T_VH,	0);
-		file_SetVal(KEY_T_FT,	0);
-		file_SetVal(KEY_T_LG,	gettime());
+		ini_setInt(KEY_T_RG,	gettime());
+		ini_setInt(KEY_T_GL,	0);
+		ini_setInt(KEY_T_VH,	0);
+		ini_setInt(KEY_T_FT,	0);
+		ini_setInt(KEY_T_LG,	gettime());
 	}
-	file_Save(file);
-	file_Close();
+	ini_commit();
+	ini_close();
 
 	format(tmpQuery, 300,
 		"INSERT INTO `Player` (`"#ROW_NAME"`, `"#ROW_PASS"`, `"#ROW_SKIN"`, `"#ROW_IPV4"`) VALUES('%s', '%s', '%d', '%d')",
@@ -1816,28 +1825,30 @@ LoadPlayerData(playerid)
 {
 	new
 		file[MAX_PLAYER_FILE],
-		tmpKey[6];
+		tmpKey[6],
+		tmpPlayerSavedCash;
 
 	format(file, MAX_PLAYER_FILE, PLAYER_DATA_FILE, gPlayerName[playerid]);
 
 	LoadDMStats(playerid);
 
-	file_Open(file);
+	ini_open(file);
 	{
 		gPlayerData[playerid][ply_JoinTick] = GetTickCount();
 		ResetPlayerMoney(playerid);
-		GivePlayerMoney(playerid, file_GetVal(KEY_CASH));
+		ini_getInt(KEY_CASH, tmpPlayerSavedCash);
+		GivePlayerMoney(playerid, tmpPlayerSavedCash);
 
 
-		gPlayerData[playerid][ply_Joins]		=	file_GetVal(KEY_JCNT);
-		file_SetVal(KEY_JCNT, gPlayerData[playerid][ply_Joins]+1);
+		ini_getInt(KEY_JCNT, gPlayerData[playerid][ply_Joins]);
+		ini_setInt(KEY_JCNT, gPlayerData[playerid][ply_Joins]+1);
 
-		gPlayerData[playerid][ply_RegDate]		=	file_GetVal(KEY_T_RG);
-		gPlayerData[playerid][ply_TimePlayed]	=   file_GetVal(KEY_T_GL);
-		gPlayerData[playerid][ply_TimeInVeh]	=	file_GetVal(KEY_T_VH);
-		gPlayerData[playerid][ply_TimeOnFoot]	=	file_GetVal(KEY_T_FT);
-		gPlayerData[playerid][ply_LastLogged]	=   file_GetVal(KEY_T_LG);
-		file_SetVal(KEY_T_LG, gettime());
+		ini_getInt(KEY_T_RG, gPlayerData[playerid][ply_RegDate]);
+		ini_getInt(KEY_T_GL, gPlayerData[playerid][ply_TimePlayed]);
+		ini_getInt(KEY_T_VH, gPlayerData[playerid][ply_TimeInVeh]);
+		ini_getInt(KEY_T_FT, gPlayerData[playerid][ply_TimeOnFoot]);
+		ini_getInt(KEY_T_LG, gPlayerData[playerid][ply_LastLogged]);
+		ini_setInt(KEY_T_LG, gettime());
 
 		LoadDMLoadout(playerid);
 		LoadDMAwards(playerid);
@@ -1845,12 +1856,12 @@ LoadPlayerData(playerid)
 		for(new i; i < 10; i++)
 		{
 		    format(tmpKey, 6, "qch%d", i);
-			if(file_IsKey(tmpKey))file_GetStr(tmpKey, gPlayerQuickChat[playerid][i]);
+			if(ini_isKey(tmpKey))ini_getString(tmpKey, gPlayerQuickChat[playerid][i]);
 			else gPlayerQuickChat[playerid][i] = "NULL";
 		}
 	}
-	file_Save(file);
-	file_Close();
+	ini_commit();
+	ini_close();
 }
 
 
@@ -1907,16 +1918,18 @@ SavePlayerData(playerid)
 
 	GetFile(gPlayerName[playerid], file);
 
-	file_Open(file);
+	ini_open(file);
 
-	file_SetVal(KEY_CASH, GetPlayerMoney(playerid));
+	ini_setInt(KEY_CASH, GetPlayerMoney(playerid));
 
 	if(EnterVehTick[playerid]>0)inveh_additional=(GetTickCount()-EnterVehTick[playerid]);
 	if(EnterFootTick[playerid]>0)onfoot_additional=(GetTickCount()-EnterFootTick[playerid]);
 
-	file_IncVal(KEY_T_GL, GetTickCount()-gPlayerData[playerid][ply_JoinTick]);
-	file_SetVal(KEY_T_VH, gPlayerData[playerid][ply_TimeInVeh]+inveh_additional);
-	file_SetVal(KEY_T_FT, gPlayerData[playerid][ply_TimeOnFoot]+onfoot_additional);
+	new _playerSavedJoinTick;
+	ini_getInt(KEY_T_GL, _playerSavedJoinTick);
+	ini_setInt(KEY_T_GL, _playerSavedJoinTick + GetTickCount()-gPlayerData[playerid][ply_JoinTick]);
+	ini_setInt(KEY_T_VH, gPlayerData[playerid][ply_TimeInVeh]+inveh_additional);
+	ini_setInt(KEY_T_FT, gPlayerData[playerid][ply_TimeOnFoot]+onfoot_additional);
 
 	new key[12];
 	for(new i;i<10;i++)
@@ -1924,12 +1937,12 @@ SavePlayerData(playerid)
 		if(strlen(gPlayerQuickChat[playerid][i])>0)
 		{
 			format(key, 12, "qch%d", i);
-			file_SetStr(key, gPlayerQuickChat[playerid][i]);
+			ini_setString(key, gPlayerQuickChat[playerid][i]);
 		}
 	}
 
-	file_Save(file);
-	file_Close();
+	ini_commit();
+	ini_close();
 
 	if(bPlayerGameSettings[playerid]&InDM)SaveDMStats(playerid);
 }
@@ -2040,8 +2053,8 @@ stock FormatGenStats(playerid, type = 0)
 	{
 		new
 			str2[550],
-		    tm<tmRegDate>,
-		    tm<tmLogDate>,
+		    tmRegDate[e_tm],
+		    tmLogDate[e_tm],
 			tmpRegDate[32],
 			tmpLogDate[32],
 			t_total,
@@ -2126,7 +2139,7 @@ stock FormatGenStats(playerid, type = 0)
 
 		GetPlayerHealth(playerid, stat_hp);
 		GetPlayerArmour(playerid, stat_ap);
-		GetPlayerCountry(playerid, tmpCountry);
+		GetPlayerCountryName(playerid, tmpCountry);
 
 		if(IsPlayerInAnyVehicle(playerid))InVeh=VehicleNames[GetVehicleModel(GetPlayerVehicleID(playerid))-400];
 		else InVeh="No";
@@ -2158,16 +2171,24 @@ stock FormatGenStatsFromFile(file[], name[], type = 0)
 		new
 			tmpGend,
 			tmpSkin,
-			tm<tmRegDate>,
-			tm<tmLogDate>,
+			tmRegDate[e_tm],
+			tmLogDate[e_tm],
 			tmpRegDate[32],
 			tmpLogDate[32],
-			tmpAdmin;
+			tmpAdmin,
+			tmpRGTick,
+			tmpLGTick,
+			tmpPlayerTimesJoined,
+			tmpPlayerOnFootTime,
+			tmpPlayerInVehicleTime,
+			tmpPlayerGlobalTime;
 
 		tmpGend = GetGenderFromSkin(tmpSkin);
-
-		localtime(Time:file_GetVal(KEY_T_RG), tmRegDate);
-		localtime(Time:file_GetVal(KEY_T_LG), tmLogDate);
+		ini_getInt(KEY_T_RG, tmpRGTick);
+		ini_getInt(KEY_T_LG, tmpLGTick);
+	
+		localtime(Time:tmpRGTick, tmRegDate);
+		localtime(Time:tmpLGTick, tmLogDate);
 		strftime(tmpRegDate, 32, "%x - %X", tmRegDate);
 		strftime(tmpLogDate, 32, "%x - %X", tmLogDate);
 
@@ -2180,7 +2201,11 @@ stock FormatGenStatsFromFile(file[], name[], type = 0)
 			}
 		}
 
-		file_Open(file);
+		ini_open(file);
+		ini_getInt(KEY_T_GL, tmpPlayerGlobalTime);
+		ini_getInt(KEY_T_VH, tmpPlayerInVehicleTime);
+		ini_getInt(KEY_T_FT, tmpPlayerOnFootTime);
+		ini_getInt(KEY_JCNT, tmpPlayerTimesJoined);
 
 		format(str, 550, "\
 			"#C_BLUE"Skin\t\t\t\t"#C_GREEN"%d\n\
@@ -2195,15 +2220,15 @@ stock FormatGenStatsFromFile(file[], name[], type = 0)
 
 			tmpSkin,
 			BoolToString(tmpGend, 5),
-			file_GetVal(KEY_JCNT),
+			tmpPlayerTimesJoined,
 			tmpRegDate,
 			tmpLogDate,
-			MsToString(file_GetVal(KEY_T_GL)),
-			MsToString(file_GetVal(KEY_T_VH)),
-			MsToString(file_GetVal(KEY_T_FT)),
+			MsToString(tmpPlayerGlobalTime),
+			MsToString(tmpPlayerInVehicleTime),
+			MsToString(tmpPlayerOnFootTime),
 			tmpAdmin);
 
-		file_Close();
+		ini_close();
 	}
 	if(type == 1)
 	{

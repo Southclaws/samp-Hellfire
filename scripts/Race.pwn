@@ -522,17 +522,17 @@ rc_Load()
 		return 0;
 	}
 
-	file_Open(tmpRaceFile);
+	ini_open(tmpRaceFile);
 	{
 		for(new i;i<rc_Data[rc_CurrentRace][rc_MaxPlayers];i++)
 		{
 		    format(slotstr, 6, "Slot%d", i);
-		    file_GetStr(slotstr, slotdata);
+		    ini_getString(slotstr, slotdata);
 			sscanf(slotdata, "p<,>ffff", rc_StartSlot[i][0], rc_StartSlot[i][1], rc_StartSlot[i][2], rc_StartSlot[i][3]);
 			rc_PlayerSlotIndex[i] = -1;
 		}
 	}
-	file_Close();
+	ini_close();
 	return 1;
 }
 rc_Join(playerid)
@@ -591,7 +591,7 @@ rc_CountTick()
 	}
 	else rc_RaceCount--;
 }
-hook OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
+hook OnPlayerClickPlayerTD(playerid, PlayerText:playertextid)
 {
 	if(playertextid == rc_LobbyInfo)
 		rc_FormatInfo(playerid, rc_CurrentRace);
@@ -769,10 +769,10 @@ LoadRaces()
 
 		format(filename, sizeof(filename), RC_DATA_FILE, rc_Data[idx][rc_Name]);
 
-		file_Open(filename);
-		rc_Data[idx][rc_FinishLocationID]	= file_GetVal("FinishPos");
-		rc_Data[idx][rc_MaxPlayers]			= file_GetVal("MaxPlayers");
-		file_Close();
+		ini_open(filename);
+		ini_getInt("FinishPos", rc_Data[idx][rc_FinishLocationID]);
+		ini_getInt("MaxPlayers", rc_Data[idx][rc_MaxPlayers]);
+		ini_close();
 
 		rc_Data[idx][rc_Distance] = Distance2D(
 			rc_Data[idx][rc_Pos][0], rc_Data[idx][rc_Pos][1],

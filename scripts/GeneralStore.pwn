@@ -40,7 +40,7 @@ ItemType:	item_type,
 
 new
 			shp_Data				[MAX_STORE][E_STORE_DATA],
-Iterator:	shp_Index<MAX_STORE>,
+	Iterator:shp_Index<MAX_STORE>,
 			shp_ItemIndexSize		[MAX_ITEM_INDEX],
 			shp_ItemIndex			[MAX_ITEM_INDEX][MAX_ITEM_INDEX_ITEMS][E_STORE_ITEM_DATA];
 

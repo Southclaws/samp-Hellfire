@@ -17,7 +17,7 @@ enum E_SUPPLY_CRATE_DATA
 new
 			crt_Data[MAX_SUPPLY_CRATE][E_SUPPLY_CRATE_DATA],
 			crt_UseCount[MAX_SUPPLY_CRATE],
-Iterator:	crt_Index<MAX_SUPPLY_CRATE>;
+	Iterator:crt_Index<MAX_SUPPLY_CRATE>;
 
 new
 			crt_CrateUseTick[MAX_PLAYERS][3],

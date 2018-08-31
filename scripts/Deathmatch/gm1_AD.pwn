@@ -11,8 +11,8 @@ new
 	bool:PointCT,						// Timer variable
 	capturer,                       	// Person who is capturing
 	DefendingTeam,	 					// Defending Team
-	Bar:ADbar,                      	// Progress Bar
-	ADfill,                         	// Fill amount for Bar
+	PlayerBar:ADbar[MAX_PLAYERS],                      	// Progress Bar
+	Float:ADfill,                         	// Fill amount for Bar
 	ADcaptureTime=30,					// Capture Time In Seconds
 	
 	AD_ObjPole,
@@ -89,9 +89,8 @@ GetPlayersCapturingAD()
 AD_CaptureUpdate(playerid)
 {
 	ADfill += (1*GetPlayersCapturingAD());
-	SetProgressBarValue(ADbar, ADfill);
 	MoveADFlag();
-	PlayerLoop(i)if( (bPlayerGameSettings[i]&InDM) && (bPlayerDeathmatchSettings[i]&dm_Capturing) )UpdateProgressBar(ADbar, i);
+	PlayerLoop(i)if( (bPlayerGameSettings[i]&InDM) && (bPlayerDeathmatchSettings[i]&dm_Capturing) ) SetPlayerProgressBarValue(i, ADbar[i], ADfill);
 	if(ADfill >= ADcaptureTime)
 	{
 		GiveXP(playerid, 25, "Capture");
@@ -101,7 +100,7 @@ AD_CaptureUpdate(playerid)
 	    PlayerLoop(i)
 		{
 			if(IsPlayerInDynamicArea(i, PointToCapture) && i!=playerid && pTeam(i)!=DefendingTeam)GiveXP(i, 15, "Capture Assist");
-			if(bPlayerGameSettings[i]&InDM)HideProgressBarForPlayer(i, ADbar);
+			if(bPlayerGameSettings[i]&InDM) HidePlayerProgressBar(i, ADbar[i]);
 		}
 
 		ADfill=0;
