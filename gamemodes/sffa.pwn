@@ -29,7 +29,7 @@ native IsValidVehicle(vehicleid);
 #include <CTime>					// By RyDeR:				http://forum.sa-mp.com/showthread.php?t=294054
 #undef time
 
-#include <ini>						// By Southclaw:			https://gist.github.com/Southclaw/5979695/
+#include <ini>						// By Southclaw:			https://github.com/Southclaws/samp-ini/
 #include <progress2>				// By Torbido/Southclaw:	http://forum.sa-mp.com/showthread.php?t=537468
 #include <camera-sequencer>			// By Southclaw:			http://forum.sa-mp.com/showthread.php?t=329813
 #include <SIF>						// By Southclaw:			https://github.com/Southclaw/SIF
@@ -43,10 +43,10 @@ native IsValidVehicle(vehicleid);
 #include <SIF/old/Dispenser.pwn>
 
 #include <mathutil>
-#include <Balloon>					// By Southclaw:			https://gist.github.com/Southclaw/6254507
-#include <Linegen>					// By Southclaw:			https://gist.github.com/Southclaw/6254512
-#include <Zipline>					// By Southclaw:			https://gist.github.com/Southclaw/6254523
-#include <Ladders>					// By Southclaw:			https://gist.github.com/Southclaw/6254527
+#include <balloon>					// By Southclaw:			https://github.com/Southclaws/samp-balloon
+#include <linegen>					// By Southclaw:			https://github.com/Southclaws/samp-linegen
+#include <zipline>					// By Southclaw:			https://github.com/Southclaws/samp-zipline
+#include <ladders>					// By Southclaw:			https://github.com/Southclaws/samp-ladders
 
 #include <YSI\y_utils>				// By Y_Less:				http://forum.sa-mp.com/showthread.php?p=1696956
 #include <YSI\y_va>
